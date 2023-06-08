@@ -1,6 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>CSDN文章完美粘贴到Hexo上</title>
+    <url>/2023/06/08/CSDN%E6%96%87%E7%AB%A0%E5%AE%8C%E7%BE%8E%E7%B2%98%E8%B4%B4%E5%88%B0Hexo%E4%B8%8A/</url>
+    <content><![CDATA[<p>完美将csdn的md(包括图片)复制到hexo上<br>其实主要就是复制图片，因为csdn有防盗链，自己的hexo上不能拉取csdn上的图片资源</p>
+<h1 id="1-安装Typora"><a href="#1-安装Typora" class="headerlink" title="1. 安装Typora"></a>1. 安装Typora</h1><p>Typora作为本地的md编辑器，有在复制网络图片时，直接将其保存到本地的能力，我们可以利用这个实现<br>链接：<a class="link"   href="https://pan.baidu.com/s/1l8eGw_g6s2YJExXcGZCylw?pwd=qwer" >安装包及补丁百度网盘 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<h1 id="2-配置typora"><a href="#2-配置typora" class="headerlink" title="2.配置typora"></a>2.配置typora</h1><p>首先我们用typora，打开hexo的<code>source/_posts</code>目录，方便测试<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/CSDN%E6%96%87%E7%AB%A0%E5%AE%8C%E7%BE%8E%E7%B2%98%E8%B4%B4%E5%88%B0Hexo%E4%B8%8A/b1b6f95ef08f4c1e9dbc5779ae463818.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<p>把图片保存路径指定到本地hexo项目的<code>../article_images/$&#123;filename&#125;</code>下面，这样当你在typora里编辑posts里的md时，进行图片粘贴时，图片会保存在article_images里的文章同名文件夹下<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/CSDN%E6%96%87%E7%AB%A0%E5%AE%8C%E7%BE%8E%E7%B2%98%E8%B4%B4%E5%88%B0Hexo%E4%B8%8A/5d06effe27464379b492ea4fdd4120ff.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<p>下面展示了粘贴到Typora里的效果<br>有水印是个败笔，但我懒得弄图床或者OSS了，评价是能用就行<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/CSDN%E6%96%87%E7%AB%A0%E5%AE%8C%E7%BE%8E%E7%B2%98%E8%B4%B4%E5%88%B0Hexo%E4%B8%8A/1f40ad5b45744a14ae13b11f9b76e686.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/CSDN%E6%96%87%E7%AB%A0%E5%AE%8C%E7%BE%8E%E7%B2%98%E8%B4%B4%E5%88%B0Hexo%E4%B8%8A/02f2dc78f2f344eebc244e9bc71a250b.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h1 id="3-全文复制"><a href="#3-全文复制" class="headerlink" title="3.全文复制"></a>3.全文复制</h1><p>将CSDN的文章全选复制粘贴到typora里打开的posts目录里的md即可<br>注意hexo的md顶部的yml配置还是保留一下<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/CSDN%E6%96%87%E7%AB%A0%E5%AE%8C%E7%BE%8E%E7%B2%98%E8%B4%B4%E5%88%B0Hexo%E4%B8%8A/94dc4cd0af9e458b84b900e98e422088.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h1 id="4-部署看看效果"><a href="#4-部署看看效果" class="headerlink" title="4.部署看看效果"></a>4.部署看看效果</h1><div class="highlight-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="code"><pre><span class="line">hexo server</span><br></pre></td></tr></table></figure></div>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/CSDN%E6%96%87%E7%AB%A0%E5%AE%8C%E7%BE%8E%E7%B2%98%E8%B4%B4%E5%88%B0Hexo%E4%B8%8A/25631182bdf64d39b82b01d23fd7d04a.png"
+                      alt="在这里插入图片描述"
+                ></p>
+]]></content>
+  </entry>
+  <entry>
     <title>Hello World</title>
     <url>/2023/06/07/hello-world/</url>
     <content><![CDATA[<p>Welcome to <a class="link"   href="https://hexo.io/" >Hexo <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>! This is your very first post. Check <a class="link"   href="https://hexo.io/docs/" >documentation <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> for more info. If you get any problems when using Hexo, you can find the answer in <a class="link"   href="https://hexo.io/docs/troubleshooting.html" >troubleshooting <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> or you can ask me on <a class="link"   href="https://github.com/hexojs/hexo/issues" >GitHub <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>.</p>
@@ -29,17 +72,17 @@
 <p>再上传这个id_rsa.pub里的文本(即公钥)<br><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://img-blog.csdnimg.cn/779477f8707349fdb3b12422de41d674.png"
+                     data-src="/./../article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/779477f8707349fdb3b12422de41d674.png"
                       alt="在这里插入图片描述"
                 ><br>输入这行命令以验证是否成功<br><code>ssh -T git@github.com</code></p>
 <h1 id="安装golang"><a href="#安装golang" class="headerlink" title="安装golang"></a>安装golang</h1><ol>
 <li>下载<br><a class="link"   href="https://studygolang.com/dl" >下载地址 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a><br>也可<code>wget https://studygolang.com/dl/golang/go1.20.4.linux-amd64.tar.gz</code></li>
 <li>解压</li>
-<li>配环境变量<br>配置GOROOT(go核心内容的文件夹，即从官网下的那个)和GOPATH(go mod时存储第三方库的文件夹) <div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">vim /etc/profile</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">即刚刚解压的压缩包的文件夹</span></span><br><span class="line">export GOROOT=/usr/local/env/go</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">你自己指定一个存第三方库的文件夹</span></span><br><span class="line">export GOPATH=/usr/local/env/gopath</span><br><span class="line">export PATH=$PATH:$GOROOT/bin:$GOPATH/bin</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">保存退出</span></span><br><span class="line">:wq</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">配置生效</span></span><br><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure></div>
+<li>配环境变量<br> 配置GOROOT(go核心内容的文件夹，即从官网下的那个)和GOPATH(go mod时存储第三方库的文件夹) <div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">vim /etc/profile</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">即刚刚解压的压缩包的文件夹</span></span><br><span class="line">export GOROOT=/usr/local/env/go</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">你自己指定一个存第三方库的文件夹</span></span><br><span class="line">export GOPATH=/usr/local/env/gopath</span><br><span class="line">export PATH=$PATH:$GOROOT/bin:$GOPATH/bin</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">保存退出</span></span><br><span class="line">:wq</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">配置生效</span></span><br><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure></div>
  完全使用命令就是 <div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">echo &#x27;export GOROOT=/usr/local/env/go&#x27; &gt;&gt; /etc/profile</span><br><span class="line">echo &#x27;export GOPATH=/usr/local/env/gopath&#x27; &gt;&gt; /etc/profile</span><br><span class="line">echo &#x27;export PATH=$PATH:$GOROOT/bin:$GOPATH/bin&#x27; &gt;&gt; /etc/profile</span><br><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure></div></li>
 <li>改下go的配置，即开启module模式和下载的镜像源 <div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">go env -w GO111MODULE=on</span><br><span class="line">go env -w GOPROXY=https://mirrors.aliyun.com/goproxy/</span><br></pre></td></tr></table></figure></div>
  测试 <div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">go version</span><br><span class="line">go env</span><br></pre></td></tr></table></figure></div></li>
-<li>其他<br>我发现每次开个新shell，都要重新<code>source /etc/profile</code>才能正常使用<code>go version</code><br>看博客知道要再配一下<br>注意每个用户都要配一下这个 <div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">echo &#x27;source /etc/profile&#x27; &gt;&gt; ~/.bashrc</span><br></pre></td></tr></table></figure></div>
+<li>其他<br> 我发现每次开个新shell，都要重新<code>source /etc/profile</code>才能正常使用<code>go version</code><br> 看博客知道要再配一下<br> 注意每个用户都要配一下这个 <div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">echo &#x27;source /etc/profile&#x27; &gt;&gt; ~/.bashrc</span><br></pre></td></tr></table></figure></div>
  这样子每次开新shell就会触发这个命令</li>
 </ol>
 <h1 id="安装neovim"><a href="#安装neovim" class="headerlink" title="安装neovim"></a>安装neovim</h1><blockquote>
@@ -59,10 +102,10 @@
 </ol>
 <h2 id="二、编译neovim"><a href="#二、编译neovim" class="headerlink" title="二、编译neovim"></a>二、编译neovim</h2><ol>
 <li>下载源码 <div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">git clone -b v0.9.0 https://github.com/neovim/neovim.git ~/Downloads/neovim9</span><br></pre></td></tr></table></figure></div></li>
-<li>编译与安装<br>注意第二行的下载操作，可能会总是拉取不到github的项目，实在不行就进浏览器手动下，然后放在对应的位置，下载网址和放置路径在dos里都有展示 <div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">cd ~/Downloads/neovim9</span><br><span class="line">make CMAKE_EXTRA_FLAGS=&quot;-DCMAKE_INSTALL_PREFIX=/opt/neovim&quot;</span><br><span class="line">sudo make install</span><br><span class="line">sudo ln -s /opt/neovim/bin/nvim /usr/local/bin/nvim</span><br></pre></td></tr></table></figure></div></li>
+<li>编译与安装<br> 注意第二行的下载操作，可能会总是拉取不到github的项目，实在不行就进浏览器手动下，然后放在对应的位置，下载网址和放置路径在dos里都有展示 <div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">cd ~/Downloads/neovim9</span><br><span class="line">make CMAKE_EXTRA_FLAGS=&quot;-DCMAKE_INSTALL_PREFIX=/opt/neovim&quot;</span><br><span class="line">sudo make install</span><br><span class="line">sudo ln -s /opt/neovim/bin/nvim /usr/local/bin/nvim</span><br></pre></td></tr></table></figure></div></li>
 <li>测试<br>输入<code>nvim test.txt</code></li>
 <li>起别名，使<code>vim</code>命令会打开<code>nvim</code> <div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">echo &quot;alias vim=&#x27;nvim&#x27;&quot; &gt;&gt; /etc/profile</span><br><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure></div>
-treesitter报错可以不用管</li>
+ treesitter报错可以不用管</li>
 </ol>
 <ul>
 <li><p>安装NvChad<br><a class="link"   href="https://docs.rockylinux.org/books/nvchad/install_nvchad/" >Turning Neovim into an advanced IDE <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a><br>参考视频<a class="link"   href="https://www.bilibili.com/video/BV1nu411t7NM/?spm_id_from=333.337.search-card.all.click&vd_source=43b6af819307ca6bdad60477a02d8d1c" >针对Golang的NeoVim完美配置 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
@@ -70,17 +113,17 @@ treesitter报错可以不用管</li>
 <p>  然后输入nvim<br>  <img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://img-blog.csdnimg.cn/1773b057fe03459490f9e825b6c69d0f.png"
+                     data-src="/./../article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/1773b057fe03459490f9e825b6c69d0f.png"
                       alt="在这里插入图片描述"
                 ><br>  然后输入N<br>  然后等他把相关的插件下完(好像挂着梯子下快一点？)<br>  到这个界面就是下好了<br>  <img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://img-blog.csdnimg.cn/3ce95e7c730a43feb88d1440a11210e7.png"
+                     data-src="/./../article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/3ce95e7c730a43feb88d1440a11210e7.png"
                       alt="在这里插入图片描述"
                 ><br>然后输入<code>空格 th</code>来选主题<br><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://img-blog.csdnimg.cn/07da57a3f0ea4c548fdd13993cb437e9.png"
+                     data-src="/./../article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/07da57a3f0ea4c548fdd13993cb437e9.png"
                       alt="在这里插入图片描述"
                 ></p>
 </li>
@@ -95,12 +138,12 @@ treesitter报错可以不用管</li>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://img-blog.csdnimg.cn/123077b0f8ad433f88676290cbe24196.png"
+                     data-src="/./../article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/123077b0f8ad433f88676290cbe24196.png"
                       alt="在这里插入图片描述"
                 ><br>然后退出vim，再输入vim，输入命令<code>:MasonInstallAll</code><br>此时等一小会会出现<br><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://img-blog.csdnimg.cn/410c813a4ccb4ab39d1d3200f43a6c96.png"
+                     data-src="/./../article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/410c813a4ccb4ab39d1d3200f43a6c96.png"
                       alt="在这里插入图片描述"
                 ></p>
 <p>再添加如下</p>
@@ -108,7 +151,7 @@ treesitter报错可以不用管</li>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://img-blog.csdnimg.cn/7a69a6ecad1b45e5a15df5543396ebfd.png"
+                     data-src="/./../article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/7a69a6ecad1b45e5a15df5543396ebfd.png"
                       alt="在这里插入图片描述"
                 ></p>
 <blockquote>
@@ -124,22 +167,23 @@ treesitter报错可以不用管</li>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://img-blog.csdnimg.cn/ba5e51e6f8624d8db666e1fc78d69907.png"
+                     data-src="/./../article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/ba5e51e6f8624d8db666e1fc78d69907.png"
                       alt="在这里插入图片描述"
                 ></p>
 <p>……………………..不想写了，跟着视频配吧</p>
+<p>​	</p>
 <h1 id="安装Nerd字体"><a href="#安装Nerd字体" class="headerlink" title="安装Nerd字体"></a>安装Nerd字体</h1><p><a class="link"   href="https://blog.csdn.net/HUSTHY/article/details/104023077" >ubuntu系统添加新的字体——JetBrains Mono 字体添加实例 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a><br><a class="link"   href="https://www.nerdfonts.com/font-downloads" >字体下载网站 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
 <p>用jetbrains mono即可</p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://img-blog.csdnimg.cn/adeba8ca4c864e5c9105e2b55c9177c4.png"
+                     data-src="/./../article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/adeba8ca4c864e5c9105e2b55c9177c4.png"
                       alt="在这里插入图片描述"
                 ></p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://img-blog.csdnimg.cn/f02f262f9ec84c4db14308ea8c312289.png"
+                     data-src="/./../article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/f02f262f9ec84c4db14308ea8c312289.png"
                       alt="在这里插入图片描述"
                 ></p>
 <h1 id="nvim-tree"><a href="#nvim-tree" class="headerlink" title="nvim-tree"></a>nvim-tree</h1><p>自带，在normal模式下用<code>ctrl n</code>唤出<br><code>ctrl h</code>和<code>ctrl l</code>切换左右</p>
@@ -179,8 +223,8 @@ treesitter报错可以不用管</li>
     <content><![CDATA[<p>因为标题还是属于yml的一部分，所以对于冒号的处理还是有问题<br>网上推荐的使用转义字符的方法没用<br>我找到一篇用了单引号的，可行<br>所以标题这样写就可以了<br><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/images/hexo%E6%A0%87%E9%A2%98%E7%9A%84%E5%86%92%E5%8F%B7%E9%97%AE%E9%A2%98/1.jpg"
-                      alt="图片1"
+                     data-src="/./../article_images/hexo%E6%A0%87%E9%A2%98%E7%9A%84%E5%86%92%E5%8F%B7%E9%97%AE%E9%A2%98/image-20230608154626024.png"
+                      alt="image-20230608154626024"
                 ></p>
 ]]></content>
       <categories>
@@ -188,6 +232,23 @@ treesitter报错可以不用管</li>
       </categories>
       <tags>
         <tag>hexo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hexo安装资源压缩插件报错，Command failed: C:&#92;Windows&#92;system32&#92;cmd.exe /s /c &quot;autoreconf -ivf&quot;</title>
+    <url>/2023/06/07/%E8%B5%84%E6%BA%90%E5%8E%8B%E7%BC%A9%E6%8F%92%E4%BB%B6%E6%8A%A5%E9%94%99/</url>
+    <content><![CDATA[<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><div class="note-large blue"><div class="notel-title"><p>修改windows的hosts文件</p>
+</div><div class="notel-content"><p>修改C:\Windows\System32\drivers\etc\hosts<br>添加一行<br>151.101.76.133    raw.githubusercontent.com</p>
+</div></div>
+<p>然后就可以愉快安装了</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">npm install hexo-all-minifier --save</span><br></pre></td></tr></table></figure></div>]]></content>
+      <categories>
+        <category>报错解决</category>
+      </categories>
+      <tags>
+        <tag>hexo</tag>
+        <tag>npm</tag>
+        <tag>windows</tag>
       </tags>
   </entry>
   <entry>
@@ -503,23 +564,6 @@ treesitter报错可以不用管</li>
         <tag>CSS</tag>
         <tag>JavaScript</tag>
         <tag>Vue</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Hexo安装资源压缩插件报错，Command failed: C:&#92;Windows&#92;system32&#92;cmd.exe /s /c &quot;autoreconf -ivf&quot;</title>
-    <url>/2023/06/07/%E8%B5%84%E6%BA%90%E5%8E%8B%E7%BC%A9%E6%8F%92%E4%BB%B6%E6%8A%A5%E9%94%99/</url>
-    <content><![CDATA[<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><div class="note-large blue"><div class="notel-title"><p>修改windows的hosts文件</p>
-</div><div class="notel-content"><p>修改C:\Windows\System32\drivers\etc\hosts<br>添加一行<br>151.101.76.133    raw.githubusercontent.com</p>
-</div></div>
-<p>然后就可以愉快安装了</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">npm install hexo-all-minifier --save</span><br></pre></td></tr></table></figure></div>]]></content>
-      <categories>
-        <category>报错解决</category>
-      </categories>
-      <tags>
-        <tag>hexo</tag>
-        <tag>npm</tag>
-        <tag>windows</tag>
       </tags>
   </entry>
 </search>
