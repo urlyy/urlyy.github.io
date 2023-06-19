@@ -673,6 +673,9 @@
     <url>/2023/06/11/%E8%AE%B0%E5%BD%95/</url>
     <content><![CDATA[<p><a class="link"   href="https://zhuanlan.zhihu.com/p/600213330" >https://zhuanlan.zhihu.com/p/600213330 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
 ]]></content>
+      <tags>
+        <tag>不时之需</tag>
+      </tags>
   </entry>
   <entry>
     <title>Hexo安装资源压缩插件报错，Command failed: C:&#92;Windows&#92;system32&#92;cmd.exe /s /c &quot;autoreconf -ivf&quot;</title>
