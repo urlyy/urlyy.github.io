@@ -53,8 +53,8 @@
                 ></li>
 </ul>
 <h1 id="完成过程"><a href="#完成过程" class="headerlink" title="完成过程"></a>完成过程</h1><h2 id="配置环境"><a href="#配置环境" class="headerlink" title="配置环境"></a>配置环境</h2><ol>
-<li>Go（参考我写的<a class="link"   href="https://blog.csdn.net/qq_51955445/article/details/126564406" >deepin搭建go开发环境（git、go、neovim、NvChad、Nerd Font） <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>，只要看go部分就行了）<br>deepin和ubuntu都是用apt<br>注意<font color="red"><strong>我的go版本是1.20.4</strong></font>，所以部分代码可能不能在较低版本的Go上编译成功</li>
-<li>Goland（因为我vsc总是报权限不足，nvim也用的繁琐，果然还得是正宗IDE靠谱）<br>链接：<a class="link"   href="https://pan.baidu.com/s/1BWEFf8zeLnud98fy5hOTiQ?pwd=qwer" >GoLand下载方式（含POJIE） <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
+<li>Go（参考我写的<a class="link"   href="https://urlyy.github.io/2023/06/07/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/" >deepin搭建go开发环境（git、go、neovim、NvChad、Nerd Font） <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>，只要看go部分就行了）<br>deepin和ubuntu都是用apt<br>注意<font color="red"><strong>我的go版本是1.20.4</strong></font>，所以部分代码可能不能在较低版本的Go上编译成功</li>
+<li>Goland（因为我vsc总是报权限不足，nvim也用的繁琐，果然还得是正宗IDE靠谱）<br>链接：<a class="link"   href="https://pan.baidu.com/s/1BWEFf8zeLnud98fy5hOTiQ?pwd=qwer" >Jetbrains全家桶破解文件 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
 <li>配一下Goland运行程序的方式<br>参考了下别人配的Goland教程，可以减少很多的测试时间，而且也是第一次学着搭配命令行参数配置运行程序<br><img  
                      lazyload
                      src="/images/loading.svg"
@@ -168,25 +168,6 @@
       <tags>
         <tag>hexo</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>Hello World</title>
-    <url>/2023/06/07/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a class="link"   href="https://hexo.io/" >Hexo <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>! This is your very first post. Check <a class="link"   href="https://hexo.io/docs/" >documentation <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> for more info. If you get any problems when using Hexo, you can find the answer in <a class="link"   href="https://hexo.io/docs/troubleshooting.html" >troubleshooting <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> or you can ask me on <a class="link"   href="https://github.com/hexojs/hexo/issues" >GitHub <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure></div>
-
-<p>More info: <a class="link"   href="https://hexo.io/docs/writing.html" >Writing <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure></div>
-
-<p>More info: <a class="link"   href="https://hexo.io/docs/server.html" >Server <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure></div>
-
-<p>More info: <a class="link"   href="https://hexo.io/docs/generating.html" >Generating <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure></div>
-
-<p>More info: <a class="link"   href="https://hexo.io/docs/one-command-deployment.html" >Deployment <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-<h1 id="Redefine主题文档"><a href="#Redefine主题文档" class="headerlink" title="Redefine主题文档"></a>Redefine主题文档</h1><p><a class="link"   href="https://redefine-docs.ohevan.com/getting-started" >快速开始 - Redefine Docs (ohevan.com) <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-]]></content>
   </entry>
   <entry>
     <title>deepin搭建go开发环境（git、go、neovim、nvchad、nerd)</title>
@@ -345,6 +326,25 @@
       </tags>
   </entry>
   <entry>
+    <title>Hello World</title>
+    <url>/2023/06/07/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a class="link"   href="https://hexo.io/" >Hexo <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>! This is your very first post. Check <a class="link"   href="https://hexo.io/docs/" >documentation <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> for more info. If you get any problems when using Hexo, you can find the answer in <a class="link"   href="https://hexo.io/docs/troubleshooting.html" >troubleshooting <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> or you can ask me on <a class="link"   href="https://github.com/hexojs/hexo/issues" >GitHub <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure></div>
+
+<p>More info: <a class="link"   href="https://hexo.io/docs/writing.html" >Writing <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure></div>
+
+<p>More info: <a class="link"   href="https://hexo.io/docs/server.html" >Server <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure></div>
+
+<p>More info: <a class="link"   href="https://hexo.io/docs/generating.html" >Generating <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure></div>
+
+<p>More info: <a class="link"   href="https://hexo.io/docs/one-command-deployment.html" >Deployment <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<h1 id="Redefine主题文档"><a href="#Redefine主题文档" class="headerlink" title="Redefine主题文档"></a>Redefine主题文档</h1><p><a class="link"   href="https://redefine-docs.ohevan.com/getting-started" >快速开始 - Redefine Docs (ohevan.com) <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+]]></content>
+  </entry>
+  <entry>
     <title>解决Hexo标题的冒号问题</title>
     <url>/2023/06/08/hexo%E6%A0%87%E9%A2%98%E7%9A%84%E5%86%92%E5%8F%B7%E9%97%AE%E9%A2%98/</url>
     <content><![CDATA[<p>因为标题还是属于yml的一部分，所以对于冒号的处理还是有问题<br>网上推荐的使用转义字符的方法没用<br>我找到一篇用了单引号的，可行<br>所以标题这样写就可以了<br><img  
@@ -359,6 +359,15 @@
       </categories>
       <tags>
         <tag>hexo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>记录</title>
+    <url>/2023/06/11/%E8%AE%B0%E5%BD%95/</url>
+    <content><![CDATA[<p><a class="link"   href="https://zhuanlan.zhihu.com/p/600213330" >https://zhuanlan.zhihu.com/p/600213330 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+]]></content>
+      <tags>
+        <tag>不时之需</tag>
       </tags>
   </entry>
   <entry>
@@ -666,15 +675,6 @@
         <tag>CSS</tag>
         <tag>JavaScript</tag>
         <tag>Vue</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>记录</title>
-    <url>/2023/06/11/%E8%AE%B0%E5%BD%95/</url>
-    <content><![CDATA[<p><a class="link"   href="https://zhuanlan.zhihu.com/p/600213330" >https://zhuanlan.zhihu.com/p/600213330 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-]]></content>
-      <tags>
-        <tag>不时之需</tag>
       </tags>
   </entry>
   <entry>
