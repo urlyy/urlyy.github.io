@@ -2,7 +2,7 @@
 <search>
   <entry>
     <title>6.5840-lab1-mr记录</title>
-    <url>/2023/03/19/6-5840-mr-lab1%E8%AE%B0%E5%BD%95/</url>
+    <url>/2023/02/19/6-5840-mr-lab1%E8%AE%B0%E5%BD%95/</url>
     <content><![CDATA[<p>6.5840分布式(前6.824)—Lab1 MapReduce 学习记录</p>
 <h1 id="MapReduce"><a href="#MapReduce" class="headerlink" title="MapReduce"></a>MapReduce</h1><p><img  
                      lazyload
@@ -119,57 +119,6 @@
       </tags>
   </entry>
   <entry>
-    <title>CSDN文章完美粘贴到Hexo上</title>
-    <url>/2023/06/08/CSDN%E6%96%87%E7%AB%A0%E5%AE%8C%E7%BE%8E%E7%B2%98%E8%B4%B4%E5%88%B0Hexo%E4%B8%8A/</url>
-    <content><![CDATA[<p>完美将csdn的md(包括图片)复制到hexo上<br>其实主要就是复制图片，因为csdn有防盗链，自己的hexo上不能拉取csdn上的图片资源</p>
-<h1 id="1-安装Typora"><a href="#1-安装Typora" class="headerlink" title="1. 安装Typora"></a>1. 安装Typora</h1><p>Typora作为本地的md编辑器，有在复制网络图片时，直接将其保存到本地的能力，我们可以利用这个实现<br>链接：<a class="link"   href="https://pan.baidu.com/s/1l8eGw_g6s2YJExXcGZCylw?pwd=qwer" >安装包及补丁百度网盘 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-<h1 id="2-配置typora"><a href="#2-配置typora" class="headerlink" title="2.配置typora"></a>2.配置typora</h1><p>首先我们用typora，打开hexo的<code>source/_posts</code>目录，方便测试<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/./../article_images/CSDN%E6%96%87%E7%AB%A0%E5%AE%8C%E7%BE%8E%E7%B2%98%E8%B4%B4%E5%88%B0Hexo%E4%B8%8A/b1b6f95ef08f4c1e9dbc5779ae463818.png"
-                      alt="在这里插入图片描述"
-                ></p>
-<p>把图片保存路径指定到本地hexo项目的<code>../article_images/$&#123;filename&#125;</code>下面，这样当你在typora里编辑posts里的md时，进行图片粘贴时，图片会保存在article_images里的文章同名文件夹下<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/./../article_images/CSDN%E6%96%87%E7%AB%A0%E5%AE%8C%E7%BE%8E%E7%B2%98%E8%B4%B4%E5%88%B0Hexo%E4%B8%8A/5d06effe27464379b492ea4fdd4120ff.png"
-                      alt="在这里插入图片描述"
-                ></p>
-<p>下面展示了粘贴到Typora里的效果<br>有水印是个败笔，但我懒得弄图床或者OSS了，评价是能用就行<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/./../article_images/CSDN%E6%96%87%E7%AB%A0%E5%AE%8C%E7%BE%8E%E7%B2%98%E8%B4%B4%E5%88%B0Hexo%E4%B8%8A/1f40ad5b45744a14ae13b11f9b76e686.png"
-                      alt="在这里插入图片描述"
-                ><br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/./../article_images/CSDN%E6%96%87%E7%AB%A0%E5%AE%8C%E7%BE%8E%E7%B2%98%E8%B4%B4%E5%88%B0Hexo%E4%B8%8A/02f2dc78f2f344eebc244e9bc71a250b.png"
-                      alt="在这里插入图片描述"
-                ></p>
-<h1 id="3-全文复制"><a href="#3-全文复制" class="headerlink" title="3.全文复制"></a>3.全文复制</h1><p>将CSDN的文章全选复制粘贴到typora里打开的posts目录里的md即可<br>注意hexo的md顶部的yml配置还是保留一下</p>
-<p>注意不要在typora的源代码模式下进行粘贴，不然不会将网图保存到本地</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/./../article_images/CSDN%E6%96%87%E7%AB%A0%E5%AE%8C%E7%BE%8E%E7%B2%98%E8%B4%B4%E5%88%B0Hexo%E4%B8%8A/94dc4cd0af9e458b84b900e98e422088.png"
-                      alt="在这里插入图片描述"
-                ></p>
-<h1 id="4-部署看看效果"><a href="#4-部署看看效果" class="headerlink" title="4.部署看看效果"></a>4.部署看看效果</h1><div class="highlight-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="code"><pre><span class="line">hexo server</span><br></pre></td></tr></table></figure></div>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/./../article_images/CSDN%E6%96%87%E7%AB%A0%E5%AE%8C%E7%BE%8E%E7%B2%98%E8%B4%B4%E5%88%B0Hexo%E4%B8%8A/25631182bdf64d39b82b01d23fd7d04a.png"
-                      alt="在这里插入图片描述"
-                ></p>
-]]></content>
-      <categories>
-        <category>trick</category>
-      </categories>
-      <tags>
-        <tag>hexo</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>AVL树实现练习</title>
     <url>/2022/02/05/AVL%E6%A0%91%E7%BB%83%E4%B9%A0/</url>
     <content><![CDATA[<p>debug了好久才写出来的平衡树，代码里有注释可以方便理解<br>可能有代码冗余或者有误的地方，欢迎指出错误<br><strong>（好像因为是看了别人的博客，所以混淆了结点高度这个概念，我先解释一下我代码里的Height&#x3D;当前结点到叶子结点的经过的边+1）</strong><br>很抱歉影响了你的观看体验！<br><img  
@@ -232,6 +181,62 @@
       </categories>
       <tags>
         <tag>树</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>6.5840-raft-lab2记录-TODO</title>
+    <url>/2023/06/20/6-5840-raft-lab2%E8%AE%B0%E5%BD%95-TODO/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title>CSDN文章完美粘贴到Hexo上</title>
+    <url>/2023/06/08/CSDN%E6%96%87%E7%AB%A0%E5%AE%8C%E7%BE%8E%E7%B2%98%E8%B4%B4%E5%88%B0Hexo%E4%B8%8A/</url>
+    <content><![CDATA[<p>完美将csdn的md(包括图片)复制到hexo上<br>其实主要就是复制图片，因为csdn有防盗链，自己的hexo上不能拉取csdn上的图片资源</p>
+<h1 id="1-安装Typora"><a href="#1-安装Typora" class="headerlink" title="1. 安装Typora"></a>1. 安装Typora</h1><p>Typora作为本地的md编辑器，有在复制网络图片时，直接将其保存到本地的能力，我们可以利用这个实现<br>链接：<a class="link"   href="https://pan.baidu.com/s/1l8eGw_g6s2YJExXcGZCylw?pwd=qwer" >安装包及补丁百度网盘 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<h1 id="2-配置typora"><a href="#2-配置typora" class="headerlink" title="2.配置typora"></a>2.配置typora</h1><p>首先我们用typora，打开hexo的<code>source/_posts</code>目录，方便测试<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/CSDN%E6%96%87%E7%AB%A0%E5%AE%8C%E7%BE%8E%E7%B2%98%E8%B4%B4%E5%88%B0Hexo%E4%B8%8A/b1b6f95ef08f4c1e9dbc5779ae463818.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<p>把图片保存路径指定到本地hexo项目的<code>../article_images/$&#123;filename&#125;</code>下面，这样当你在typora里编辑posts里的md时，进行图片粘贴时，图片会保存在article_images里的文章同名文件夹下<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/CSDN%E6%96%87%E7%AB%A0%E5%AE%8C%E7%BE%8E%E7%B2%98%E8%B4%B4%E5%88%B0Hexo%E4%B8%8A/5d06effe27464379b492ea4fdd4120ff.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<p>下面展示了粘贴到Typora里的效果<br>有水印是个败笔，但我懒得弄图床或者OSS了，评价是能用就行<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/CSDN%E6%96%87%E7%AB%A0%E5%AE%8C%E7%BE%8E%E7%B2%98%E8%B4%B4%E5%88%B0Hexo%E4%B8%8A/1f40ad5b45744a14ae13b11f9b76e686.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/CSDN%E6%96%87%E7%AB%A0%E5%AE%8C%E7%BE%8E%E7%B2%98%E8%B4%B4%E5%88%B0Hexo%E4%B8%8A/02f2dc78f2f344eebc244e9bc71a250b.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h1 id="3-全文复制"><a href="#3-全文复制" class="headerlink" title="3.全文复制"></a>3.全文复制</h1><p>将CSDN的文章全选复制粘贴到typora里打开的posts目录里的md即可<br>注意hexo的md顶部的yml配置还是保留一下</p>
+<p>注意不要在typora的源代码模式下进行粘贴，不然不会将网图保存到本地</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/CSDN%E6%96%87%E7%AB%A0%E5%AE%8C%E7%BE%8E%E7%B2%98%E8%B4%B4%E5%88%B0Hexo%E4%B8%8A/94dc4cd0af9e458b84b900e98e422088.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h1 id="4-部署看看效果"><a href="#4-部署看看效果" class="headerlink" title="4.部署看看效果"></a>4.部署看看效果</h1><div class="highlight-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="code"><pre><span class="line">hexo server</span><br></pre></td></tr></table></figure></div>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/CSDN%E6%96%87%E7%AB%A0%E5%AE%8C%E7%BE%8E%E7%B2%98%E8%B4%B4%E5%88%B0Hexo%E4%B8%8A/25631182bdf64d39b82b01d23fd7d04a.png"
+                      alt="在这里插入图片描述"
+                ></p>
+]]></content>
+      <categories>
+        <category>trick</category>
+      </categories>
+      <tags>
+        <tag>hexo</tag>
       </tags>
   </entry>
   <entry>
@@ -554,6 +559,48 @@
       </categories>
   </entry>
   <entry>
+    <title>casbin权限和配置文件的理解</title>
+    <url>/2023/01/23/casbin%E6%9D%83%E9%99%90%E5%92%8C%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E7%90%86%E8%A7%A3/</url>
+    <content><![CDATA[<blockquote>
+<p><a class="link"   href="https://casbin.org/zh/docs/syntax-for-models" >官方文档 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+</blockquote>
+<h1 id="基础权限模型"><a href="#基础权限模型" class="headerlink" title="基础权限模型"></a>基础权限模型</h1><p>下图为我基于个人理解画出来的(关于多租户RBAC模型可能有误)<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/casbin%E6%9D%83%E9%99%90%E5%92%8C%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E7%90%86%E8%A7%A3/378049c141444624996c7d0b484ee55a.png"
+                      alt="在这里插入图片描述"
+                ><br>发现一篇博客讲的还行<a class="link"   href="https://blog.csdn.net/lk2684753/article/details/99680892" >Casbin权限模型 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>，看他的<strong>权限系统设计模型分析</strong>部分</p>
+<h1 id="casbin配置文件内容的结构解释"><a href="#casbin配置文件内容的结构解释" class="headerlink" title="casbin配置文件内容的结构解释"></a>casbin配置文件内容的结构解释</h1><p>注意<code>matchers</code>可以设置多个。我在知道这个之前一直疑惑为什么需要<code>policy_effect</code><br><code>policy.csv</code>只是一个数据文件，即持久化了的用户权限数据，也可以存在<code>数据库</code>中<br>而<code>model.conf</code>一般在设计项目权限模型时就定好了，一般就用<code>conf文件</code>或者<code>字符串形式</code><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/casbin%E6%9D%83%E9%99%90%E5%92%8C%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E7%90%86%E8%A7%A3/6ccbdac64106499584d24eea65476274.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h1 id="model-conf文档相关"><a href="#model-conf文档相关" class="headerlink" title="model.conf文档相关"></a>model.conf文档相关</h1><ul>
+<li>至少包含<code>[request_definition], [policy_definition], [policy_effect], [matchers]</code></li>
+<li>使用<code>#</code>进行注释</li>
+<li><code>[policy_definition]</code>如果只有操作没有具体资源，比如<code>write-all-objects</code>，可以只写<code>p = sub, act</code></li>
+<li>[policy_effect]：自己去看官方文档吧，感觉怪怪的</li>
+</ul>
+<h1 id="模型方案的具体实现"><a href="#模型方案的具体实现" class="headerlink" title="模型方案的具体实现"></a>模型方案的具体实现</h1><ul>
+<li>ACL(最基础的，后面模型的改变均基于此)  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">[request_definition]</span><br><span class="line">r = sub, obj, act</span><br><span class="line"></span><br><span class="line">[policy_definition]</span><br><span class="line">p = sub, obj, act</span><br><span class="line"></span><br><span class="line">[policy_effect]</span><br><span class="line">e = some(where (p.eft == allow))</span><br><span class="line"></span><br><span class="line">[matchers]</span><br><span class="line">m = r.sub == p.sub &amp;&amp; r.obj == p.obj &amp;&amp; r.act == p.act</span><br></pre></td></tr></table></figure></div></li>
+<li>有超级用户的ACL：<br>  matchers加个<code>如果是超级用户就放行</code>  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">m = r.sub == p.sub &amp;&amp; r.obj == p.obj &amp;&amp; r.act == p.act || r.sub == &quot;root&quot;</span><br></pre></td></tr></table></figure></div></li>
+<li>没有用户、只有资源和操作的ACL<br>  去掉所有的<code>sub</code>  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">r = obj, act</span><br><span class="line">p = obj, act</span><br><span class="line">m = r.obj == p.obj &amp;&amp; r.act == p.act</span><br></pre></td></tr></table></figure></div></li>
+<li>基础RBAC<br>  添加<code>role_definition</code>，且只有两个下划线  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">[role_definition]</span><br><span class="line">g = _, _</span><br></pre></td></tr></table></figure></div>
+  matcher添加<code>用户-角色</code>关联  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">m = g(r.sub, p.sub) &amp;&amp; r.obj == p.obj &amp;&amp; r.act == p.act</span><br></pre></td></tr></table></figure></div></li>
+<li>具有资源角色的RBAC<br>  相比<code>基础RBAC</code>添加<code>角色-资源</code>关联  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">g = _, _</span><br><span class="line">g2 = _, _</span><br><span class="line"></span><br><span class="line">m = g(r.sub, p.sub) &amp;&amp; g2(r.obj, p.obj) &amp;&amp; r.act == p.act</span><br></pre></td></tr></table></figure></div></li>
+<li>带有域&#x2F;租户的RBAC	<br>  三个下划线并添加关联  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">g = _, _, _</span><br><span class="line"></span><br><span class="line">m = g(r.sub, p.sub, r.dom) &amp;&amp; r.dom == p.dom &amp;&amp; r.obj == p.obj &amp;&amp; r.act == p.act</span><br></pre></td></tr></table></figure></div></li>
+<li>ABAC<br>  <code>matchers</code>进行属性的过滤，且不需要<code>policy</code>文件，因为权限是<code>即时</code>得出的  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">m = r.sub == r.obj.Owner</span><br></pre></td></tr></table></figure></div></li>
+<li>Restful<br>  <code>matchers</code>进行<code>正则</code>匹配  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">m = r.sub == p.sub &amp;&amp; keyMatch(r.obj, p.obj) &amp;&amp; regexMatch(r.act, p.act)</span><br></pre></td></tr></table></figure></div></li>
+<li>matcher全<code>allow</code>才<code>true</code>  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">e = !some(where (p.eft == deny))</span><br></pre></td></tr></table></figure></div></li>
+</ul>
+]]></content>
+      <categories>
+        <category>权限</category>
+        <category>笔记</category>
+      </categories>
+  </entry>
+  <entry>
     <title>deepin搭建go开发环境（git、go、neovim、nvchad、nerd)</title>
     <url>/2023/06/07/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/</url>
     <content><![CDATA[<h1 id="安装deepin虚拟机"><a href="#安装deepin虚拟机" class="headerlink" title="安装deepin虚拟机"></a>安装deepin虚拟机</h1><p><a class="link"   href="https://www.deepin.org/zh/download/" >官网下载地址 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a><br>vmware中记得版本选择是<code>debian 10.x 64位</code><br>然后就是一些确认操作，然后就可以了</p>
@@ -710,65 +757,6 @@
       </tags>
   </entry>
   <entry>
-    <title>casbin权限和配置文件的理解</title>
-    <url>/2023/01/23/casbin%E6%9D%83%E9%99%90%E5%92%8C%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E7%90%86%E8%A7%A3/</url>
-    <content><![CDATA[<blockquote>
-<p><a class="link"   href="https://casbin.org/zh/docs/syntax-for-models" >官方文档 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-</blockquote>
-<h1 id="基础权限模型"><a href="#基础权限模型" class="headerlink" title="基础权限模型"></a>基础权限模型</h1><p>下图为我基于个人理解画出来的(关于多租户RBAC模型可能有误)<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/./../article_images/casbin%E6%9D%83%E9%99%90%E5%92%8C%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E7%90%86%E8%A7%A3/378049c141444624996c7d0b484ee55a.png"
-                      alt="在这里插入图片描述"
-                ><br>发现一篇博客讲的还行<a class="link"   href="https://blog.csdn.net/lk2684753/article/details/99680892" >Casbin权限模型 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>，看他的<strong>权限系统设计模型分析</strong>部分</p>
-<h1 id="casbin配置文件内容的结构解释"><a href="#casbin配置文件内容的结构解释" class="headerlink" title="casbin配置文件内容的结构解释"></a>casbin配置文件内容的结构解释</h1><p>注意<code>matchers</code>可以设置多个。我在知道这个之前一直疑惑为什么需要<code>policy_effect</code><br><code>policy.csv</code>只是一个数据文件，即持久化了的用户权限数据，也可以存在<code>数据库</code>中<br>而<code>model.conf</code>一般在设计项目权限模型时就定好了，一般就用<code>conf文件</code>或者<code>字符串形式</code><br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/./../article_images/casbin%E6%9D%83%E9%99%90%E5%92%8C%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E7%90%86%E8%A7%A3/6ccbdac64106499584d24eea65476274.png"
-                      alt="在这里插入图片描述"
-                ></p>
-<h1 id="model-conf文档相关"><a href="#model-conf文档相关" class="headerlink" title="model.conf文档相关"></a>model.conf文档相关</h1><ul>
-<li>至少包含<code>[request_definition], [policy_definition], [policy_effect], [matchers]</code></li>
-<li>使用<code>#</code>进行注释</li>
-<li><code>[policy_definition]</code>如果只有操作没有具体资源，比如<code>write-all-objects</code>，可以只写<code>p = sub, act</code></li>
-<li>[policy_effect]：自己去看官方文档吧，感觉怪怪的</li>
-</ul>
-<h1 id="模型方案的具体实现"><a href="#模型方案的具体实现" class="headerlink" title="模型方案的具体实现"></a>模型方案的具体实现</h1><ul>
-<li>ACL(最基础的，后面模型的改变均基于此)  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">[request_definition]</span><br><span class="line">r = sub, obj, act</span><br><span class="line"></span><br><span class="line">[policy_definition]</span><br><span class="line">p = sub, obj, act</span><br><span class="line"></span><br><span class="line">[policy_effect]</span><br><span class="line">e = some(where (p.eft == allow))</span><br><span class="line"></span><br><span class="line">[matchers]</span><br><span class="line">m = r.sub == p.sub &amp;&amp; r.obj == p.obj &amp;&amp; r.act == p.act</span><br></pre></td></tr></table></figure></div></li>
-<li>有超级用户的ACL：<br>  matchers加个<code>如果是超级用户就放行</code>  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">m = r.sub == p.sub &amp;&amp; r.obj == p.obj &amp;&amp; r.act == p.act || r.sub == &quot;root&quot;</span><br></pre></td></tr></table></figure></div></li>
-<li>没有用户、只有资源和操作的ACL<br>  去掉所有的<code>sub</code>  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">r = obj, act</span><br><span class="line">p = obj, act</span><br><span class="line">m = r.obj == p.obj &amp;&amp; r.act == p.act</span><br></pre></td></tr></table></figure></div></li>
-<li>基础RBAC<br>  添加<code>role_definition</code>，且只有两个下划线  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">[role_definition]</span><br><span class="line">g = _, _</span><br></pre></td></tr></table></figure></div>
-  matcher添加<code>用户-角色</code>关联  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">m = g(r.sub, p.sub) &amp;&amp; r.obj == p.obj &amp;&amp; r.act == p.act</span><br></pre></td></tr></table></figure></div></li>
-<li>具有资源角色的RBAC<br>  相比<code>基础RBAC</code>添加<code>角色-资源</code>关联  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">g = _, _</span><br><span class="line">g2 = _, _</span><br><span class="line"></span><br><span class="line">m = g(r.sub, p.sub) &amp;&amp; g2(r.obj, p.obj) &amp;&amp; r.act == p.act</span><br></pre></td></tr></table></figure></div></li>
-<li>带有域&#x2F;租户的RBAC	<br>  三个下划线并添加关联  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">g = _, _, _</span><br><span class="line"></span><br><span class="line">m = g(r.sub, p.sub, r.dom) &amp;&amp; r.dom == p.dom &amp;&amp; r.obj == p.obj &amp;&amp; r.act == p.act</span><br></pre></td></tr></table></figure></div></li>
-<li>ABAC<br>  <code>matchers</code>进行属性的过滤，且不需要<code>policy</code>文件，因为权限是<code>即时</code>得出的  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">m = r.sub == r.obj.Owner</span><br></pre></td></tr></table></figure></div></li>
-<li>Restful<br>  <code>matchers</code>进行<code>正则</code>匹配  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">m = r.sub == p.sub &amp;&amp; keyMatch(r.obj, p.obj) &amp;&amp; regexMatch(r.act, p.act)</span><br></pre></td></tr></table></figure></div></li>
-<li>matcher全<code>allow</code>才<code>true</code>  <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">e = !some(where (p.eft == deny))</span><br></pre></td></tr></table></figure></div></li>
-</ul>
-]]></content>
-      <categories>
-        <category>权限</category>
-        <category>笔记</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>解决Hexo标题的冒号问题</title>
-    <url>/2023/06/08/hexo%E6%A0%87%E9%A2%98%E7%9A%84%E5%86%92%E5%8F%B7%E9%97%AE%E9%A2%98/</url>
-    <content><![CDATA[<p>因为标题还是属于yml的一部分，所以对于冒号的处理还是有问题<br>网上推荐的使用转义字符的方法没用<br>我找到一篇用了单引号的，可行<br>所以标题这样写就可以了<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/./../article_images/hexo%E6%A0%87%E9%A2%98%E7%9A%84%E5%86%92%E5%8F%B7%E9%97%AE%E9%A2%98/image-20230608154626024.png"
-                      alt="image-20230608154626024"
-                ></p>
-]]></content>
-      <categories>
-        <category>报错解决</category>
-      </categories>
-      <tags>
-        <tag>hexo</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Hello World</title>
     <url>/2021/09/06/hello-world/</url>
     <content><![CDATA[<p>Welcome to <a class="link"   href="https://hexo.io/" >Hexo <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>! This is your very first post. Check <a class="link"   href="https://hexo.io/docs/" >documentation <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> for more info. If you get any problems when using Hexo, you can find the answer in <a class="link"   href="https://hexo.io/docs/troubleshooting.html" >troubleshooting <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> or you can ask me on <a class="link"   href="https://github.com/hexojs/hexo/issues" >GitHub <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>.</p>
@@ -786,6 +774,23 @@
 <p>More info: <a class="link"   href="https://hexo.io/docs/one-command-deployment.html" >Deployment <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
 <h1 id="Redefine主题文档"><a href="#Redefine主题文档" class="headerlink" title="Redefine主题文档"></a>Redefine主题文档</h1><p><a class="link"   href="https://redefine-docs.ohevan.com/getting-started" >快速开始 - Redefine Docs (ohevan.com) <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
 ]]></content>
+  </entry>
+  <entry>
+    <title>解决Hexo标题的冒号问题</title>
+    <url>/2023/06/08/hexo%E6%A0%87%E9%A2%98%E7%9A%84%E5%86%92%E5%8F%B7%E9%97%AE%E9%A2%98/</url>
+    <content><![CDATA[<p>因为标题还是属于yml的一部分，所以对于冒号的处理还是有问题<br>网上推荐的使用转义字符的方法没用<br>我找到一篇用了单引号的，可行<br>所以标题这样写就可以了<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/hexo%E6%A0%87%E9%A2%98%E7%9A%84%E5%86%92%E5%8F%B7%E9%97%AE%E9%A2%98/image-20230608154626024.png"
+                      alt="image-20230608154626024"
+                ></p>
+]]></content>
+      <categories>
+        <category>报错解决</category>
+      </categories>
+      <tags>
+        <tag>hexo</tag>
+      </tags>
   </entry>
   <entry>
     <title>java线程池学习</title>
@@ -1092,6 +1097,27 @@
         <category>爬虫</category>
         <category>笔记</category>
       </categories>
+  </entry>
+  <entry>
+    <title>网站收藏</title>
+    <url>/2023/06/11/%E5%AE%9E%E7%94%A8%E7%BD%91%E7%AB%99%E8%AE%B0%E5%BD%95/</url>
+    <content><![CDATA[<h1 id="学习类"><a href="#学习类" class="headerlink" title="学习类"></a>学习类</h1><ul>
+<li><a class="link"   href="https://go.dev/tour/list" >go入门练习 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
+<li><a class="link"   href="https://pdos.csail.mit.edu/6.824/schedule.html" >6.5840课程官网(前6.824) <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
+<li><a class="link"   href="https://google.github.io/comprehensive-rust/hello-world.html#speaker-notes" >rust教程 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
+</ul>
+<h1 id="工具类"><a href="#工具类" class="headerlink" title="工具类"></a>工具类</h1><ul>
+<li><a class="link"   href="https://docsmall.com/image-compress" >图片大小压缩 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
+<li><a class="link"   href="https://www.sojson.com/image/change.html#google_vignette" >图片尺寸修改和格式转换 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
+<li><a class="link"   href="https://pan.baidu.com/s/1BWEFf8zeLnud98fy5hOTiQ?pwd=qwer" >Jetbrains全家桶破解插件 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
+<li><a class="link"   href="http://www.52jingtanhao.win/auth/login##" >科学上网 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
+<li><a class="link"   href="http://www.taodudu.cc/news/show-4234631.html" >字符画 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
+<li><a class="link"   href="http://zhongguose.com/#meiguihui" >中国传统颜色 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>不时之需</tag>
+      </tags>
   </entry>
   <entry>
     <title>Tools for better thinking</title>
@@ -1999,61 +2025,6 @@
       </categories>
   </entry>
   <entry>
-    <title>网站收藏</title>
-    <url>/2023/06/11/%E5%AE%9E%E7%94%A8%E7%BD%91%E7%AB%99%E8%AE%B0%E5%BD%95/</url>
-    <content><![CDATA[<ul>
-<li><a class="link"   href="https://docsmall.com/image-compress" >图片大小压缩 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
-<li><a class="link"   href="https://www.sojson.com/image/change.html#google_vignette" >图片尺寸修改和格式转换 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
-<li><a class="link"   href="https://pan.baidu.com/s/1BWEFf8zeLnud98fy5hOTiQ?pwd=qwer" >Jetbrains全家桶破解插件 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
-<li><a class="link"   href="http://www.52jingtanhao.win/auth/login##" >科学上网 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
-<li><a class="link"   href="http://www.taodudu.cc/news/show-4234631.html" >字符画 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
-<li><a class="link"   href="http://zhongguose.com/#meiguihui" >中国传统颜色 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>不时之需</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>数据结构与算法之美笔记之如何权衡选择使用哪种数据结构和算法</title>
-    <url>/2022/02/26/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E4%B9%8B%E7%BE%8E%E7%AC%94%E8%AE%B0%E4%B9%8B%E5%A6%82%E4%BD%95%E6%9D%83%E8%A1%A1%E9%80%89%E6%8B%A9%E4%BD%BF%E7%94%A8%E5%93%AA%E7%A7%8D%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%92%8C%E7%AE%97%E6%B3%95/</url>
-    <content><![CDATA[<p>学习数据结构和算法，不要停留在学院派的思维中，只把算法当作应付面试、考试或者竞赛的花拳绣腿。作为软件开发工程师，我们要把数据结构和算法，应用到软件开发中，解决实际的开发问题。</p>
-<p>要想游刃有余地解决今后你要面对的问题，光是熟知每种数据结构和算法的功能、特点、时间空间复杂度，还是不够的。毕竟工程上的问题不是算法题。算法题的背景、条件、限制都非常明确，我们只需要在规定的输入、输出下，找最优解就可以了。</p>
-<p>而工程上的问题往往都比较开放，在选择数据结构和算法的时候，我们往往需要综合各种因素，比如编码难度、维护成本、数据特征、数据规模等，<strong>最终选择一个工程的最合适解，而非理论上的最优解。</strong></p>
-<p>作者的六条经验：</p>
-<h1 id="1-时间、空间复杂度不能跟性能划等号"><a href="#1-时间、空间复杂度不能跟性能划等号" class="headerlink" title="1. 时间、空间复杂度不能跟性能划等号"></a>1. 时间、空间复杂度<strong>不能跟性能划等号</strong></h1><h3 id="复杂度不是执行时间和内存消耗的精确值"><a href="#复杂度不是执行时间和内存消耗的精确值" class="headerlink" title="复杂度不是执行时间和内存消耗的精确值"></a>复杂度<strong>不是</strong>执行时间和内存消耗的精确值</h3><p>在用大O表示法表示复杂度的时候，我们会忽略掉低阶、常数、系数，只保留高阶，并且它的度量单位是语句的执行频度。每条语句的执行时间，并非是相同、确定的。所以，<strong>复杂度给出的只能是一个非精确量值的趋势。</strong></p>
-<h3 id="代码的执行时间有时不跟时间复杂度成正比"><a href="#代码的执行时间有时不跟时间复杂度成正比" class="headerlink" title="代码的执行时间有时不跟时间复杂度成正比"></a>代码的执行时间<strong>有时不跟时间复杂度成正比</strong></h3><p>我们常说，时间复杂度是O(nlogn)的算法，比时间复杂度是O(n^2)的算法，执行效率要高。<strong>这样说的一个前提是，算法处理的是大规模数据的情况。对于小规模数据的处理，算法的执行效率并不一定跟时间复杂度成正比，有时还会跟复杂度成反比。</strong></p>
-<h3 id="对于处理不同问题的不同算法，其复杂度大小没有可比性"><a href="#对于处理不同问题的不同算法，其复杂度大小没有可比性" class="headerlink" title="对于处理不同问题的不同算法，其复杂度大小没有可比性"></a>对于处理<strong>不同问题</strong>的<strong>不同算法</strong>，其复杂度大小没有可比性</h3><p>复杂度只能用来表征不同算法，在处理同样的问题，以及同样数据类型的情况下的性能表现。但是，对于不同的问题、不同的数据类型，不同算法之间的复杂度大小并没有可比性。</p>
-<h1 id="2-抛开数据规模谈数据结构和算法都是“耍流氓”"><a href="#2-抛开数据规模谈数据结构和算法都是“耍流氓”" class="headerlink" title="2. 抛开数据规模谈数据结构和算法都是“耍流氓”"></a>2. 抛开<strong>数据规模</strong>谈数据结构和算法都是“耍流氓”</h1><p>在平时的开发中，在数据规模很小的情况下，普通算法和高级算法之间的性能差距会非常小。如果代码执行频率不高、又不是核心代码，这个时候，我们选择数据结构和算法的主要依据是，其<strong>是否简单、容易维护、容易实现</strong>。大部分情况下，我们直接用最简单的存储结构和最暴力的算法就可以了。<br>比如，对于长度在一百以内的字符串匹配，我们直接使用朴素的字符串匹配算法就够了。如果用KMP、BM这些更加高效的字符串匹配算法，实际上就大材小用了。因为这对于处理时间是毫秒量级敏感的系统来说，性能的提升并不大。相反，这些高级算法会<strong>徒增编码的难度，还容易产生bug。</strong></p>
-<h1 id="3-结合数据特征和访问方式来选择数据结构"><a href="#3-结合数据特征和访问方式来选择数据结构" class="headerlink" title="3. 结合数据特征和访问方式来选择数据结构"></a>3. 结合<strong>数据特征</strong>和<strong>访问方式</strong>来选择数据结构</h1><p>面对实际的软件开发场景，当我们掌握了基础数据结构和算法之后，最考验能力的并不是数据结构和算法本身，而是<strong>对问题需求的挖掘、抽象、建模</strong>。如何将一个背景复杂、开放的问题，通过细致的观察、调研、假设，理清楚要处理数据的特征与访问方式，这才是解决问题的重点。只有理清楚了这些东西，我们才能将问题转化成合理的数据结构模型，进而找到满足需求的算法。<br><br>比如我们前面讲过，Trie树这种数据结构是一种非常高效的字符串匹配算法。但是，如果你要处理的数据，并没有太多的前缀重合，并且字符集很大，显然就不适合利用Trie树了。所以，在用Trie树之前，我们需要详细地分析数据的特点，甚至还要写些分析代码、测试代码，明确要处理的数据是否适合使用Trie树这种数据结构。<br><br>再比如，图的表示方式有很多种，邻接矩阵、邻接表、逆邻接表、二元组等等。你面对的场景应该用哪种方式来表示，具体还要看你的数据特征和访问方式。如果每个数据之间联系很少，对应到图中，就是一个稀疏图，就比较适合用邻接表来存储。相反，如果是稠密图，那就比较适合采用邻接矩阵来存储。</p>
-<h1 id="4-区别对待IO密集、内存密集和计算密集"><a href="#4-区别对待IO密集、内存密集和计算密集" class="headerlink" title="4. 区别对待IO密集、内存密集和计算密集"></a>4. 区别对待IO密集、内存密集和计算密集</h1><p>如果你要处理的数据存储在磁盘，比如数据库中。那<strong>代码的性能瓶颈有可能在磁盘IO，而并非算法本身</strong>。这个时候，你需要合理地选择数据存储格式和存取方式，减少磁盘IO的次数。</p>
-<p>比如我们在递归那一节讲过最终推荐人的例子。你应该注意到了，当时我给出的代码尽管正确，但其实并不高效。如果某个用户是经过层层推荐才来注册的，那我们获取他的最终推荐人的时候，就需要多次访问数据库，性能显然就不高了。</p>
-<p>不过，这个问题解决起来不难。我们知道，某个用户的最终推荐人一旦确定，就不会变动。所以，我们可以离线计算每个用户的最终推荐人，并且保存在表中的某个字段里。当我们要查看某个用户的最终推荐人的时候，访问一次数据库就可以获取到。</p>
-<p>刚刚我们讲了数据存储在磁盘的情况，现在我们再来看下，数据存储在内存中的情况。如果你的数据是存储在内存中，那我们还需要考虑，代码是内存密集型的还是CPU密集型的。</p>
-<p>所谓<strong>CPU密集型</strong>，简单点理解就是，代码执行效率的瓶颈主要在CPU执行的效率。我们从内存中读取一次数据，到CPU缓存或者寄存器之后，会进行多次频繁的CPU计算（比如加减乘除），CPU计算耗时占大部分。所以，在选择数据结构和算法的时候，要尽量减少逻辑计算的复杂度。比如，<strong>用位运算代替加减乘除运算等</strong>。</p>
-<p>所谓<strong>内存密集型</strong>，简单点理解就是，代码执行效率的瓶颈在内存数据的存取。对于内存密集型的代码，计算操作都比较简单，比如，字符串比较操作，实际上就是内存密集型的。每次从内存中读取数据之后，我们只需要进行一次简单的比较操作。所以，内存数据的读取速度，是字符串比较操作的瓶颈。因此，在选择数据结构和算法的时候，需要考虑是否能减少数据的读取量，数据是否在内存中连续存储，是否能利用CPU缓存预读。</p>
-<h1 id="5-善用语言提供的类，避免重复造轮子"><a href="#5-善用语言提供的类，避免重复造轮子" class="headerlink" title="5. 善用语言提供的类，避免重复造轮子"></a>5. 善用语言提供的类，避免重复造轮子</h1><p>实际上，对于大部分常用的数据结构和算法，编程语言都提供了现成的类和函数实现。比如，Java中的HashMap就是散列表的实现，TreeMap就是红黑树的实现等。在实际的软件开发中，除非有特殊的要求，我们都可以直接使用编程语言中提供的这些类或函数。</p>
-<p>但这并不代表，学习数据结构和算法是没用的。深入理解原理，有助于你能更好地应用这些编程语言提供的类和函数。能否深入理解所用工具、类的原理，这也是普通程序员跟技术专家的区别。</p>
-<h1 id="6-千万不要漫无目的地过度优化"><a href="#6-千万不要漫无目的地过度优化" class="headerlink" title="6. 千万不要漫无目的地过度优化"></a>6. 千万不要漫无目的地过度优化</h1><p>比如，一段代码执行只需要0.01秒，你非得用一个非常复杂的算法或者数据结构，将其优化成0.005秒。即便你的算法再优秀，这种微小优化的意义也并不大。相反，<strong>对应的代码维护成本可能要高很多</strong>。</p>
-<p>不过度优化并不代表，我们在软件开发的时候，可以不加思考地随意选择数据结构和算法。我们要学会估算。估算能力实际上也是一个非常重要的能力。我们不仅要对普通情况下的数据规模和性能压力做估算，还需要对异常以及将来一段时间内，可能达到的数据规模和性能压力做估算。这样，我们才能做到未雨绸缪，写出来的代码才能经久可用。</p>
-<p>还有，当你真的要优化代码的时候，一定要先做Benchmark基准测试。这样才能避免你想当然地换了一个更高效的算法，但真实情况下，性能反倒下降了。</p>
-<hr>
-<p>一个评论的总结：</p>
-<ol>
-<li>目标不同，评价标准不同。</li>
-<li>根据环境特征选择解决方法。</li>
-<li>将复杂、开放的问题，合理抽象为特定范式。</li>
-<li>善于找到问题的瓶颈，并优先解决。</li>
-<li>善于借助前人的经验，并尽可能理解他们的经历与选择。</li>
-<li>注意成本收益，投入恰到好处，切忌严重过度投入。</li>
-</ol>
-]]></content>
-      <categories>
-        <category>数据结构</category>
-        <category>笔记</category>
-      </categories>
-  </entry>
-  <entry>
     <title>数据结构与算法之美笔记之位图、布隆过滤器</title>
     <url>/2022/02/19/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E4%B9%8B%E7%BE%8E%E7%AC%94%E8%AE%B0%E4%B9%8B%E4%BD%8D%E5%9B%BE%E3%80%81%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8/</url>
     <content><![CDATA[<h1 id="位图-BitMap"><a href="#位图-BitMap" class="headerlink" title="位图(BitMap)"></a>位图(BitMap)</h1><p>我们有1千万个整数，整数的范围在1到1亿之间。如何快速查找某个整数是否在这1千万个整数中呢？<br>答：<br>除了散列表，我们还可以申请一个大小为1亿的布尔数组，$arr[i]&#x3D;true$表示$i$在这1千万个整数内，<br><strong>但是</strong>因为很多语言中的布尔类型是$1Byte$的，空间还是很大。实际上，为了表示$true$和$false$，我们可以用$1bit$就行了</p>
@@ -2113,52 +2084,38 @@
       </categories>
   </entry>
   <entry>
-    <title>数据结构与算法之美笔记之索引、并行算法</title>
-    <url>/2022/02/22/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E4%B9%8B%E7%BE%8E%E7%AC%94%E8%AE%B0%E4%B9%8B%E7%B4%A2%E5%BC%95%E3%80%81%E5%B9%B6%E8%A1%8C%E7%AE%97%E6%B3%95/</url>
-    <content><![CDATA[<h1 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h1><p>索引就像书的<strong>目录</strong>，通过目录，我们就可以快速定位相关知识点的页数，查找的速度也会有质的提高。</p>
+    <title>数据结构与算法之美笔记之如何权衡选择使用哪种数据结构和算法</title>
+    <url>/2022/02/26/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E4%B9%8B%E7%BE%8E%E7%AC%94%E8%AE%B0%E4%B9%8B%E5%A6%82%E4%BD%95%E6%9D%83%E8%A1%A1%E9%80%89%E6%8B%A9%E4%BD%BF%E7%94%A8%E5%93%AA%E7%A7%8D%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%92%8C%E7%AE%97%E6%B3%95/</url>
+    <content><![CDATA[<p>学习数据结构和算法，不要停留在学院派的思维中，只把算法当作应付面试、考试或者竞赛的花拳绣腿。作为软件开发工程师，我们要把数据结构和算法，应用到软件开发中，解决实际的开发问题。</p>
+<p>要想游刃有余地解决今后你要面对的问题，光是熟知每种数据结构和算法的功能、特点、时间空间复杂度，还是不够的。毕竟工程上的问题不是算法题。算法题的背景、条件、限制都非常明确，我们只需要在规定的输入、输出下，找最优解就可以了。</p>
+<p>而工程上的问题往往都比较开放，在选择数据结构和算法的时候，我们往往需要综合各种因素，比如编码难度、维护成本、数据特征、数据规模等，<strong>最终选择一个工程的最合适解，而非理论上的最优解。</strong></p>
+<p>作者的六条经验：</p>
+<h1 id="1-时间、空间复杂度不能跟性能划等号"><a href="#1-时间、空间复杂度不能跟性能划等号" class="headerlink" title="1. 时间、空间复杂度不能跟性能划等号"></a>1. 时间、空间复杂度<strong>不能跟性能划等号</strong></h1><h3 id="复杂度不是执行时间和内存消耗的精确值"><a href="#复杂度不是执行时间和内存消耗的精确值" class="headerlink" title="复杂度不是执行时间和内存消耗的精确值"></a>复杂度<strong>不是</strong>执行时间和内存消耗的精确值</h3><p>在用大O表示法表示复杂度的时候，我们会忽略掉低阶、常数、系数，只保留高阶，并且它的度量单位是语句的执行频度。每条语句的执行时间，并非是相同、确定的。所以，<strong>复杂度给出的只能是一个非精确量值的趋势。</strong></p>
+<h3 id="代码的执行时间有时不跟时间复杂度成正比"><a href="#代码的执行时间有时不跟时间复杂度成正比" class="headerlink" title="代码的执行时间有时不跟时间复杂度成正比"></a>代码的执行时间<strong>有时不跟时间复杂度成正比</strong></h3><p>我们常说，时间复杂度是O(nlogn)的算法，比时间复杂度是O(n^2)的算法，执行效率要高。<strong>这样说的一个前提是，算法处理的是大规模数据的情况。对于小规模数据的处理，算法的执行效率并不一定跟时间复杂度成正比，有时还会跟复杂度成反比。</strong></p>
+<h3 id="对于处理不同问题的不同算法，其复杂度大小没有可比性"><a href="#对于处理不同问题的不同算法，其复杂度大小没有可比性" class="headerlink" title="对于处理不同问题的不同算法，其复杂度大小没有可比性"></a>对于处理<strong>不同问题</strong>的<strong>不同算法</strong>，其复杂度大小没有可比性</h3><p>复杂度只能用来表征不同算法，在处理同样的问题，以及同样数据类型的情况下的性能表现。但是，对于不同的问题、不同的数据类型，不同算法之间的复杂度大小并没有可比性。</p>
+<h1 id="2-抛开数据规模谈数据结构和算法都是“耍流氓”"><a href="#2-抛开数据规模谈数据结构和算法都是“耍流氓”" class="headerlink" title="2. 抛开数据规模谈数据结构和算法都是“耍流氓”"></a>2. 抛开<strong>数据规模</strong>谈数据结构和算法都是“耍流氓”</h1><p>在平时的开发中，在数据规模很小的情况下，普通算法和高级算法之间的性能差距会非常小。如果代码执行频率不高、又不是核心代码，这个时候，我们选择数据结构和算法的主要依据是，其<strong>是否简单、容易维护、容易实现</strong>。大部分情况下，我们直接用最简单的存储结构和最暴力的算法就可以了。<br>比如，对于长度在一百以内的字符串匹配，我们直接使用朴素的字符串匹配算法就够了。如果用KMP、BM这些更加高效的字符串匹配算法，实际上就大材小用了。因为这对于处理时间是毫秒量级敏感的系统来说，性能的提升并不大。相反，这些高级算法会<strong>徒增编码的难度，还容易产生bug。</strong></p>
+<h1 id="3-结合数据特征和访问方式来选择数据结构"><a href="#3-结合数据特征和访问方式来选择数据结构" class="headerlink" title="3. 结合数据特征和访问方式来选择数据结构"></a>3. 结合<strong>数据特征</strong>和<strong>访问方式</strong>来选择数据结构</h1><p>面对实际的软件开发场景，当我们掌握了基础数据结构和算法之后，最考验能力的并不是数据结构和算法本身，而是<strong>对问题需求的挖掘、抽象、建模</strong>。如何将一个背景复杂、开放的问题，通过细致的观察、调研、假设，理清楚要处理数据的特征与访问方式，这才是解决问题的重点。只有理清楚了这些东西，我们才能将问题转化成合理的数据结构模型，进而找到满足需求的算法。<br><br>比如我们前面讲过，Trie树这种数据结构是一种非常高效的字符串匹配算法。但是，如果你要处理的数据，并没有太多的前缀重合，并且字符集很大，显然就不适合利用Trie树了。所以，在用Trie树之前，我们需要详细地分析数据的特点，甚至还要写些分析代码、测试代码，明确要处理的数据是否适合使用Trie树这种数据结构。<br><br>再比如，图的表示方式有很多种，邻接矩阵、邻接表、逆邻接表、二元组等等。你面对的场景应该用哪种方式来表示，具体还要看你的数据特征和访问方式。如果每个数据之间联系很少，对应到图中，就是一个稀疏图，就比较适合用邻接表来存储。相反，如果是稠密图，那就比较适合采用邻接矩阵来存储。</p>
+<h1 id="4-区别对待IO密集、内存密集和计算密集"><a href="#4-区别对待IO密集、内存密集和计算密集" class="headerlink" title="4. 区别对待IO密集、内存密集和计算密集"></a>4. 区别对待IO密集、内存密集和计算密集</h1><p>如果你要处理的数据存储在磁盘，比如数据库中。那<strong>代码的性能瓶颈有可能在磁盘IO，而并非算法本身</strong>。这个时候，你需要合理地选择数据存储格式和存取方式，减少磁盘IO的次数。</p>
+<p>比如我们在递归那一节讲过最终推荐人的例子。你应该注意到了，当时我给出的代码尽管正确，但其实并不高效。如果某个用户是经过层层推荐才来注册的，那我们获取他的最终推荐人的时候，就需要多次访问数据库，性能显然就不高了。</p>
+<p>不过，这个问题解决起来不难。我们知道，某个用户的最终推荐人一旦确定，就不会变动。所以，我们可以离线计算每个用户的最终推荐人，并且保存在表中的某个字段里。当我们要查看某个用户的最终推荐人的时候，访问一次数据库就可以获取到。</p>
+<p>刚刚我们讲了数据存储在磁盘的情况，现在我们再来看下，数据存储在内存中的情况。如果你的数据是存储在内存中，那我们还需要考虑，代码是内存密集型的还是CPU密集型的。</p>
+<p>所谓<strong>CPU密集型</strong>，简单点理解就是，代码执行效率的瓶颈主要在CPU执行的效率。我们从内存中读取一次数据，到CPU缓存或者寄存器之后，会进行多次频繁的CPU计算（比如加减乘除），CPU计算耗时占大部分。所以，在选择数据结构和算法的时候，要尽量减少逻辑计算的复杂度。比如，<strong>用位运算代替加减乘除运算等</strong>。</p>
+<p>所谓<strong>内存密集型</strong>，简单点理解就是，代码执行效率的瓶颈在内存数据的存取。对于内存密集型的代码，计算操作都比较简单，比如，字符串比较操作，实际上就是内存密集型的。每次从内存中读取数据之后，我们只需要进行一次简单的比较操作。所以，内存数据的读取速度，是字符串比较操作的瓶颈。因此，在选择数据结构和算法的时候，需要考虑是否能减少数据的读取量，数据是否在内存中连续存储，是否能利用CPU缓存预读。</p>
+<h1 id="5-善用语言提供的类，避免重复造轮子"><a href="#5-善用语言提供的类，避免重复造轮子" class="headerlink" title="5. 善用语言提供的类，避免重复造轮子"></a>5. 善用语言提供的类，避免重复造轮子</h1><p>实际上，对于大部分常用的数据结构和算法，编程语言都提供了现成的类和函数实现。比如，Java中的HashMap就是散列表的实现，TreeMap就是红黑树的实现等。在实际的软件开发中，除非有特殊的要求，我们都可以直接使用编程语言中提供的这些类或函数。</p>
+<p>但这并不代表，学习数据结构和算法是没用的。深入理解原理，有助于你能更好地应用这些编程语言提供的类和函数。能否深入理解所用工具、类的原理，这也是普通程序员跟技术专家的区别。</p>
+<h1 id="6-千万不要漫无目的地过度优化"><a href="#6-千万不要漫无目的地过度优化" class="headerlink" title="6. 千万不要漫无目的地过度优化"></a>6. 千万不要漫无目的地过度优化</h1><p>比如，一段代码执行只需要0.01秒，你非得用一个非常复杂的算法或者数据结构，将其优化成0.005秒。即便你的算法再优秀，这种微小优化的意义也并不大。相反，<strong>对应的代码维护成本可能要高很多</strong>。</p>
+<p>不过度优化并不代表，我们在软件开发的时候，可以不加思考地随意选择数据结构和算法。我们要学会估算。估算能力实际上也是一个非常重要的能力。我们不仅要对普通情况下的数据规模和性能压力做估算，还需要对异常以及将来一段时间内，可能达到的数据规模和性能压力做估算。这样，我们才能做到未雨绸缪，写出来的代码才能经久可用。</p>
+<p>还有，当你真的要优化代码的时候，一定要先做Benchmark基准测试。这样才能避免你想当然地换了一个更高效的算法，但真实情况下，性能反倒下降了。</p>
 <hr>
-<p><strong>索引的需求定义</strong></p>
+<p>一个评论的总结：</p>
 <ol>
-<li>功能性需求（作者谈到的几种）<ul>
-<li>数据是<strong>格式化数据</strong>还是<strong>非格式化</strong>数据？对于非结构化数据，我们一般需要做预处理，提取出查询关键词，对关键词构建索引。</li>
-<li>数据是<strong>静态</strong>数据还是<strong>动态</strong>数据？静态数据就相对简单，动态索引就不仅要考虑他的查询效率，还要考虑索引更新效率</li>
-<li>索引存储在<strong>内存</strong>还是<strong>硬盘</strong>？内存中操作速度肯定快些，但是如果数据量太大，索引就需要存在磁盘里了，当然我们也可以将索引一部分存在内存一部分存在磁盘</li>
-<li><strong>单值</strong>查找还是<strong>区间</strong>查找？</li>
-<li><strong>单关键词</strong>查找还是<strong>多关键词</strong>组合查找？比如，搜索引擎中构建的索引，既要支持一个关键词的查找，比如“数据结构”，也要支持组合关键词查找，比如“数据结构 AND 算法”。对于多关键词查询来说，要分多种情况。像MySQL这种结构化数据的查询需求，我们可以实现针对多个关键词的组合，建立索引；对于像搜索引擎这样的非结构数据的查询需求，我们可以针对单个关键词构建索引，然后通过集合操作，比如求并集、求交集等，计算出多个关键词组合的查询结果。</li>
-</ul>
-</li>
-<li>非功能性需求</li>
+<li>目标不同，评价标准不同。</li>
+<li>根据环境特征选择解决方法。</li>
+<li>将复杂、开放的问题，合理抽象为特定范式。</li>
+<li>善于找到问题的瓶颈，并优先解决。</li>
+<li>善于借助前人的经验，并尽可能理解他们的经历与选择。</li>
+<li>注意成本收益，投入恰到好处，切忌严重过度投入。</li>
 </ol>
-<ul>
-<li>索引对存储空间的消耗不能过大。因为有时候，索引对存储空间的消耗会超过原始数据。</li>
-<li>在考虑索引查询效率的同时，我们还要考虑索引的维护成本。索引的更新势必会影响到增删改操作的性能。</li>
-</ul>
-<hr>
-<p><strong>构建索引常用的数据结构</strong></p>
-<ul>
-<li><p><strong>散列表</strong><br>我们知道，散列表增删改查操作的性能非常好，时间复杂度是O(1)。一些<strong>键值数据库</strong>，比如Redis、Memcache，就是使用散列表来构建索引的。这类索引，一般都构建在内存中。</p>
-</li>
-<li><p><strong>红黑树</strong><br>红黑树作为一种常用的平衡二叉查找树，数据插入、删除、查找的时间复杂度是O(logn)，也非常适合用来构建内存索引。Ext文件系统中，对磁盘块的索引，用的就是红黑树。</p>
-</li>
-<li><p><strong>B+树</strong><br>B+树比起红黑树来说，更加适合构建<strong>存储在磁盘中的索引</strong>。B+树是一个多叉树，所以，对相同个数的数据构建索引，B+树的高度要低于红黑树。当借助索引查询数据的时候，读取B+树索引，需要的磁盘IO次数非常更少。所以，<strong>大部分关系型数据库的索引，比如MySQL、Oracle，都是用B+树来实现的。</strong></p>
-</li>
-<li><p><strong>跳表</strong><br>跳表也支持快速添加、删除、查找数据。而且，我们通过灵活调整索引结点个数和数据个数之间的比例，可以很好地平衡索引对内存的消耗及其查询效率。<strong>Redis中的有序集合，就是用跳表来构建的。</strong></p>
-</li>
-<li><p><strong>布隆过滤器</strong><br>我们知道，<strong>布隆过滤器有一定的判错率</strong>。但是，我们可以<strong>规避它的短处</strong>，发挥它的长处。尽管对于判定存在的数据，有可能并不存在，但是<strong>对于判定不存在的数据，那肯定就不存在</strong>。而且，布隆过滤器还有一个更大的特点，那就是<strong>内存占用非常少</strong>。我们可以针对数据，构建一个布隆过滤器，并且<strong>存储在内存中</strong>。当要查询数据的时候，我们可以先通过布隆过滤器，判定是否存在。<strong>如果通过布隆过滤器判定数据不存在，那我们就没有必要读取磁盘中的索引了。对于数据不存在的情况，数据查询就更加快速了。</strong></p>
-</li>
-<li><p><strong>有序数组</strong><br>有序数组也可以被作为索引。如果<strong>数据是静态的</strong>，也就是不会有插入、删除、更新操作，比如去年的xx数据，那我们可以把数据的关键词（查询用的）抽取出来，组织成有序数组，然后利用<strong>二分查找</strong>算法来快速查找数据。</p>
-</li>
-</ul>
-<hr>
-<h1 id="并行算法"><a href="#并行算法" class="headerlink" title="并行算法"></a>并行算法</h1><p>当算法无法再继续优化的情况下，我们该如何来进一步提高执行效率呢？ </p>
-<ul>
-<li>并行排序<br>比如归并排序，我们把8GB的数据分成16个文件，再用16个文件分别排序完，再对这16个有序集合合并，快排的原理也是分治，<br>它们的区别在于，第一种处理思路是，先随意地对数据分片，排序之后再合并。第二种处理思路是，先对数据按照大小划分区间，然后再排序，排完序就不需要再处理了。</li>
-<li>并行查找<br>将数据分到多个散列表中，再开多个线程分别在各自的散列表内查找，插入元素就是把元素插入装载因子最小的那个散列表中，这样有助于减少散列冲突。</li>
-<li>并行字符串匹配</li>
-<li>并行搜索</li>
-</ul>
-<p>并行计算是一个工程上的实现思路，尽管跟算法关系不大，但是，在实际的软件开发中，它确实可以非常巧妙地提高程序的运行效率，是一种非常好用的性能优化手段。</p>
-<p>特别是，当要处理的数据规模达到一定程度之后，我们无法通过继续优化算法，来提高执行效率 的时候，我们就需要在实现的思路上做文章，利用更多的硬件资源，来加快执行的效率。所以，在很多超大规模数据处理中，并行处理的思想，应用非常广泛，比如MapReduce实际上就是一种并行计算框架。</p>
 ]]></content>
       <categories>
         <category>数据结构</category>
@@ -2485,6 +2442,59 @@
 <li><a class="link"   href="https://blog.csdn.net/qq_51955445/article/details/125869125?spm=1001.2014.3001.5502" >windows查看并杀死进程 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
 </ul>
 ]]></content>
+  </entry>
+  <entry>
+    <title>数据结构与算法之美笔记之索引、并行算法</title>
+    <url>/2022/02/22/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E4%B9%8B%E7%BE%8E%E7%AC%94%E8%AE%B0%E4%B9%8B%E7%B4%A2%E5%BC%95%E3%80%81%E5%B9%B6%E8%A1%8C%E7%AE%97%E6%B3%95/</url>
+    <content><![CDATA[<h1 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h1><p>索引就像书的<strong>目录</strong>，通过目录，我们就可以快速定位相关知识点的页数，查找的速度也会有质的提高。</p>
+<hr>
+<p><strong>索引的需求定义</strong></p>
+<ol>
+<li>功能性需求（作者谈到的几种）<ul>
+<li>数据是<strong>格式化数据</strong>还是<strong>非格式化</strong>数据？对于非结构化数据，我们一般需要做预处理，提取出查询关键词，对关键词构建索引。</li>
+<li>数据是<strong>静态</strong>数据还是<strong>动态</strong>数据？静态数据就相对简单，动态索引就不仅要考虑他的查询效率，还要考虑索引更新效率</li>
+<li>索引存储在<strong>内存</strong>还是<strong>硬盘</strong>？内存中操作速度肯定快些，但是如果数据量太大，索引就需要存在磁盘里了，当然我们也可以将索引一部分存在内存一部分存在磁盘</li>
+<li><strong>单值</strong>查找还是<strong>区间</strong>查找？</li>
+<li><strong>单关键词</strong>查找还是<strong>多关键词</strong>组合查找？比如，搜索引擎中构建的索引，既要支持一个关键词的查找，比如“数据结构”，也要支持组合关键词查找，比如“数据结构 AND 算法”。对于多关键词查询来说，要分多种情况。像MySQL这种结构化数据的查询需求，我们可以实现针对多个关键词的组合，建立索引；对于像搜索引擎这样的非结构数据的查询需求，我们可以针对单个关键词构建索引，然后通过集合操作，比如求并集、求交集等，计算出多个关键词组合的查询结果。</li>
+</ul>
+</li>
+<li>非功能性需求</li>
+</ol>
+<ul>
+<li>索引对存储空间的消耗不能过大。因为有时候，索引对存储空间的消耗会超过原始数据。</li>
+<li>在考虑索引查询效率的同时，我们还要考虑索引的维护成本。索引的更新势必会影响到增删改操作的性能。</li>
+</ul>
+<hr>
+<p><strong>构建索引常用的数据结构</strong></p>
+<ul>
+<li><p><strong>散列表</strong><br>我们知道，散列表增删改查操作的性能非常好，时间复杂度是O(1)。一些<strong>键值数据库</strong>，比如Redis、Memcache，就是使用散列表来构建索引的。这类索引，一般都构建在内存中。</p>
+</li>
+<li><p><strong>红黑树</strong><br>红黑树作为一种常用的平衡二叉查找树，数据插入、删除、查找的时间复杂度是O(logn)，也非常适合用来构建内存索引。Ext文件系统中，对磁盘块的索引，用的就是红黑树。</p>
+</li>
+<li><p><strong>B+树</strong><br>B+树比起红黑树来说，更加适合构建<strong>存储在磁盘中的索引</strong>。B+树是一个多叉树，所以，对相同个数的数据构建索引，B+树的高度要低于红黑树。当借助索引查询数据的时候，读取B+树索引，需要的磁盘IO次数非常更少。所以，<strong>大部分关系型数据库的索引，比如MySQL、Oracle，都是用B+树来实现的。</strong></p>
+</li>
+<li><p><strong>跳表</strong><br>跳表也支持快速添加、删除、查找数据。而且，我们通过灵活调整索引结点个数和数据个数之间的比例，可以很好地平衡索引对内存的消耗及其查询效率。<strong>Redis中的有序集合，就是用跳表来构建的。</strong></p>
+</li>
+<li><p><strong>布隆过滤器</strong><br>我们知道，<strong>布隆过滤器有一定的判错率</strong>。但是，我们可以<strong>规避它的短处</strong>，发挥它的长处。尽管对于判定存在的数据，有可能并不存在，但是<strong>对于判定不存在的数据，那肯定就不存在</strong>。而且，布隆过滤器还有一个更大的特点，那就是<strong>内存占用非常少</strong>。我们可以针对数据，构建一个布隆过滤器，并且<strong>存储在内存中</strong>。当要查询数据的时候，我们可以先通过布隆过滤器，判定是否存在。<strong>如果通过布隆过滤器判定数据不存在，那我们就没有必要读取磁盘中的索引了。对于数据不存在的情况，数据查询就更加快速了。</strong></p>
+</li>
+<li><p><strong>有序数组</strong><br>有序数组也可以被作为索引。如果<strong>数据是静态的</strong>，也就是不会有插入、删除、更新操作，比如去年的xx数据，那我们可以把数据的关键词（查询用的）抽取出来，组织成有序数组，然后利用<strong>二分查找</strong>算法来快速查找数据。</p>
+</li>
+</ul>
+<hr>
+<h1 id="并行算法"><a href="#并行算法" class="headerlink" title="并行算法"></a>并行算法</h1><p>当算法无法再继续优化的情况下，我们该如何来进一步提高执行效率呢？ </p>
+<ul>
+<li>并行排序<br>比如归并排序，我们把8GB的数据分成16个文件，再用16个文件分别排序完，再对这16个有序集合合并，快排的原理也是分治，<br>它们的区别在于，第一种处理思路是，先随意地对数据分片，排序之后再合并。第二种处理思路是，先对数据按照大小划分区间，然后再排序，排完序就不需要再处理了。</li>
+<li>并行查找<br>将数据分到多个散列表中，再开多个线程分别在各自的散列表内查找，插入元素就是把元素插入装载因子最小的那个散列表中，这样有助于减少散列冲突。</li>
+<li>并行字符串匹配</li>
+<li>并行搜索</li>
+</ul>
+<p>并行计算是一个工程上的实现思路，尽管跟算法关系不大，但是，在实际的软件开发中，它确实可以非常巧妙地提高程序的运行效率，是一种非常好用的性能优化手段。</p>
+<p>特别是，当要处理的数据规模达到一定程度之后，我们无法通过继续优化算法，来提高执行效率 的时候，我们就需要在实现的思路上做文章，利用更多的硬件资源，来加快执行的效率。所以，在很多超大规模数据处理中，并行处理的思想，应用非常广泛，比如MapReduce实际上就是一种并行计算框架。</p>
+]]></content>
+      <categories>
+        <category>数据结构</category>
+        <category>笔记</category>
+      </categories>
   </entry>
   <entry>
     <title>Hexo安装资源压缩插件报错，Command failed: C:&#92;Windows&#92;system32&#92;cmd.exe /s /c &quot;autoreconf -ivf&quot;</title>
