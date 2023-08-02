@@ -1,4 +1,4 @@
-window.addEventListener("DOMContentLoaded",()=>{Global.themeInfo={theme:"Redefine v"+Global.theme_config.version,author:"EvanNotFound",repository:"https://github.com/EvanNotFound/hexo-theme-redefine"},Global.localStorageKey="Global-THEME-STATUS",Global.styleStatus={isExpandPageWidth:!1,isDark:!1,fontSizeLevel:0,isOpenPageAside:!0},Global.printThemeInfo=()=>{console.log(`      ______ __  __  ______  __    __  ______                       \r
+window.addEventListener("DOMContentLoaded",()=>{Global.themeInfo={theme:"Redefine v"+Global.theme_config.version,author:"EvanNotFound",repository:"https://github.com/EvanNotFound/hexo-theme-redefine"},Global.localStorageKey="REDEFINE-THEME-STATUS",Global.styleStatus={isExpandPageWidth:!1,isDark:!1,fontSizeLevel:0,isOpenPageAside:!0},Global.printThemeInfo=()=>{console.log(`      ______ __  __  ______  __    __  ______                       \r
      /\\__  _/\\ \\_\\ \\/\\  ___\\/\\ "-./  \\/\\  ___\\                      \r
      \\/_/\\ \\\\ \\  __ \\ \\  __\\\\ \\ \\-./\\ \\ \\  __\\                      \r
         \\ \\_\\\\ \\_\\ \\_\\ \\_____\\ \\_\\ \\ \\_\\ \\_____\\                    \r
