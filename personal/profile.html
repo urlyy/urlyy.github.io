@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>urlyy - 个人主页</title>
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+    <script src="./lib/rellax@1.12.1/rellax.min.js"></script>
+    <style>
+         body {
+            font-family: Arial, sans-serif;
+             display: flex;
+             flex-direction: column;
+            /*justify-content: center;
+            align-items: center; */
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="https://www.bilibili.com/video/BV1vNzJYUE5G/?vd_source=43b6af819307ca6bdad60477a02d8d1c#reply248859005313">参考这个视频</a>
+
+    <div class="rellax" data-rellax-speed="-3" data-rellax-percentage="0.5">
+        I’m slow and smooth
+    </div>
+    
+    <div class="rellax" data-rellax-speed="7">
+        I’m super fast!!
+    </div>
+    
+    <div class="rellax" data-rellax-speed="-5">
+        I’m extra slow and smooth
+    </div>
+
+    <div id="typed-strings">
+        <p>Typed.js is a <strong>JavaScript</strong> library.</p>
+        <p>It <em>types</em> out sentences.</p>
+    </div>
+    <div id="typed"/>
+
+    
+<script>
+    var rellax = new Rellax('.rellax', {
+        center:true
+    });
+    var typed = new Typed('#typed', {
+        stringsElement: '#typed-strings',
+        typeSpeed: 50,  // 每个字符输入的速度（单位是毫秒）
+        backSpeed: 25,  // 每个字符删除的速度
+        backDelay: 1000,  // 删除前等待的时间（单位是毫秒）
+        startDelay: 500,  // 打字开始前的延迟时间
+        loop: true,  // 是否循环播放
+    });
+
+</script>
+
+</body>
+</html>
