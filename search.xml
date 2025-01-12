@@ -1022,66 +1022,6 @@ func (b *Builder)String()string&#123;
       </categories>
   </entry>
   <entry>
-    <title>Lightfm学习记录</title>
-    <url>/2024/04/05/Lightfm%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/</url>
-    <content><![CDATA[<blockquote>
-<p>推荐参考资料</p>
-<ul>
-<li><a class="link"   href="https://making.lyst.com/lightfm/docs/home.html" >官方文档<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li><a class="link"   href="https://github.com/lyst/lightfm" >仓库地址<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li><a class="link"   href="https://github.com/lyst/lightfm-paper/blob/master/paper/paper.pdf" >论文地址<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li><a class="link"   href="https://blog.csdn.net/weixin_42223090/article/details/124946918?spm=1001.2101.3001.6650.2&utm_medium=distribute.pc_relevant.none-task-blog-2~default~BlogCommendFromBaidu~Rate-2-124946918-blog-132798311.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2~default~BlogCommendFromBaidu~Rate-2-124946918-blog-132798311.235%5Ev43%5Epc_blog_bottom_relevance_base6&utm_relevant_index=5" >LightFM推荐系统框架学习笔记<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li><a class="link"   href="https://www.sdk.cn/details/DJRrM6gmdO0w8eo4mE?ivk_sa=1024320u" >LightFM推荐模型库<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li>(利于入门)<a class="link"   href="https://towardsdatascience.com/how-i-would-explain-building-lightfm-hybrid-recommenders-to-a-5-year-old-b6ee18571309" >how-i-would-explain-building-lightfm-hybrid-recommenders-to-a-5-year-old<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li>(用处不大)<a class="link"   href="https://blog.csdn.net/u010379996/article/details/114701098?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522170834428116800188555665%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fall.%2522%257D&request_id=170834428116800188555665&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~first_rank_ecpm_v1~rank_v31_ecpm-19-114701098-null-null.142%5Ev99%5Epc_search_result_base9&utm_term=lightfm&spm=1018.2226.3001.4187" >协同推荐 + lightfm + 根据用户已读诗词推荐<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li>(可能有用)<a class="link"   href="https://towardsdatascience.com/recommendation-system-in-python-lightfm-61c85010ce17" >Recommendation System in Python: LightFM<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li>(进阶调参有用)<a class="link"   href="https://zhuanlan.zhihu.com/p/269880643/" >针对推荐系统隐式和显式反馈的混合模型——lightFM（下：python场景实例）<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-</ul>
-</blockquote>
-<p>上面的引用资料都很有用！</p>
-<h1 id="一些使用的细节"><a href="#一些使用的细节" class="headerlink" title="一些使用的细节"></a>一些使用的细节</h1><h2 id="对于用户和物品的特征设置权重"><a href="#对于用户和物品的特征设置权重" class="headerlink" title="对于用户和物品的特征设置权重"></a>对于用户和物品的特征设置权重</h2><p>注意网上的文章大多都是未设置权重的，如<code>(user id, [list of feature names])</code>，但是从官方文档我们可以看到实际上是可以设置权重的<code>(user id, &#123;feature name: feature weight&#125;)</code><br>这个权重的意思就是某字段在全部字段中的占比，比如<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/./../article_images/Lightfm%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/27fe2e6ba844454cb028f42ed9cd9434.png"
-                      alt="在这里插入图片描述"
-                ></p>
-<h2 id="打印稀疏矩阵"><a href="#打印稀疏矩阵" class="headerlink" title="打印稀疏矩阵"></a>打印稀疏矩阵</h2><p>一般的交互矩阵都是稀疏矩阵，貌似没有很好的实现<code>__str__</code>，为了查看矩阵的值，参考下方<br> <div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line">(interactions, weights) = dataset1.build_interactions([(x[<span class="number">0</span>], x[<span class="number">1</span>], x[<span class="number">2</span>]) <span class="keyword">for</span> x <span class="keyword">in</span> df.values ])</span><br><span class="line">interactions.todense()</span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">matrix([[1, 1, 0, 0],</span></span><br><span class="line"><span class="string">       [0, 1, 1, 0],</span></span><br><span class="line"><span class="string">       [1, 0, 1, 1]])</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br></pre></td></tr></table></figure></div></p>
-<h1 id="矩阵分解"><a href="#矩阵分解" class="headerlink" title="矩阵分解"></a>矩阵分解</h1><p>日常业务中可以得到用户的行为数据(交互)，如点赞&#x2F;评分等，如三元组{userID,itemID,rate},但是复杂业务中矩阵会很大，且矩阵十分稀疏(可能1w个物品，用户A只点赞了5个，我们在lightfm中使用的就是<code>scipy</code>的<code>coo_matrix</code>和<code>csr_matrix</code>)。我们的推荐，实际上就是预测这些空白项的值。因此我们引入矩阵分解，将这个大矩阵分解为两个较小的矩阵以实现降维，如<code>M x N</code>分解为<code>M x k</code>和<code>k x N</code>，即把他们投射到k维(这个k无法解释，此时就成为隐向量了)。此时两个小矩阵重新一乘，原来有的项会近似相等，原来的空白项此时也有值，那么这些值就是预测值了。<br>而对于这个分解过程，就有一些算法和目标函数了，我暂时还没搞懂<br>按照论文的说法，至少比<code>MF模型</code>和<code>CB</code>要好</p>
-<h1 id="混合模型"><a href="#混合模型" class="headerlink" title="混合模型"></a>混合模型</h1><p>由于协同过滤需要历史交互数据，存在冷启动问题；同时由于基于内容的推荐没有使用交互，用户之间是孤立的，所以实际效果不如协同过滤。所以提出了混合模型，结合了基于内容的推荐(<code>CB</code>)和协同过滤的基于模型推荐(<code>CF协同过滤，MF矩阵分解</code>)两种方式，训练者可以传入用户&#x2F;物品的特征信息(如地理位置&#x2F;年龄)等，同时也传入交互信息{userID,itemID,rate},那么在数据少时仍可以基于用户物品的特征进行适当的推荐<br>所以，如果没有传入用户物品的特征信息，那么模型只是一个单纯的MF模型，基于内容是通过embedding实现的<br>而embedding是通过矩阵分解?得到的，事实上<code>M x k</code>的矩阵元素都是embedding</p>
-<h1 id="论文解读-我是科研新人，如有不对欢迎指正"><a href="#论文解读-我是科研新人，如有不对欢迎指正" class="headerlink" title="论文解读(我是科研新人，如有不对欢迎指正)"></a>论文解读(我是科研新人，如有不对欢迎指正)</h1><p>模型的需求：1. 如果物品A和B经常同时被推荐，那么应该学到A和B非常相似 2. 模型能即时根据新数据进行更新<br>对于需求一，使用latent representation，根据交互信息确定两个物体的embedding的距离。<br>对于需求二，将用户和物体表示为内容特征的线性组合</p>
-<p>对于predict，就是是对用户&#x2F;物品的已分解出的特征矩阵进行点积，再加上偏置，得到一个值$\hat r_{ui}$，这个就是MF模型的方法。但是这个$q_u$和$p_i$还有那两个偏置都是各特征之和(也算线性组合)，所以也融入了一点CB的思想。<br>$$<br>\hat r_{ui} &#x3D; f (q_u · p_i + b_u + b_i)<br>$$</p>
-<p>目标函数是求最优化的分解出的矩阵，利用了交互信息，即对于交互信息(有正向和负向的交互)，每个{user,item}对求出$\hat r_{ui}$然后根据正负属性进行操作，累乘后再两部分相乘。<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/./../article_images/Lightfm%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/77577f16795a298e9aea3c3d03524d16.png"
-                      alt="在这里插入图片描述"
-                ><br>论文中提及的模型结构如下<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/./../article_images/Lightfm%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/45c1202e6907e95a21be13e789fa0507.png"
-                      alt="在这里插入图片描述"
-                ><br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/./../article_images/Lightfm%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/754545025d44bee65e070b0a10b956db.png"
-                      alt="在这里插入图片描述"
-                ><br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/./../article_images/Lightfm%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/08e30d8c944f91422a354f97122c0fa0.png"
-                      alt="在这里插入图片描述"
-                ></p>
-<h1 id="我的demo"><a href="#我的demo" class="headerlink" title="我的demo"></a>我的demo</h1><p>只是对于官方例子和参考其他人的例子改出来的demo，不知道是不是符合原作者的想法。<br>使用这个框架时，对于用户&#x2F;物品的特征和交互量的量化，似乎也是一个关键，而所有例子都没有体现（包括我这个）。不过这本来也该是自己完成的。</p>
-<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> scipy <span class="keyword">import</span> sparse</span><br><span class="line"><span class="keyword">from</span> lightfm <span class="keyword">import</span> LightFM</span><br><span class="line"></span><br><span class="line"><span class="comment"># 交互信息</span></span><br><span class="line">interaction = [(<span class="string">&#x27;u1&#x27;</span>, <span class="string">&#x27;i1&#x27;</span>, <span class="number">1</span>), (<span class="string">&#x27;u1&#x27;</span>, <span class="string">&#x27;i3&#x27;</span>, <span class="number">2</span>), (<span class="string">&#x27;u2&#x27;</span>, <span class="string">&#x27;i2&#x27;</span>, <span class="number">1</span>), (<span class="string">&#x27;u2&#x27;</span>, <span class="string">&#x27;i3&#x27;</span>, <span class="number">3</span>),</span><br><span class="line">               (<span class="string">&#x27;u3&#x27;</span>, <span class="string">&#x27;i1&#x27;</span>, <span class="number">4</span>), (<span class="string">&#x27;u3&#x27;</span>, <span class="string">&#x27;i4&#x27;</span>, <span class="number">5</span>), (<span class="string">&#x27;u3&#x27;</span>, <span class="string">&#x27;i2&#x27;</span>, <span class="number">2</span>)]</span><br><span class="line"><span class="comment"># 3user 4item 5种rate</span></span><br><span class="line">interaction</span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">[(&#x27;u1&#x27;, &#x27;i1&#x27;, 1),</span></span><br><span class="line"><span class="string"> (&#x27;u1&#x27;, &#x27;i3&#x27;, 2),</span></span><br><span class="line"><span class="string"> (&#x27;u2&#x27;, &#x27;i2&#x27;, 1),</span></span><br><span class="line"><span class="string"> (&#x27;u2&#x27;, &#x27;i3&#x27;, 3),</span></span><br><span class="line"><span class="string"> (&#x27;u3&#x27;, &#x27;i1&#x27;, 4),</span></span><br><span class="line"><span class="string"> (&#x27;u3&#x27;, &#x27;i4&#x27;, 5),</span></span><br><span class="line"><span class="string"> (&#x27;u3&#x27;, &#x27;i2&#x27;, 2)]</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line">user_data = [(<span class="string">&#x27;u1&#x27;</span>, &#123;<span class="string">&#x27;f1&#x27;</span>: <span class="number">5</span>, <span class="string">&#x27;f2&#x27;</span>: <span class="number">2</span>, <span class="string">&#x27;f3&#x27;</span>: <span class="number">1</span>&#125;),</span><br><span class="line"> (<span class="string">&#x27;u2&#x27;</span>, &#123;<span class="string">&#x27;f1&#x27;</span>: <span class="number">0</span>, <span class="string">&#x27;f2&#x27;</span>: <span class="number">1</span>, <span class="string">&#x27;f3&#x27;</span>: <span class="number">3</span>&#125;),</span><br><span class="line"> (<span class="string">&#x27;u3&#x27;</span>, &#123;<span class="string">&#x27;f1&#x27;</span>: <span class="number">4</span>, <span class="string">&#x27;f2&#x27;</span>: <span class="number">3</span>, <span class="string">&#x27;f3&#x27;</span>: <span class="number">3</span>&#125;)]</span><br><span class="line"></span><br><span class="line">users = <span class="built_in">set</span>(<span class="built_in">map</span>(<span class="keyword">lambda</span> i:i[<span class="number">0</span>],interaction))</span><br><span class="line">items = <span class="built_in">set</span>(<span class="built_in">map</span>(<span class="keyword">lambda</span> i:i[<span class="number">1</span>],interaction))</span><br><span class="line">user_features = [<span class="string">&#x27;f1&#x27;</span>,<span class="string">&#x27;f2&#x27;</span>,<span class="string">&#x27;f3&#x27;</span>]</span><br><span class="line"><span class="built_in">print</span>(users,items,user_features)</span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">&#123;&#x27;u3&#x27;, &#x27;u2&#x27;, &#x27;u1&#x27;&#125; &#123;&#x27;i1&#x27;, &#x27;i2&#x27;, &#x27;i4&#x27;, &#x27;i3&#x27;&#125; [&#x27;f1&#x27;, &#x27;f2&#x27;, &#x27;f3&#x27;]</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> lightfm.data <span class="keyword">import</span> Dataset</span><br><span class="line"><span class="comment"># we call fit to supply user id, item id and user/item features</span></span><br><span class="line">dataset1 = Dataset()</span><br><span class="line"><span class="comment"># 把数据先丢进去，生成&#123;值:内部id&#125;的映射，方便后面提取出稀疏矩阵</span></span><br><span class="line">dataset1.fit_partial(users=users,items=items,user_features=user_features)</span><br><span class="line">dataset1.mapping()</span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">第一行是用户的编号(模型内部生成)</span></span><br><span class="line"><span class="string">第二行是用户的特征及其编号，可以看到用户编号也作为特征</span></span><br><span class="line"><span class="string">第三行第四行就是物品的编号和特征和特征编号</span></span><br><span class="line"><span class="string">搞这么多编号也对应了这个模型适合分析离散的数据，虽然我没怎么懂</span></span><br><span class="line"><span class="string">(&#123;&#x27;u3&#x27;: 0, &#x27;u2&#x27;: 1, &#x27;u1&#x27;: 2&#125;,</span></span><br><span class="line"><span class="string"> &#123;&#x27;u3&#x27;: 0, &#x27;u2&#x27;: 1, &#x27;u1&#x27;: 2, &#x27;f1&#x27;: 3, &#x27;f2&#x27;: 4, &#x27;f3&#x27;: 5&#125;,</span></span><br><span class="line"><span class="string"> &#123;&#x27;i1&#x27;: 0, &#x27;i2&#x27;: 1, &#x27;i4&#x27;: 2, &#x27;i3&#x27;: 3&#125;,</span></span><br><span class="line"><span class="string"> &#123;&#x27;i1&#x27;: 0, &#x27;i2&#x27;: 1, &#x27;i4&#x27;: 2, &#x27;i3&#x27;: 3&#125;)</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 构造用户特征矩阵</span></span><br><span class="line">uf = dataset1.build_user_features(user_data)</span><br><span class="line">uf.todense()</span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">6列三行，对应3个用户的6个特征属性，</span></span><br><span class="line"><span class="string">计算过程我们来看第二行，u2是(&#x27;u2&#x27;, &#123;&#x27;f1&#x27;: 0, &#x27;f2&#x27;: 1, &#x27;f3&#x27;: 3&#125;),他的特征就是</span></span><br><span class="line"><span class="string">&#123;u1:0,u2:1,u3:0,f1:0,f2:1,f3:3&#125;，其他为0的就不看了，只剩&#123;u2:1,f2:1,f3:3&#125;，</span></span><br><span class="line"><span class="string">所以分母为5，分子为各值，就出来了0,2,   0,2,   0.6，这就是权重的作用，可以分配比例</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">matrix([[0.09090909, 0.        , 0.        , 0.36363637, 0.27272728,</span></span><br><span class="line"><span class="string">         0.27272728],</span></span><br><span class="line"><span class="string">        [0.        , 0.2       , 0.        , 0.        , 0.2       ,</span></span><br><span class="line"><span class="string">         0.6       ],</span></span><br><span class="line"><span class="string">        [0.        , 0.        , 0.11111111, 0.5555556 , 0.22222222,</span></span><br><span class="line"><span class="string">         0.11111111]], dtype=float32)</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 构造交互矩阵</span></span><br><span class="line">(interactions, weights) = dataset1.build_interactions(interaction)</span><br><span class="line"><span class="built_in">print</span>(interactions.todense())</span><br><span class="line"><span class="built_in">print</span>(weights.todense())</span><br><span class="line"><span class="comment"># 注意这里的行数是用户数，列数是物品数，所以是交互</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">[[1 1 1 0]</span></span><br><span class="line"><span class="string"> [0 1 0 1]</span></span><br><span class="line"><span class="string"> [1 0 0 1]]</span></span><br><span class="line"><span class="string">[[4. 2. 5. 0.]</span></span><br><span class="line"><span class="string"> [0. 1. 0. 3.]</span></span><br><span class="line"><span class="string"> [1. 0. 0. 2.]]</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># windows只能用这个</span></span><br><span class="line">model = LightFM(loss=<span class="string">&#x27;logistic&#x27;</span>)</span><br><span class="line"><span class="comment"># 下面的参数在ubuntu上可运行，效果更好</span></span><br><span class="line"><span class="comment"># 参考 https://github.com/lyst/lightfm/issues/690</span></span><br><span class="line"><span class="comment"># model = LightFM(loss=&#x27;warp&#x27;)</span></span><br><span class="line"></span><br><span class="line">model.fit(interactions,</span><br><span class="line">      user_features= uf, </span><br><span class="line">      sample_weight= weights,</span><br><span class="line">      epochs=<span class="number">10</span>)</span><br><span class="line">      </span><br><span class="line"><span class="keyword">from</span> lightfm.evaluation <span class="keyword">import</span> auc_score</span><br><span class="line"><span class="comment"># 好像是测试一下</span></span><br><span class="line">train_auc = auc_score(model,</span><br><span class="line">                      interactions,</span><br><span class="line">                      user_features=uf</span><br><span class="line">                     ).mean()</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;Hybrid training set AUC: %s&#x27;</span> % train_auc)</span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">好像效果不是很好</span></span><br><span class="line"><span class="string">Hybrid training set AUC: 0.5</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"></span><br><span class="line">user_id_map, user_feature_map, item_id_map, item_feature_map = dataset1.mapping()</span><br><span class="line"><span class="comment"># 预测现有的用户</span></span><br><span class="line"><span class="comment"># 注意输入的id必须要转换为lightfm内部的id</span></span><br><span class="line">user_x = user_id_map[<span class="string">&#x27;u3&#x27;</span>]</span><br><span class="line"><span class="comment"># 即对于该用户，看所有物品和他的匹配度</span></span><br><span class="line">items_range = np.arange(<span class="built_in">len</span>(items))</span><br><span class="line">res = model.predict(user_x, items_range)</span><br><span class="line">res = <span class="built_in">list</span>(<span class="built_in">zip</span>(items_range,res))</span><br><span class="line">res = <span class="built_in">sorted</span>(res, key=<span class="keyword">lambda</span> x: x[<span class="number">1</span>],reverse=<span class="literal">True</span>)</span><br><span class="line">res</span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">注意下方拿到的是内部重新编号后的id及对应的分数，需要重新映射回原来的物品id</span></span><br><span class="line"><span class="string">[(3, 0.5297617), (0, 0.51895887), (2, 0.4935133), (1, 0.46990803)]</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br></pre></td></tr></table></figure></div>
-]]></content>
-      <categories>
-        <category>人工智能</category>
-      </categories>
-      <tags>
-        <tag>推荐算法</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>C语言的OJ判题机设计与实现</title>
     <url>/2024/06/04/C%E8%AF%AD%E8%A8%80%E7%9A%84OJ%E5%88%A4%E9%A2%98%E6%9C%BA%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0/</url>
     <content><![CDATA[<h1 id="1-接收判题入参"><a href="#1-接收判题入参" class="headerlink" title="1. 接收判题入参"></a>1. 接收判题入参</h1><p>判题需要作答代码、测试输入和期望输出、编译器名称、时空限制。对于支持special judge的还需要传入是否为sj和sj代码。推荐使用消息队列，应对高并发的比赛情况会比较好。<br>但是消息队列是异步的，我为了快点实现能提交后在当前页面获得判题结果，就单纯的用了rpc+nginx负载均衡，不过我觉得如果要实现当场获得判题结果，也可以mq+websocket</p>
@@ -1194,6 +1134,66 @@ func (b *Builder)String()string&#123;
       </categories>
       <tags>
         <tag>LLM</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Lightfm学习记录</title>
+    <url>/2024/04/05/Lightfm%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/</url>
+    <content><![CDATA[<blockquote>
+<p>推荐参考资料</p>
+<ul>
+<li><a class="link"   href="https://making.lyst.com/lightfm/docs/home.html" >官方文档<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   href="https://github.com/lyst/lightfm" >仓库地址<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   href="https://github.com/lyst/lightfm-paper/blob/master/paper/paper.pdf" >论文地址<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   href="https://blog.csdn.net/weixin_42223090/article/details/124946918?spm=1001.2101.3001.6650.2&utm_medium=distribute.pc_relevant.none-task-blog-2~default~BlogCommendFromBaidu~Rate-2-124946918-blog-132798311.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2~default~BlogCommendFromBaidu~Rate-2-124946918-blog-132798311.235%5Ev43%5Epc_blog_bottom_relevance_base6&utm_relevant_index=5" >LightFM推荐系统框架学习笔记<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   href="https://www.sdk.cn/details/DJRrM6gmdO0w8eo4mE?ivk_sa=1024320u" >LightFM推荐模型库<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>(利于入门)<a class="link"   href="https://towardsdatascience.com/how-i-would-explain-building-lightfm-hybrid-recommenders-to-a-5-year-old-b6ee18571309" >how-i-would-explain-building-lightfm-hybrid-recommenders-to-a-5-year-old<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>(用处不大)<a class="link"   href="https://blog.csdn.net/u010379996/article/details/114701098?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522170834428116800188555665%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fall.%2522%257D&request_id=170834428116800188555665&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~first_rank_ecpm_v1~rank_v31_ecpm-19-114701098-null-null.142%5Ev99%5Epc_search_result_base9&utm_term=lightfm&spm=1018.2226.3001.4187" >协同推荐 + lightfm + 根据用户已读诗词推荐<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>(可能有用)<a class="link"   href="https://towardsdatascience.com/recommendation-system-in-python-lightfm-61c85010ce17" >Recommendation System in Python: LightFM<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>(进阶调参有用)<a class="link"   href="https://zhuanlan.zhihu.com/p/269880643/" >针对推荐系统隐式和显式反馈的混合模型——lightFM（下：python场景实例）<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+</blockquote>
+<p>上面的引用资料都很有用！</p>
+<h1 id="一些使用的细节"><a href="#一些使用的细节" class="headerlink" title="一些使用的细节"></a>一些使用的细节</h1><h2 id="对于用户和物品的特征设置权重"><a href="#对于用户和物品的特征设置权重" class="headerlink" title="对于用户和物品的特征设置权重"></a>对于用户和物品的特征设置权重</h2><p>注意网上的文章大多都是未设置权重的，如<code>(user id, [list of feature names])</code>，但是从官方文档我们可以看到实际上是可以设置权重的<code>(user id, &#123;feature name: feature weight&#125;)</code><br>这个权重的意思就是某字段在全部字段中的占比，比如<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/Lightfm%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/27fe2e6ba844454cb028f42ed9cd9434.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h2 id="打印稀疏矩阵"><a href="#打印稀疏矩阵" class="headerlink" title="打印稀疏矩阵"></a>打印稀疏矩阵</h2><p>一般的交互矩阵都是稀疏矩阵，貌似没有很好的实现<code>__str__</code>，为了查看矩阵的值，参考下方<br> <div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line">(interactions, weights) = dataset1.build_interactions([(x[<span class="number">0</span>], x[<span class="number">1</span>], x[<span class="number">2</span>]) <span class="keyword">for</span> x <span class="keyword">in</span> df.values ])</span><br><span class="line">interactions.todense()</span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">matrix([[1, 1, 0, 0],</span></span><br><span class="line"><span class="string">       [0, 1, 1, 0],</span></span><br><span class="line"><span class="string">       [1, 0, 1, 1]])</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br></pre></td></tr></table></figure></div></p>
+<h1 id="矩阵分解"><a href="#矩阵分解" class="headerlink" title="矩阵分解"></a>矩阵分解</h1><p>日常业务中可以得到用户的行为数据(交互)，如点赞&#x2F;评分等，如三元组{userID,itemID,rate},但是复杂业务中矩阵会很大，且矩阵十分稀疏(可能1w个物品，用户A只点赞了5个，我们在lightfm中使用的就是<code>scipy</code>的<code>coo_matrix</code>和<code>csr_matrix</code>)。我们的推荐，实际上就是预测这些空白项的值。因此我们引入矩阵分解，将这个大矩阵分解为两个较小的矩阵以实现降维，如<code>M x N</code>分解为<code>M x k</code>和<code>k x N</code>，即把他们投射到k维(这个k无法解释，此时就成为隐向量了)。此时两个小矩阵重新一乘，原来有的项会近似相等，原来的空白项此时也有值，那么这些值就是预测值了。<br>而对于这个分解过程，就有一些算法和目标函数了，我暂时还没搞懂<br>按照论文的说法，至少比<code>MF模型</code>和<code>CB</code>要好</p>
+<h1 id="混合模型"><a href="#混合模型" class="headerlink" title="混合模型"></a>混合模型</h1><p>由于协同过滤需要历史交互数据，存在冷启动问题；同时由于基于内容的推荐没有使用交互，用户之间是孤立的，所以实际效果不如协同过滤。所以提出了混合模型，结合了基于内容的推荐(<code>CB</code>)和协同过滤的基于模型推荐(<code>CF协同过滤，MF矩阵分解</code>)两种方式，训练者可以传入用户&#x2F;物品的特征信息(如地理位置&#x2F;年龄)等，同时也传入交互信息{userID,itemID,rate},那么在数据少时仍可以基于用户物品的特征进行适当的推荐<br>所以，如果没有传入用户物品的特征信息，那么模型只是一个单纯的MF模型，基于内容是通过embedding实现的<br>而embedding是通过矩阵分解?得到的，事实上<code>M x k</code>的矩阵元素都是embedding</p>
+<h1 id="论文解读-我是科研新人，如有不对欢迎指正"><a href="#论文解读-我是科研新人，如有不对欢迎指正" class="headerlink" title="论文解读(我是科研新人，如有不对欢迎指正)"></a>论文解读(我是科研新人，如有不对欢迎指正)</h1><p>模型的需求：1. 如果物品A和B经常同时被推荐，那么应该学到A和B非常相似 2. 模型能即时根据新数据进行更新<br>对于需求一，使用latent representation，根据交互信息确定两个物体的embedding的距离。<br>对于需求二，将用户和物体表示为内容特征的线性组合</p>
+<p>对于predict，就是是对用户&#x2F;物品的已分解出的特征矩阵进行点积，再加上偏置，得到一个值$\hat r_{ui}$，这个就是MF模型的方法。但是这个$q_u$和$p_i$还有那两个偏置都是各特征之和(也算线性组合)，所以也融入了一点CB的思想。<br>$$<br>\hat r_{ui} &#x3D; f (q_u · p_i + b_u + b_i)<br>$$</p>
+<p>目标函数是求最优化的分解出的矩阵，利用了交互信息，即对于交互信息(有正向和负向的交互)，每个{user,item}对求出$\hat r_{ui}$然后根据正负属性进行操作，累乘后再两部分相乘。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/Lightfm%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/77577f16795a298e9aea3c3d03524d16.png"
+                      alt="在这里插入图片描述"
+                ><br>论文中提及的模型结构如下<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/Lightfm%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/45c1202e6907e95a21be13e789fa0507.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/Lightfm%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/754545025d44bee65e070b0a10b956db.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/Lightfm%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/08e30d8c944f91422a354f97122c0fa0.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h1 id="我的demo"><a href="#我的demo" class="headerlink" title="我的demo"></a>我的demo</h1><p>只是对于官方例子和参考其他人的例子改出来的demo，不知道是不是符合原作者的想法。<br>使用这个框架时，对于用户&#x2F;物品的特征和交互量的量化，似乎也是一个关键，而所有例子都没有体现（包括我这个）。不过这本来也该是自己完成的。</p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> scipy <span class="keyword">import</span> sparse</span><br><span class="line"><span class="keyword">from</span> lightfm <span class="keyword">import</span> LightFM</span><br><span class="line"></span><br><span class="line"><span class="comment"># 交互信息</span></span><br><span class="line">interaction = [(<span class="string">&#x27;u1&#x27;</span>, <span class="string">&#x27;i1&#x27;</span>, <span class="number">1</span>), (<span class="string">&#x27;u1&#x27;</span>, <span class="string">&#x27;i3&#x27;</span>, <span class="number">2</span>), (<span class="string">&#x27;u2&#x27;</span>, <span class="string">&#x27;i2&#x27;</span>, <span class="number">1</span>), (<span class="string">&#x27;u2&#x27;</span>, <span class="string">&#x27;i3&#x27;</span>, <span class="number">3</span>),</span><br><span class="line">               (<span class="string">&#x27;u3&#x27;</span>, <span class="string">&#x27;i1&#x27;</span>, <span class="number">4</span>), (<span class="string">&#x27;u3&#x27;</span>, <span class="string">&#x27;i4&#x27;</span>, <span class="number">5</span>), (<span class="string">&#x27;u3&#x27;</span>, <span class="string">&#x27;i2&#x27;</span>, <span class="number">2</span>)]</span><br><span class="line"><span class="comment"># 3user 4item 5种rate</span></span><br><span class="line">interaction</span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">[(&#x27;u1&#x27;, &#x27;i1&#x27;, 1),</span></span><br><span class="line"><span class="string"> (&#x27;u1&#x27;, &#x27;i3&#x27;, 2),</span></span><br><span class="line"><span class="string"> (&#x27;u2&#x27;, &#x27;i2&#x27;, 1),</span></span><br><span class="line"><span class="string"> (&#x27;u2&#x27;, &#x27;i3&#x27;, 3),</span></span><br><span class="line"><span class="string"> (&#x27;u3&#x27;, &#x27;i1&#x27;, 4),</span></span><br><span class="line"><span class="string"> (&#x27;u3&#x27;, &#x27;i4&#x27;, 5),</span></span><br><span class="line"><span class="string"> (&#x27;u3&#x27;, &#x27;i2&#x27;, 2)]</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line">user_data = [(<span class="string">&#x27;u1&#x27;</span>, &#123;<span class="string">&#x27;f1&#x27;</span>: <span class="number">5</span>, <span class="string">&#x27;f2&#x27;</span>: <span class="number">2</span>, <span class="string">&#x27;f3&#x27;</span>: <span class="number">1</span>&#125;),</span><br><span class="line"> (<span class="string">&#x27;u2&#x27;</span>, &#123;<span class="string">&#x27;f1&#x27;</span>: <span class="number">0</span>, <span class="string">&#x27;f2&#x27;</span>: <span class="number">1</span>, <span class="string">&#x27;f3&#x27;</span>: <span class="number">3</span>&#125;),</span><br><span class="line"> (<span class="string">&#x27;u3&#x27;</span>, &#123;<span class="string">&#x27;f1&#x27;</span>: <span class="number">4</span>, <span class="string">&#x27;f2&#x27;</span>: <span class="number">3</span>, <span class="string">&#x27;f3&#x27;</span>: <span class="number">3</span>&#125;)]</span><br><span class="line"></span><br><span class="line">users = <span class="built_in">set</span>(<span class="built_in">map</span>(<span class="keyword">lambda</span> i:i[<span class="number">0</span>],interaction))</span><br><span class="line">items = <span class="built_in">set</span>(<span class="built_in">map</span>(<span class="keyword">lambda</span> i:i[<span class="number">1</span>],interaction))</span><br><span class="line">user_features = [<span class="string">&#x27;f1&#x27;</span>,<span class="string">&#x27;f2&#x27;</span>,<span class="string">&#x27;f3&#x27;</span>]</span><br><span class="line"><span class="built_in">print</span>(users,items,user_features)</span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">&#123;&#x27;u3&#x27;, &#x27;u2&#x27;, &#x27;u1&#x27;&#125; &#123;&#x27;i1&#x27;, &#x27;i2&#x27;, &#x27;i4&#x27;, &#x27;i3&#x27;&#125; [&#x27;f1&#x27;, &#x27;f2&#x27;, &#x27;f3&#x27;]</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> lightfm.data <span class="keyword">import</span> Dataset</span><br><span class="line"><span class="comment"># we call fit to supply user id, item id and user/item features</span></span><br><span class="line">dataset1 = Dataset()</span><br><span class="line"><span class="comment"># 把数据先丢进去，生成&#123;值:内部id&#125;的映射，方便后面提取出稀疏矩阵</span></span><br><span class="line">dataset1.fit_partial(users=users,items=items,user_features=user_features)</span><br><span class="line">dataset1.mapping()</span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">第一行是用户的编号(模型内部生成)</span></span><br><span class="line"><span class="string">第二行是用户的特征及其编号，可以看到用户编号也作为特征</span></span><br><span class="line"><span class="string">第三行第四行就是物品的编号和特征和特征编号</span></span><br><span class="line"><span class="string">搞这么多编号也对应了这个模型适合分析离散的数据，虽然我没怎么懂</span></span><br><span class="line"><span class="string">(&#123;&#x27;u3&#x27;: 0, &#x27;u2&#x27;: 1, &#x27;u1&#x27;: 2&#125;,</span></span><br><span class="line"><span class="string"> &#123;&#x27;u3&#x27;: 0, &#x27;u2&#x27;: 1, &#x27;u1&#x27;: 2, &#x27;f1&#x27;: 3, &#x27;f2&#x27;: 4, &#x27;f3&#x27;: 5&#125;,</span></span><br><span class="line"><span class="string"> &#123;&#x27;i1&#x27;: 0, &#x27;i2&#x27;: 1, &#x27;i4&#x27;: 2, &#x27;i3&#x27;: 3&#125;,</span></span><br><span class="line"><span class="string"> &#123;&#x27;i1&#x27;: 0, &#x27;i2&#x27;: 1, &#x27;i4&#x27;: 2, &#x27;i3&#x27;: 3&#125;)</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 构造用户特征矩阵</span></span><br><span class="line">uf = dataset1.build_user_features(user_data)</span><br><span class="line">uf.todense()</span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">6列三行，对应3个用户的6个特征属性，</span></span><br><span class="line"><span class="string">计算过程我们来看第二行，u2是(&#x27;u2&#x27;, &#123;&#x27;f1&#x27;: 0, &#x27;f2&#x27;: 1, &#x27;f3&#x27;: 3&#125;),他的特征就是</span></span><br><span class="line"><span class="string">&#123;u1:0,u2:1,u3:0,f1:0,f2:1,f3:3&#125;，其他为0的就不看了，只剩&#123;u2:1,f2:1,f3:3&#125;，</span></span><br><span class="line"><span class="string">所以分母为5，分子为各值，就出来了0,2,   0,2,   0.6，这就是权重的作用，可以分配比例</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">matrix([[0.09090909, 0.        , 0.        , 0.36363637, 0.27272728,</span></span><br><span class="line"><span class="string">         0.27272728],</span></span><br><span class="line"><span class="string">        [0.        , 0.2       , 0.        , 0.        , 0.2       ,</span></span><br><span class="line"><span class="string">         0.6       ],</span></span><br><span class="line"><span class="string">        [0.        , 0.        , 0.11111111, 0.5555556 , 0.22222222,</span></span><br><span class="line"><span class="string">         0.11111111]], dtype=float32)</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 构造交互矩阵</span></span><br><span class="line">(interactions, weights) = dataset1.build_interactions(interaction)</span><br><span class="line"><span class="built_in">print</span>(interactions.todense())</span><br><span class="line"><span class="built_in">print</span>(weights.todense())</span><br><span class="line"><span class="comment"># 注意这里的行数是用户数，列数是物品数，所以是交互</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">[[1 1 1 0]</span></span><br><span class="line"><span class="string"> [0 1 0 1]</span></span><br><span class="line"><span class="string"> [1 0 0 1]]</span></span><br><span class="line"><span class="string">[[4. 2. 5. 0.]</span></span><br><span class="line"><span class="string"> [0. 1. 0. 3.]</span></span><br><span class="line"><span class="string"> [1. 0. 0. 2.]]</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># windows只能用这个</span></span><br><span class="line">model = LightFM(loss=<span class="string">&#x27;logistic&#x27;</span>)</span><br><span class="line"><span class="comment"># 下面的参数在ubuntu上可运行，效果更好</span></span><br><span class="line"><span class="comment"># 参考 https://github.com/lyst/lightfm/issues/690</span></span><br><span class="line"><span class="comment"># model = LightFM(loss=&#x27;warp&#x27;)</span></span><br><span class="line"></span><br><span class="line">model.fit(interactions,</span><br><span class="line">      user_features= uf, </span><br><span class="line">      sample_weight= weights,</span><br><span class="line">      epochs=<span class="number">10</span>)</span><br><span class="line">      </span><br><span class="line"><span class="keyword">from</span> lightfm.evaluation <span class="keyword">import</span> auc_score</span><br><span class="line"><span class="comment"># 好像是测试一下</span></span><br><span class="line">train_auc = auc_score(model,</span><br><span class="line">                      interactions,</span><br><span class="line">                      user_features=uf</span><br><span class="line">                     ).mean()</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;Hybrid training set AUC: %s&#x27;</span> % train_auc)</span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">好像效果不是很好</span></span><br><span class="line"><span class="string">Hybrid training set AUC: 0.5</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"></span><br><span class="line">user_id_map, user_feature_map, item_id_map, item_feature_map = dataset1.mapping()</span><br><span class="line"><span class="comment"># 预测现有的用户</span></span><br><span class="line"><span class="comment"># 注意输入的id必须要转换为lightfm内部的id</span></span><br><span class="line">user_x = user_id_map[<span class="string">&#x27;u3&#x27;</span>]</span><br><span class="line"><span class="comment"># 即对于该用户，看所有物品和他的匹配度</span></span><br><span class="line">items_range = np.arange(<span class="built_in">len</span>(items))</span><br><span class="line">res = model.predict(user_x, items_range)</span><br><span class="line">res = <span class="built_in">list</span>(<span class="built_in">zip</span>(items_range,res))</span><br><span class="line">res = <span class="built_in">sorted</span>(res, key=<span class="keyword">lambda</span> x: x[<span class="number">1</span>],reverse=<span class="literal">True</span>)</span><br><span class="line">res</span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">注意下方拿到的是内部重新编号后的id及对应的分数，需要重新映射回原来的物品id</span></span><br><span class="line"><span class="string">[(3, 0.5297617), (0, 0.51895887), (2, 0.4935133), (1, 0.46990803)]</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br></pre></td></tr></table></figure></div>
+]]></content>
+      <categories>
+        <category>人工智能</category>
+      </categories>
+      <tags>
+        <tag>推荐算法</tag>
       </tags>
   </entry>
   <entry>
@@ -2503,45 +2503,6 @@ import {initHBE} from "/js/plugins/hbe.js";
 ]]></content>
   </entry>
   <entry>
-    <title>bcompare使用</title>
-    <url>/2024/10/31/bcompare%E4%BD%BF%E7%94%A8/</url>
-    <content><![CDATA[<p>因为用meld报错<code>/usr/bin/python3: symbol lookup error: /snap/core20/current/lib/x86_64-linux-gnu/libpthread.so.0: undefined symbol: __libc_pthread_init, version GLIBC_PRIVATE</code>，只好改用bcompare</p>
-<p>网站：<a class="link"   href="https://www.scootersoftware.com/download.php?zz=dl4" >https://www.scootersoftware.com/download.php?zz=dl4<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-<p>下载链接：<a class="link"   href="https://www.scootersoftware.com/files/bcompare-4.4.6.27483_amd64.deb" >https://www.scootersoftware.com/files/bcompare-4.4.6.27483_amd64.deb<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-<p>安装与输入破解码</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo dpkg -i bcompare-4.4.6.27483_amd64.deb</span><br><span class="line"></span><br><span class="line">cd /usr/lib/beyondcompare/</span><br><span class="line"></span><br><span class="line">sudo sed -i &quot;s/keexjEP3t4Mue23hrnuPtY4TdcsqNiJL-5174TsUdLmJSIXKfG2NGPwBL6vnRPddT7tH29qpkneX63DO9ECSPE9rzY1zhThHERg8lHM9IBFT+rVuiY823aQJuqzxCKIE1bcDqM4wgW01FH6oCBP1G4ub01xmb4BGSUG6ZrjxWHJyNLyIlGvOhoY2HAYzEtzYGwxFZn2JZ66o4RONkXjX0DF9EzsdUef3UAS+JQ+fCYReLawdjEe6tXCv88GKaaPKWxCeaUL9PejICQgRQOLGOZtZQkLgAelrOtehxz5ANOOqCaJgy2mJLQVLM5SJ9Dli909c5ybvEhVmIC0dc9dWH+/N9KmiLVlKMU7RJqnE+WXEEPI1SgglmfmLc1yVH7dqBb9ehOoKG9UE+HAE1YvH1XX2XVGeEqYUY-Tsk7YBTz0WpSpoYyPgx6Iki5KLtQ5G-aKP9eysnkuOAkrvHU8bLbGtZteGwJarev03PhfCioJL4OSqsmQGEvDbHFEbNl1qJtdwEriR+VNZts9vNNLk7UGfeNwIiqpxjk4Mn09nmSd8FhM4ifvcaIbNCRoMPGl6KU12iseSe+w+1kFsLhX+OhQM8WXcWV10cGqBzQE9OqOLUcg9n0krrR3KrohstS9smTwEx9olyLYppvC0p5i7dAx2deWvM1ZxKNs0BvcXGukR+/g&quot; BCompare</span><br></pre></td></tr></table></figure></div>
-
-<p>启动，并尝试enter key 激活</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/../article_images/bcompare%E4%BD%BF%E7%94%A8/image.png"
-                      alt="alt text"
-                ></p>
-<p>输入key</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">--- BEGIN LICENSE KEY ---</span><br><span class="line">GXN1eh9FbDiX1ACdd7XKMV7hL7x0ClBJLUJ-zFfKofjaj2yxE53xauIfkqZ8FoLpcZ0Ux6McTyNmODDSvSIHLYhg1QkTxjCeSCk6ARz0ABJcnUmd3dZYJNWFyJun14rmGByRnVPL49QH+Rs0kjRGKCB-cb8IT4Gf0Ue9WMQ1A6t31MO9jmjoYUeoUmbeAQSofvuK8GN1rLRv7WXfUJ0uyvYlGLqzq1ZoJAJDyo0Kdr4ThF-IXcv2cxVyWVW1SaMq8GFosDEGThnY7C-SgNXW30jqAOgiRjKKRX9RuNeDMFqgP2cuf0NMvyMrMScnM1ZyiAaJJtzbxqN5hZOMClUTE+++</span><br><span class="line">--- END LICENSE KEY -----</span><br></pre></td></tr></table></figure></div>
-<p>激活成功<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/../article_images/bcompare%E4%BD%BF%E7%94%A8/image2.png"
-                      alt="alt text"
-                ></p>
-<p>点这个选择待比较目录<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/../article_images/bcompare%E4%BD%BF%E7%94%A8/image3.png"
-                      alt="alt text"
-                ></p>
-<p>注意要改下设置，不然连时间戳不对他也会认为文件不一致。下面那个“比较内容”的设置，我是跟着网上博客学的，我也不知道是干嘛的。<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/../article_images/bcompare%E4%BD%BF%E7%94%A8/image4.png"
-                      alt="alt text"
-                ></p>
-<p>这样之后如果<code>apt update</code>可能会报错：<code>E: 仓库 “https://www.scootersoftware.com bcompare4 Release” 没有数字签名。</code>，直接把这个删掉即可：<code>rm /etc/apt/sources.list.d/scootersoftware.list</code></p>
-]]></content>
-  </entry>
-  <entry>
     <title>casbin权限和配置文件的理解</title>
     <url>/2023/01/23/casbin%E6%9D%83%E9%99%90%E5%92%8C%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E7%90%86%E8%A7%A3/</url>
     <content><![CDATA[<blockquote>
@@ -2582,6 +2543,45 @@ import {initHBE} from "/js/plugins/hbe.js";
         <category>权限</category>
         <category>笔记</category>
       </categories>
+  </entry>
+  <entry>
+    <title>bcompare使用</title>
+    <url>/2024/10/31/bcompare%E4%BD%BF%E7%94%A8/</url>
+    <content><![CDATA[<p>因为用meld报错<code>/usr/bin/python3: symbol lookup error: /snap/core20/current/lib/x86_64-linux-gnu/libpthread.so.0: undefined symbol: __libc_pthread_init, version GLIBC_PRIVATE</code>，只好改用bcompare</p>
+<p>网站：<a class="link"   href="https://www.scootersoftware.com/download.php?zz=dl4" >https://www.scootersoftware.com/download.php?zz=dl4<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<p>下载链接：<a class="link"   href="https://www.scootersoftware.com/files/bcompare-4.4.6.27483_amd64.deb" >https://www.scootersoftware.com/files/bcompare-4.4.6.27483_amd64.deb<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<p>安装与输入破解码</p>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo dpkg -i bcompare-4.4.6.27483_amd64.deb</span><br><span class="line"></span><br><span class="line">cd /usr/lib/beyondcompare/</span><br><span class="line"></span><br><span class="line">sudo sed -i &quot;s/keexjEP3t4Mue23hrnuPtY4TdcsqNiJL-5174TsUdLmJSIXKfG2NGPwBL6vnRPddT7tH29qpkneX63DO9ECSPE9rzY1zhThHERg8lHM9IBFT+rVuiY823aQJuqzxCKIE1bcDqM4wgW01FH6oCBP1G4ub01xmb4BGSUG6ZrjxWHJyNLyIlGvOhoY2HAYzEtzYGwxFZn2JZ66o4RONkXjX0DF9EzsdUef3UAS+JQ+fCYReLawdjEe6tXCv88GKaaPKWxCeaUL9PejICQgRQOLGOZtZQkLgAelrOtehxz5ANOOqCaJgy2mJLQVLM5SJ9Dli909c5ybvEhVmIC0dc9dWH+/N9KmiLVlKMU7RJqnE+WXEEPI1SgglmfmLc1yVH7dqBb9ehOoKG9UE+HAE1YvH1XX2XVGeEqYUY-Tsk7YBTz0WpSpoYyPgx6Iki5KLtQ5G-aKP9eysnkuOAkrvHU8bLbGtZteGwJarev03PhfCioJL4OSqsmQGEvDbHFEbNl1qJtdwEriR+VNZts9vNNLk7UGfeNwIiqpxjk4Mn09nmSd8FhM4ifvcaIbNCRoMPGl6KU12iseSe+w+1kFsLhX+OhQM8WXcWV10cGqBzQE9OqOLUcg9n0krrR3KrohstS9smTwEx9olyLYppvC0p5i7dAx2deWvM1ZxKNs0BvcXGukR+/g&quot; BCompare</span><br></pre></td></tr></table></figure></div>
+
+<p>启动，并尝试enter key 激活</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/bcompare%E4%BD%BF%E7%94%A8/image.png"
+                      alt="alt text"
+                ></p>
+<p>输入key</p>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">--- BEGIN LICENSE KEY ---</span><br><span class="line">GXN1eh9FbDiX1ACdd7XKMV7hL7x0ClBJLUJ-zFfKofjaj2yxE53xauIfkqZ8FoLpcZ0Ux6McTyNmODDSvSIHLYhg1QkTxjCeSCk6ARz0ABJcnUmd3dZYJNWFyJun14rmGByRnVPL49QH+Rs0kjRGKCB-cb8IT4Gf0Ue9WMQ1A6t31MO9jmjoYUeoUmbeAQSofvuK8GN1rLRv7WXfUJ0uyvYlGLqzq1ZoJAJDyo0Kdr4ThF-IXcv2cxVyWVW1SaMq8GFosDEGThnY7C-SgNXW30jqAOgiRjKKRX9RuNeDMFqgP2cuf0NMvyMrMScnM1ZyiAaJJtzbxqN5hZOMClUTE+++</span><br><span class="line">--- END LICENSE KEY -----</span><br></pre></td></tr></table></figure></div>
+<p>激活成功<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/bcompare%E4%BD%BF%E7%94%A8/image2.png"
+                      alt="alt text"
+                ></p>
+<p>点这个选择待比较目录<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/bcompare%E4%BD%BF%E7%94%A8/image3.png"
+                      alt="alt text"
+                ></p>
+<p>注意要改下设置，不然连时间戳不对他也会认为文件不一致。下面那个“比较内容”的设置，我是跟着网上博客学的，我也不知道是干嘛的。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/bcompare%E4%BD%BF%E7%94%A8/image4.png"
+                      alt="alt text"
+                ></p>
+<p>这样之后如果<code>apt update</code>可能会报错：<code>E: 仓库 “https://www.scootersoftware.com bcompare4 Release” 没有数字签名。</code>，直接把这个删掉即可：<code>rm /etc/apt/sources.list.d/scootersoftware.list</code></p>
+]]></content>
   </entry>
   <entry>
     <title>d3.js数据可视化学习</title>
@@ -2728,6 +2728,32 @@ import {initHBE} from "/js/plugins/hbe.js";
       </categories>
       <tags>
         <tag>LLM</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>gal/butter reflection</title>
+    <url>/2024/10/16/gal_butter_reflection/</url>
+    <content><![CDATA[
+<div class="hbe hbe-container" id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">
+  <script id="hbeData" type="hbeData" data-hmacdigest="9080e9d3cb689e71cb8943f4260f4bc9007517d9dff8c4ede374550059840d92">5abcf1c9fdf987264abb4688b39835b257ade6e7256b99a215519372555793ee350fced7024586ccc42d85960fd495d17e1bd82a7712d2059fbd0f7d9ed7570ac3ce4abc1f3c72709fdb3d746fa5c355f2a7215052c3b9a62bdf15b99a6458f78ae296ce7c1de97aebaaf1f5e0ab028c1cdc50da0bb025a2ee18216a5e6a7e29e7630d2a07ee00cb13f253f001a6eb609ee2dd8329b2bc9d23a222cc8ad5b235d72021363a8cd620f53213005e922fc536ca043ca254aea3dfa76120fabba7d8bf73284f22c4647a4f2b11baaad5a3020551fb4cd73ff54088554ba623f2c9cef3212a167af6a111ddb4011eb04d4036b86cc7d9c6334037b5f7015a3d6761ca26ab4de976fdfa87aa417e89c56fa468e35f6b536c8c7fade4b5bd7fb0aa7a754d583a3d6b66f627d754ab298b3aa4e815e6f8ab1f058787b686ea6afe492aa26f5c6ec75de783e4284ecae0e0e71441d0a9d455497853a03ef6319241a8da3e218324da3c5955764fc3d5d3153f5b64073082fd290868634fb9108f62cbca48281d9679f695191835c56f98474e23dec3e660cc8f0872b1cce4b12f8e277971ebfcdd7b5031e5b6e3588001bf0e43508b8c1667e83534ec4040dce6ba78ecbb04aa7a69093a465b6d083ac6ef633155482b12c3b3a0fa77ccdab1637c009967c86bf1023b8aed7cc8eef436f31f048c0bd3bf53fc8121e99bef0dbab59fd9b89e94678c19f43ad6ea86bb264ac5a8e813ba022a59627e206d433cfe8f829687d0066a51e0035912ea4fbf08da279e2876ad5e1133538d3b4bd2c461ab39352b72b463c6dbb1c05fd7a362378197c6e0b7f8ca94c4dd0626cd327b8ef6507f2b2b9c88b019b1c422cdd9aa613060afe6b95787b082ba05183bb96ce46f545fc3dea70d40b0c5b6e6cd097d0947737363a7a062af3da6ed6e7d391a2ebad0fc14ee3b9912835c18db446011c76c5cf3ba858173a370ce993667abf184ca3790d29d48b51fad5d99ebd0e03eeb3e305c59a8910cce4477fd0ed0899aef5e13ff9c706bfd1c011560a3313d68840063de5f9564e4d22459cca1fc6b4f32088d559a4a6f44b9bb3f797e345e06f684b4d0e93a9464d54efc64ec9e500bab27ffcf8914fdeb42792bf292cce46b1512ecb0bc657bcd22ee8c0dd87f25a7588be57f5c980c58635d4ae16de964a9d48a74a71a7d650e886280d6bd191a11d449e398bb5be70e6011b8cfb127a63ca1038b61ae3c47866bccc8a0e3b053bc821739a54dde8c8078e400f4055020873350aeb763543dad76e3a3cd23e7a07f57bf52463b6dc40d323bbc3bfb3f9ec61902c202290f91898a8620ac811976d4864091f802b93e16f4f5f765712e107d3bdccd2630eacdefdf20b331b6c2e86f8240164566513c7010845daeeb3a2432414d77d103726b52e9d09f3c5146be7bab3f3a6b12a74f6fd9af27254c95eb8b9e34045c3120a7b7d4dc3d257fdba46bc609648d6bb3b91b1648f1fc98b24c34819ed722fa309fdf7967d97131be70f5c32dcadd823abe9ec564e0d87b2c902de834f28343469a67432270dfdfda12cc343417818b56d745d6fcd7036763fb2f5f5c540c2418f7f966b067253bcc72b0823ef83e08dbabcb12ac2656c631ca3c6c00d7be99115a91792c49cfcf8a3ceaf46944e79a91548272879a11886d8f453580a9d38a1932ed9b4bd9b97ba8a8a5f08e1c685cd8929c709c383df34e8056d28ca97e88bfa2e1eafc9c81e2754b4958b33c1d2995d4084aeb4287a664ea751e77dbd06ea7f8adcf383ff5f90f7d7e6be0ba5e9fe14e36da19033817e3a6f78f9a0f88c7905431c97eca8056941524bb799e2571efe284fe9651ad6a960430870fd713e5e9c439ea1d80e96d44d6aa555d1957576b899b3734b52a944514357304f6e912e7ebc904026d6bce1c541a036528c74645add4dc788329d1bcb44d8aeaff11c8813239a3be785396144768a1c0c729c7e04cabb3ff328506c3d06105680108843c64d362ae6e73f828351cf0101186836c4218a88bc3b4a9236cbdec2a183a76a2e886fad69e08b68abe2f482c6628b125baa246cdb51055fa3109fc912e97d4283ff890bb1e1c7983458e1e6edb6753c694b21e53fe3beeddfb3862216cc6c590d1a21fede318ae1e1c0fc62d027ca9813df2bf8ab748ee992b0350127ad9d844d1e83968b878bfbf0ead55879d2461c45d53c3d1065ae34f8d60dd5c0c0475d57f17309f611c654277da28809f998ef9a277c4c7ea49e5743b03945f60d5f9fda4fe9187ac2a5ccb402b82600a918342700132395fab45fe07ff72804425c0bbfe03fffb609bc635d6949b4e11874d4a62cc43e8e2201b89e65e6b89133dc2d75c29a92750e904e35c89e387f92619452d81e430a330d49b39ac5c023bcb04c300af11544cc2a1de6519c9d8a8daf0d7ea2ebf9baeca94813c125a329fe16dbd26dbc6b0a8ad57a1f039f9563b0e4d030570c6fc07b0010685caa325ad521f6355b55adad2dd1fee2c996892c7be600ac6e95b0dff4239416ef3e093ce3132ce48b0e2becf0348f3200e9735b9b7b3a9729b21bb972146294ed009b2b600ce646395db02718b677ac9b677dde381cf446d44890dade59687f12753f3a0da18f05aa0151716cef721bcd707868bc6a5bffdbd0f0fb74e50ff524cd3086157f64bf8f6549533a904a3dfc864b99e845295791ddd2ed58a2ea142bdcbef31b7e828ae19d59eb60fabbf40bfcbec348d01338f2e80116923030f7dd3a3756cc5c154de244a64c737345d6fdf6b84b36b23c39329494fc5c898f342529aa4b6963f9a5ba59e0c984d21a4e8870f624b8e668330f48c7b83287a74d4a5542d8a7cdb65dc19dff22acedf0af6733bad478e4393a87b6d0f3ade77e889ab92dfcca13a3ac5d44be940460187173395014de1f5f0edbaee67450e60ffc094aaaac9019fe54694e84461fb7a4b6a9c34257975454de4fdfdbc1a8f870ed7b0da2c9964eb5cbc3769baa244c755c4a6ed6ec9305eaa9aca6e645032b31cb2608a3de8e54a61eb0f4de849c9db2e3997d195e308968a21a99497883c6c5b40ff75f61d1561f8656817a5ee99335fddc5aaaa8a0c72f70d56c2175fa0111aa50c009c65e6ed81e8b0f4ee79fd472c535e5f7985cb04116592ad55b5627fbbfc0bb1895e70b041a4ab7c395b64f339338c12dc54b65c33ea5d445cc2370949a9a04fed2c65575b7f240bdc2659ebd0e118912bae013129a31a92ab6f8f132b03b833a0fe513e897810eb80aedd6309142a04a66435e03fdf3caad5d861219e2d6e04eefe5592a7d4ba3cca26f347d6b4b2d6f8159ed7a3e157f200fbe8c384b91af73eb54700af0eb390d84d4092ec4b1656690803c774ba26b5e1af617af1b62ac8d2b29405b996c0e5733ca7064c8b33d024f4313786594517a9ec0c5283815488d2ca5e7f18f46aa4965a5809f8bf730dd732c06918e9b7adac8f0bd3fb0c92cf22aa56d07aa281b516dc53e03eca24cd1b5adee61f3b4431738b84be1c0b3fb38bb3e57893b9da30fd9eb95e4bdeba0fdf882773e573592fbf1e6ef3c8d95871b9c0386bf54dee2758d7870a525f8c3e2e8edd50d936d674697b01961eafb2034d46b301398c83af3db6b310f2cef99552610f36c3d3984408013e7b68a942aee0cb9adc097373ae07227938d9c7425322a07439fa6c396ed61923d8e29db53511925952ea6d1b064c9a2ae6ef0dae76fb722076ea52c2a7af1c95c9feea169bea4fc8dd5772d01386baf3c8222925ad986034d1501bd0df4412a69542a68ba9d1e044a95c1fcb2de0f0076b2a9b55a17fcc20a0cb0430daf63418a296212f2a11a7eb9004b7200d2b57161130fa5248ca036d52b2743fb8dd90ebd258e3108ac7733708d067f8c81c6e47968c2de590123cc7bc20d0ea772a172d58639f46918b88793744dc3d343e6b8b8e14112b45d72f1d10d2429188c9411536eb5db611d1bb397b311b09528d3405726255222123c2fa1483703844eb492fe91d45315034ec41db70396fad4d2785f64e753c4e679e9adf6b713805734b9e1bfa8efe73b1485913f56ad425830659b2dd587fa25b1d3cede16a691648d039227a5a3095b7060d90a4cc9e677278ca02c46a9c681010e542fc5d5e6ac57854a028833eb3018c682c58e72a37d8313cfb0f926b43da890af931df53d04c6f468f01063eca1ec63b924b2b92ea6c5a7e84808df22a21ec7cd14b8d27d1cbf930f478b41ce4b9900e8177679a3c7a2587520634de7c7b09ad9f71e8e040693f3367dbfbc6b2e9cd4c091d1f071b4ec45457bb954ed9e9bcb6cfc79f341a47153acead8cc7ec28043756b687297b1e09425a78e82e5af0e78af3a312fa1c93f2e49565d8f05366942b53dbf066e15bf21552bc6d0d262568f701dd48039f430c4d676dc493004786eadceb9eee07d22c84c8679123f03f376fffbfe32cae90b65e4e6b04f457adc5a41f18b19dd0e3c8c81d362a77fd9236278cef43978694649bf52b6ce2fe21180414bfc47683b6d756ebc2ffd13bf25a33fdcd3d5a9f935e60e060a99ce2d441844fa4ce35e8cde20e6bbf50d2f0da00963d0b14ebbe973f97c8b6a15d81bb8168ccba24ee344171180242e58e208074750a4c9cfb3d62a6310edae80be8d492b187161aa97819ff6bc1a6f9c8e6629219fba386ddc2640fe8100add2e8eb7c28daaa5929ca4b918c8b95a8238219418a6dd45d849a5d1617accc1beb6dffbf580d146cdfe9e1fc7dcb135148d8cafb8f541197e3cdd1f6af994a726ffa3044c7fcd0648e8ff9cd8be02413abeb2971d667fbda6d584f17c23c5e983d66f3188446b06b3664b6a7ddf990931762565a69bfaed6c46997e18f5bf5b6ead7b0d88d2353e14540eb585d1c91178247a2c6fee159a6643304f4f149e3534d83a7a9c78ed6361298a616a5426cbfa68729387b27eaf45d54fddc916d060a446bee618928c02936a65339af0e6963d13bb268f7d7985d14f0d4b91dfb887f48db5362130ded19ce04589f84de763ba0434ed5b8c4423f91aae731f0400a01e012f1a04ed3cb7e84510ffdd4ea13730fbf606205fa09994a7b9f2ad1b4ae3f8dc43f6d252f0dd441881d02429111a018d06d61977ad2f4435218e724212dc5a1a400c736c1e71477be449694e079d75a962c0172b300adfd2fe8b278b28ba7f477988070f15773512d7aba4bf11e1afd9d84e5f9f534082c9770d4ca3fedab2fbfa1126dd5208fae618c71493f6d6a37d1d2e8d6d25ef57da6dfbc464bb9e1bd2885a5589be382aa224fb38db67b3acf1c7dcca88815273cdca6276b7998f95879707904ac5</script>
+  <div class="hbe hbe-content">
+    <div class="hbe hbe-input hbe-input-default">
+      <input class="hbe hbe-input-field hbe-input-field-default" type="password" id="hbePass">
+      <label class="hbe hbe-input-label hbe-input-label-default" for="hbePass">
+        <span class="hbe hbe-input-label-content hbe-input-label-content-default">Hey, password is required here.</span>
+      </label>
+    </div>
+  </div>
+</div>
+<link href="/css/hbe.style.css" rel="stylesheet" type="text/css"><script data-swup-reload-script type="module" src="/js/plugins/hbe.js"></script>
+<script data-swup-reload-script type="module">
+import {initHBE} from "/js/plugins/hbe.js";
+  console.log("hexo-blog-encrypt: loaded.");
+    initHBE();
+</script>
+]]></content>
+      <tags>
+        <tag>记录</tag>
       </tags>
   </entry>
   <entry>
@@ -2906,32 +2932,6 @@ import {initHBE} from "/js/plugins/hbe.js";
 <p>More info: <a class="link"   href="https://hexo.io/docs/one-command-deployment.html" >Deployment<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
 <h1 id="Redefine主题文档"><a href="#Redefine主题文档" class="headerlink" title="Redefine主题文档"></a>Redefine主题文档</h1><p><a class="link"   href="https://redefine-docs.ohevan.com/getting-started" >快速开始 - Redefine Docs (ohevan.com)<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
 ]]></content>
-  </entry>
-  <entry>
-    <title>gal/butter reflection</title>
-    <url>/2024/10/16/gal_butter_reflection/</url>
-    <content><![CDATA[
-<div class="hbe hbe-container" id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">
-  <script id="hbeData" type="hbeData" data-hmacdigest="9080e9d3cb689e71cb8943f4260f4bc9007517d9dff8c4ede374550059840d92">5abcf1c9fdf987264abb4688b39835b257ade6e7256b99a215519372555793ee350fced7024586ccc42d85960fd495d17e1bd82a7712d2059fbd0f7d9ed7570ac3ce4abc1f3c72709fdb3d746fa5c355f2a7215052c3b9a62bdf15b99a6458f78ae296ce7c1de97aebaaf1f5e0ab028c1cdc50da0bb025a2ee18216a5e6a7e29e7630d2a07ee00cb13f253f001a6eb609ee2dd8329b2bc9d23a222cc8ad5b235d72021363a8cd620f53213005e922fc536ca043ca254aea3dfa76120fabba7d8bf73284f22c4647a4f2b11baaad5a3020551fb4cd73ff54088554ba623f2c9cef3212a167af6a111ddb4011eb04d4036b86cc7d9c6334037b5f7015a3d6761ca26ab4de976fdfa87aa417e89c56fa468e35f6b536c8c7fade4b5bd7fb0aa7a754d583a3d6b66f627d754ab298b3aa4e815e6f8ab1f058787b686ea6afe492aa26f5c6ec75de783e4284ecae0e0e71441d0a9d455497853a03ef6319241a8da3e218324da3c5955764fc3d5d3153f5b64073082fd290868634fb9108f62cbca48281d9679f695191835c56f98474e23dec3e660cc8f0872b1cce4b12f8e277971ebfcdd7b5031e5b6e3588001bf0e43508b8c1667e83534ec4040dce6ba78ecbb04aa7a69093a465b6d083ac6ef633155482b12c3b3a0fa77ccdab1637c009967c86bf1023b8aed7cc8eef436f31f048c0bd3bf53fc8121e99bef0dbab59fd9b89e94678c19f43ad6ea86bb264ac5a8e813ba022a59627e206d433cfe8f829687d0066a51e0035912ea4fbf08da279e2876ad5e1133538d3b4bd2c461ab39352b72b463c6dbb1c05fd7a362378197c6e0b7f8ca94c4dd0626cd327b8ef6507f2b2b9c88b019b1c422cdd9aa613060afe6b95787b082ba05183bb96ce46f545fc3dea70d40b0c5b6e6cd097d0947737363a7a062af3da6ed6e7d391a2ebad0fc14ee3b9912835c18db446011c76c5cf3ba858173a370ce993667abf184ca3790d29d48b51fad5d99ebd0e03eeb3e305c59a8910cce4477fd0ed0899aef5e13ff9c706bfd1c011560a3313d68840063de5f9564e4d22459cca1fc6b4f32088d559a4a6f44b9bb3f797e345e06f684b4d0e93a9464d54efc64ec9e500bab27ffcf8914fdeb42792bf292cce46b1512ecb0bc657bcd22ee8c0dd87f25a7588be57f5c980c58635d4ae16de964a9d48a74a71a7d650e886280d6bd191a11d449e398bb5be70e6011b8cfb127a63ca1038b61ae3c47866bccc8a0e3b053bc821739a54dde8c8078e400f4055020873350aeb763543dad76e3a3cd23e7a07f57bf52463b6dc40d323bbc3bfb3f9ec61902c202290f91898a8620ac811976d4864091f802b93e16f4f5f765712e107d3bdccd2630eacdefdf20b331b6c2e86f8240164566513c7010845daeeb3a2432414d77d103726b52e9d09f3c5146be7bab3f3a6b12a74f6fd9af27254c95eb8b9e34045c3120a7b7d4dc3d257fdba46bc609648d6bb3b91b1648f1fc98b24c34819ed722fa309fdf7967d97131be70f5c32dcadd823abe9ec564e0d87b2c902de834f28343469a67432270dfdfda12cc343417818b56d745d6fcd7036763fb2f5f5c540c2418f7f966b067253bcc72b0823ef83e08dbabcb12ac2656c631ca3c6c00d7be99115a91792c49cfcf8a3ceaf46944e79a91548272879a11886d8f453580a9d38a1932ed9b4bd9b97ba8a8a5f08e1c685cd8929c709c383df34e8056d28ca97e88bfa2e1eafc9c81e2754b4958b33c1d2995d4084aeb4287a664ea751e77dbd06ea7f8adcf383ff5f90f7d7e6be0ba5e9fe14e36da19033817e3a6f78f9a0f88c7905431c97eca8056941524bb799e2571efe284fe9651ad6a960430870fd713e5e9c439ea1d80e96d44d6aa555d1957576b899b3734b52a944514357304f6e912e7ebc904026d6bce1c541a036528c74645add4dc788329d1bcb44d8aeaff11c8813239a3be785396144768a1c0c729c7e04cabb3ff328506c3d06105680108843c64d362ae6e73f828351cf0101186836c4218a88bc3b4a9236cbdec2a183a76a2e886fad69e08b68abe2f482c6628b125baa246cdb51055fa3109fc912e97d4283ff890bb1e1c7983458e1e6edb6753c694b21e53fe3beeddfb3862216cc6c590d1a21fede318ae1e1c0fc62d027ca9813df2bf8ab748ee992b0350127ad9d844d1e83968b878bfbf0ead55879d2461c45d53c3d1065ae34f8d60dd5c0c0475d57f17309f611c654277da28809f998ef9a277c4c7ea49e5743b03945f60d5f9fda4fe9187ac2a5ccb402b82600a918342700132395fab45fe07ff72804425c0bbfe03fffb609bc635d6949b4e11874d4a62cc43e8e2201b89e65e6b89133dc2d75c29a92750e904e35c89e387f92619452d81e430a330d49b39ac5c023bcb04c300af11544cc2a1de6519c9d8a8daf0d7ea2ebf9baeca94813c125a329fe16dbd26dbc6b0a8ad57a1f039f9563b0e4d030570c6fc07b0010685caa325ad521f6355b55adad2dd1fee2c996892c7be600ac6e95b0dff4239416ef3e093ce3132ce48b0e2becf0348f3200e9735b9b7b3a9729b21bb972146294ed009b2b600ce646395db02718b677ac9b677dde381cf446d44890dade59687f12753f3a0da18f05aa0151716cef721bcd707868bc6a5bffdbd0f0fb74e50ff524cd3086157f64bf8f6549533a904a3dfc864b99e845295791ddd2ed58a2ea142bdcbef31b7e828ae19d59eb60fabbf40bfcbec348d01338f2e80116923030f7dd3a3756cc5c154de244a64c737345d6fdf6b84b36b23c39329494fc5c898f342529aa4b6963f9a5ba59e0c984d21a4e8870f624b8e668330f48c7b83287a74d4a5542d8a7cdb65dc19dff22acedf0af6733bad478e4393a87b6d0f3ade77e889ab92dfcca13a3ac5d44be940460187173395014de1f5f0edbaee67450e60ffc094aaaac9019fe54694e84461fb7a4b6a9c34257975454de4fdfdbc1a8f870ed7b0da2c9964eb5cbc3769baa244c755c4a6ed6ec9305eaa9aca6e645032b31cb2608a3de8e54a61eb0f4de849c9db2e3997d195e308968a21a99497883c6c5b40ff75f61d1561f8656817a5ee99335fddc5aaaa8a0c72f70d56c2175fa0111aa50c009c65e6ed81e8b0f4ee79fd472c535e5f7985cb04116592ad55b5627fbbfc0bb1895e70b041a4ab7c395b64f339338c12dc54b65c33ea5d445cc2370949a9a04fed2c65575b7f240bdc2659ebd0e118912bae013129a31a92ab6f8f132b03b833a0fe513e897810eb80aedd6309142a04a66435e03fdf3caad5d861219e2d6e04eefe5592a7d4ba3cca26f347d6b4b2d6f8159ed7a3e157f200fbe8c384b91af73eb54700af0eb390d84d4092ec4b1656690803c774ba26b5e1af617af1b62ac8d2b29405b996c0e5733ca7064c8b33d024f4313786594517a9ec0c5283815488d2ca5e7f18f46aa4965a5809f8bf730dd732c06918e9b7adac8f0bd3fb0c92cf22aa56d07aa281b516dc53e03eca24cd1b5adee61f3b4431738b84be1c0b3fb38bb3e57893b9da30fd9eb95e4bdeba0fdf882773e573592fbf1e6ef3c8d95871b9c0386bf54dee2758d7870a525f8c3e2e8edd50d936d674697b01961eafb2034d46b301398c83af3db6b310f2cef99552610f36c3d3984408013e7b68a942aee0cb9adc097373ae07227938d9c7425322a07439fa6c396ed61923d8e29db53511925952ea6d1b064c9a2ae6ef0dae76fb722076ea52c2a7af1c95c9feea169bea4fc8dd5772d01386baf3c8222925ad986034d1501bd0df4412a69542a68ba9d1e044a95c1fcb2de0f0076b2a9b55a17fcc20a0cb0430daf63418a296212f2a11a7eb9004b7200d2b57161130fa5248ca036d52b2743fb8dd90ebd258e3108ac7733708d067f8c81c6e47968c2de590123cc7bc20d0ea772a172d58639f46918b88793744dc3d343e6b8b8e14112b45d72f1d10d2429188c9411536eb5db611d1bb397b311b09528d3405726255222123c2fa1483703844eb492fe91d45315034ec41db70396fad4d2785f64e753c4e679e9adf6b713805734b9e1bfa8efe73b1485913f56ad425830659b2dd587fa25b1d3cede16a691648d039227a5a3095b7060d90a4cc9e677278ca02c46a9c681010e542fc5d5e6ac57854a028833eb3018c682c58e72a37d8313cfb0f926b43da890af931df53d04c6f468f01063eca1ec63b924b2b92ea6c5a7e84808df22a21ec7cd14b8d27d1cbf930f478b41ce4b9900e8177679a3c7a2587520634de7c7b09ad9f71e8e040693f3367dbfbc6b2e9cd4c091d1f071b4ec45457bb954ed9e9bcb6cfc79f341a47153acead8cc7ec28043756b687297b1e09425a78e82e5af0e78af3a312fa1c93f2e49565d8f05366942b53dbf066e15bf21552bc6d0d262568f701dd48039f430c4d676dc493004786eadceb9eee07d22c84c8679123f03f376fffbfe32cae90b65e4e6b04f457adc5a41f18b19dd0e3c8c81d362a77fd9236278cef43978694649bf52b6ce2fe21180414bfc47683b6d756ebc2ffd13bf25a33fdcd3d5a9f935e60e060a99ce2d441844fa4ce35e8cde20e6bbf50d2f0da00963d0b14ebbe973f97c8b6a15d81bb8168ccba24ee344171180242e58e208074750a4c9cfb3d62a6310edae80be8d492b187161aa97819ff6bc1a6f9c8e6629219fba386ddc2640fe8100add2e8eb7c28daaa5929ca4b918c8b95a8238219418a6dd45d849a5d1617accc1beb6dffbf580d146cdfe9e1fc7dcb135148d8cafb8f541197e3cdd1f6af994a726ffa3044c7fcd0648e8ff9cd8be02413abeb2971d667fbda6d584f17c23c5e983d66f3188446b06b3664b6a7ddf990931762565a69bfaed6c46997e18f5bf5b6ead7b0d88d2353e14540eb585d1c91178247a2c6fee159a6643304f4f149e3534d83a7a9c78ed6361298a616a5426cbfa68729387b27eaf45d54fddc916d060a446bee618928c02936a65339af0e6963d13bb268f7d7985d14f0d4b91dfb887f48db5362130ded19ce04589f84de763ba0434ed5b8c4423f91aae731f0400a01e012f1a04ed3cb7e84510ffdd4ea13730fbf606205fa09994a7b9f2ad1b4ae3f8dc43f6d252f0dd441881d02429111a018d06d61977ad2f4435218e724212dc5a1a400c736c1e71477be449694e079d75a962c0172b300adfd2fe8b278b28ba7f477988070f15773512d7aba4bf11e1afd9d84e5f9f534082c9770d4ca3fedab2fbfa1126dd5208fae618c71493f6d6a37d1d2e8d6d25ef57da6dfbc464bb9e1bd2885a5589be382aa224fb38db67b3acf1c7dcca88815273cdca6276b7998f95879707904ac5</script>
-  <div class="hbe hbe-content">
-    <div class="hbe hbe-input hbe-input-default">
-      <input class="hbe hbe-input-field hbe-input-field-default" type="password" id="hbePass">
-      <label class="hbe hbe-input-label hbe-input-label-default" for="hbePass">
-        <span class="hbe hbe-input-label-content hbe-input-label-content-default">Hey, password is required here.</span>
-      </label>
-    </div>
-  </div>
-</div>
-<link href="/css/hbe.style.css" rel="stylesheet" type="text/css"><script data-swup-reload-script type="module" src="/js/plugins/hbe.js"></script>
-<script data-swup-reload-script type="module">
-import {initHBE} from "/js/plugins/hbe.js";
-  console.log("hexo-blog-encrypt: loaded.");
-    initHBE();
-</script>
-]]></content>
-      <tags>
-        <tag>记录</tag>
-      </tags>
   </entry>
   <entry>
     <title>解决Hexo标题的冒号问题</title>
@@ -3183,45 +3183,6 @@ import {initHBE} from "/js/plugins/hbe.js";
       </categories>
   </entry>
   <entry>
-    <title>pq初了解</title>
-    <url>/2023/03/03/pq%E5%88%9D%E4%BA%86%E8%A7%A3/</url>
-    <content><![CDATA[<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>docker还是快的</p>
-<div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">docker pull postgres</span><br><span class="line">mkdir /myData/postgresql</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">docker run --name postgres \</span><br><span class="line">    --restart=always \</span><br><span class="line">    -e POSTGRES_PASSWORD=root \</span><br><span class="line">    -p 5432:5432 \</span><br><span class="line">    -v /myData/postgresql:/var/lib/postgresql/data \</span><br><span class="line">    -d postgres</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看</span></span><br><span class="line">docker ps</span><br></pre></td></tr></table></figure></div>
-
-<h1 id="PostgreSQL的优点"><a href="#PostgreSQL的优点" class="headerlink" title="PostgreSQL的优点"></a>PostgreSQL的优点</h1><ul>
-<li>完全开源，不像MySQL被收购后，搞社区版和商业版</li>
-<li><font color='red'>高级功能</font>：我看中的点。支持如自定义数据类型、自定义函数、复杂查询和JSON数据类型。</li>
-<li>因为功能的差异和性能特点，PQ更适用于需要高级功能和复杂查询的场景，如大规模企业应用和数据仓库。而MySQL适用于简单查询和快速读写操作的场景，如Web应用程序和小型项目。(那我拿来写oj可能有点牛刀小试了)</li>
-</ul>
-<h1 id="复杂查询支持"><a href="#复杂查询支持" class="headerlink" title="复杂查询支持"></a>复杂查询支持</h1><ul>
-<li>窗口函数<br>低版本mysql不支持我还是有点膈应  <div class="code-container" data-rel="Sql"><figure class="iseeu highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> name, department, salary, <span class="built_in">AVG</span>(salary) </span><br><span class="line"><span class="keyword">OVER</span> (</span><br><span class="line">	<span class="keyword">PARTITION</span> <span class="keyword">BY</span> department</span><br><span class="line">) <span class="keyword">AS</span> avg_salary </span><br><span class="line"><span class="keyword">FROM</span> employees;</span><br></pre></td></tr></table></figure></div></li>
-<li>WITH创建临时表并可复用  <div class="code-container" data-rel="Sql"><figure class="iseeu highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">WITH</span> temp_table <span class="keyword">AS</span> (</span><br><span class="line">  <span class="keyword">SELECT</span> id, name, salary <span class="keyword">FROM</span> employees <span class="keyword">WHERE</span> department <span class="operator">=</span> <span class="string">&#x27;Finance&#x27;</span></span><br><span class="line">)</span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> temp_table;</span><br></pre></td></tr></table></figure></div></li>
-<li>递归查询(mysql不支持)  <div class="code-container" data-rel="Sql"><figure class="iseeu highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">WITH</span> <span class="keyword">RECURSIVE</span> employee_tree <span class="keyword">AS</span> (</span><br><span class="line">  <span class="keyword">SELECT</span> id, name, manager_id, <span class="number">0</span> <span class="keyword">AS</span> level <span class="keyword">FROM</span> employees <span class="keyword">WHERE</span> manager_id <span class="keyword">IS</span> <span class="keyword">NULL</span></span><br><span class="line">  <span class="keyword">UNION</span> <span class="keyword">ALL</span></span><br><span class="line">  <span class="keyword">SELECT</span> e.id, e.name, e.manager_id, et.level <span class="operator">+</span> <span class="number">1</span> <span class="keyword">FROM</span> employees e <span class="keyword">INNER</span> <span class="keyword">JOIN</span> employee_tree et <span class="keyword">ON</span> e.manager_id <span class="operator">=</span> et.id</span><br><span class="line">)</span><br><span class="line"><span class="keyword">SELECT</span> id, name, level <span class="keyword">FROM</span> employee_tree;</span><br></pre></td></tr></table></figure></div></li>
-</ul>
-<h1 id="索引支持"><a href="#索引支持" class="headerlink" title="索引支持"></a>索引支持</h1><ul>
-<li>默认B+树</li>
-<li>hash索引：只支持等值查找，处理大量等值查找时性能优秀</li>
-<li>GIN：倒排索引，适用于包含数组、JSON和其他复杂数据类型的查询。基于倒排索引允许处理多值列。</li>
-<li>GIST：相似度匹配、全文搜索、空间数据。</li>
-<li>BRIN、SP-GIST…..</li>
-</ul>
-<p>场景：每个文字都有多个标签</p>
-<div class="code-container" data-rel="Sql"><figure class="iseeu highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> articles (</span><br><span class="line">  id SERIAL <span class="keyword">PRIMARY</span> KEY,</span><br><span class="line">  title <span class="type">VARCHAR</span>(<span class="number">100</span>),</span><br><span class="line">  tags TEXT[]</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> articles (title, tags)</span><br><span class="line"><span class="keyword">VALUES</span></span><br><span class="line">  (<span class="string">&#x27;Getting Started with PostgreSQL&#x27;</span>, <span class="keyword">ARRAY</span>[<span class="string">&#x27;database&#x27;</span>, <span class="string">&#x27;PostgreSQL&#x27;</span>, <span class="string">&#x27;tutorial&#x27;</span>]),</span><br><span class="line">  (<span class="string">&#x27;Introduction to Machine Learning&#x27;</span>, <span class="keyword">ARRAY</span>[<span class="string">&#x27;machine learning&#x27;</span>, <span class="string">&#x27;data science&#x27;</span>]),</span><br><span class="line">  (<span class="string">&#x27;Web Development Best Practices&#x27;</span>, <span class="keyword">ARRAY</span>[<span class="string">&#x27;web development&#x27;</span>, <span class="string">&#x27;programming&#x27;</span>, <span class="string">&#x27;best practices&#x27;</span>]);</span><br></pre></td></tr></table></figure></div>
-
-<ol>
-<li>查询包含特定标签的文章： <div class="code-container" data-rel="Sql"><figure class="iseeu highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> articles <span class="keyword">WHERE</span> <span class="string">&#x27;web development&#x27;</span> <span class="operator">=</span> <span class="keyword">ANY</span>(tags);</span><br></pre></td></tr></table></figure></div></li>
-<li>查询包含多个标签的文章： <div class="code-container" data-rel="Sql"><figure class="iseeu highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> articles <span class="keyword">WHERE</span> <span class="keyword">ARRAY</span>[<span class="string">&#x27;database&#x27;</span>, <span class="string">&#x27;PostgreSQL&#x27;</span>] <span class="operator">&lt;</span>@ tags;</span><br></pre></td></tr></table></figure></div></li>
-<li>查询具有特定标签的文章数量： <div class="code-container" data-rel="Sql"><figure class="iseeu highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="keyword">FROM</span> articles <span class="keyword">WHERE</span> <span class="string">&#x27;programming&#x27;</span> <span class="operator">=</span> <span class="keyword">ANY</span>(tags);</span><br></pre></td></tr></table></figure></div></li>
-</ol>
-]]></content>
-      <categories>
-        <category>数据库</category>
-      </categories>
-      <tags>
-        <tag>PosgreSQL</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>mooctest全国大学生软件测试大赛开发者赛道相关知识记录(Junit 4)</title>
     <url>/2024/11/20/mooctest%E5%85%A8%E5%9B%BD%E5%A4%A7%E5%AD%A6%E7%94%9F%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E5%A4%A7%E8%B5%9B%E5%BC%80%E5%8F%91%E8%80%85%E8%B5%9B%E9%81%93%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%E8%AE%B0%E5%BD%95(Junit4)/</url>
     <content><![CDATA[<h1 id="环境要求"><a href="#环境要求" class="headerlink" title="环境要求"></a>环境要求</h1><ul>
@@ -3349,6 +3310,45 @@ import {initHBE} from "/js/plugins/hbe.js";
 </ul>
 <h1 id="赛题列表-欢迎热心同学一起整合历史赛题"><a href="#赛题列表-欢迎热心同学一起整合历史赛题" class="headerlink" title="赛题列表(欢迎热心同学一起整合历史赛题)"></a>赛题列表(欢迎热心同学一起整合历史赛题)</h1><p><a class="link"   href="https://download.csdn.net/download/qq_51955445/90010003" >2024年全国大学生软件测试大赛开发者赛道省赛题目<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
 ]]></content>
+  </entry>
+  <entry>
+    <title>pq初了解</title>
+    <url>/2023/03/03/pq%E5%88%9D%E4%BA%86%E8%A7%A3/</url>
+    <content><![CDATA[<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>docker还是快的</p>
+<div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">docker pull postgres</span><br><span class="line">mkdir /myData/postgresql</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">docker run --name postgres \</span><br><span class="line">    --restart=always \</span><br><span class="line">    -e POSTGRES_PASSWORD=root \</span><br><span class="line">    -p 5432:5432 \</span><br><span class="line">    -v /myData/postgresql:/var/lib/postgresql/data \</span><br><span class="line">    -d postgres</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看</span></span><br><span class="line">docker ps</span><br></pre></td></tr></table></figure></div>
+
+<h1 id="PostgreSQL的优点"><a href="#PostgreSQL的优点" class="headerlink" title="PostgreSQL的优点"></a>PostgreSQL的优点</h1><ul>
+<li>完全开源，不像MySQL被收购后，搞社区版和商业版</li>
+<li><font color='red'>高级功能</font>：我看中的点。支持如自定义数据类型、自定义函数、复杂查询和JSON数据类型。</li>
+<li>因为功能的差异和性能特点，PQ更适用于需要高级功能和复杂查询的场景，如大规模企业应用和数据仓库。而MySQL适用于简单查询和快速读写操作的场景，如Web应用程序和小型项目。(那我拿来写oj可能有点牛刀小试了)</li>
+</ul>
+<h1 id="复杂查询支持"><a href="#复杂查询支持" class="headerlink" title="复杂查询支持"></a>复杂查询支持</h1><ul>
+<li>窗口函数<br>低版本mysql不支持我还是有点膈应  <div class="code-container" data-rel="Sql"><figure class="iseeu highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> name, department, salary, <span class="built_in">AVG</span>(salary) </span><br><span class="line"><span class="keyword">OVER</span> (</span><br><span class="line">	<span class="keyword">PARTITION</span> <span class="keyword">BY</span> department</span><br><span class="line">) <span class="keyword">AS</span> avg_salary </span><br><span class="line"><span class="keyword">FROM</span> employees;</span><br></pre></td></tr></table></figure></div></li>
+<li>WITH创建临时表并可复用  <div class="code-container" data-rel="Sql"><figure class="iseeu highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">WITH</span> temp_table <span class="keyword">AS</span> (</span><br><span class="line">  <span class="keyword">SELECT</span> id, name, salary <span class="keyword">FROM</span> employees <span class="keyword">WHERE</span> department <span class="operator">=</span> <span class="string">&#x27;Finance&#x27;</span></span><br><span class="line">)</span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> temp_table;</span><br></pre></td></tr></table></figure></div></li>
+<li>递归查询(mysql不支持)  <div class="code-container" data-rel="Sql"><figure class="iseeu highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">WITH</span> <span class="keyword">RECURSIVE</span> employee_tree <span class="keyword">AS</span> (</span><br><span class="line">  <span class="keyword">SELECT</span> id, name, manager_id, <span class="number">0</span> <span class="keyword">AS</span> level <span class="keyword">FROM</span> employees <span class="keyword">WHERE</span> manager_id <span class="keyword">IS</span> <span class="keyword">NULL</span></span><br><span class="line">  <span class="keyword">UNION</span> <span class="keyword">ALL</span></span><br><span class="line">  <span class="keyword">SELECT</span> e.id, e.name, e.manager_id, et.level <span class="operator">+</span> <span class="number">1</span> <span class="keyword">FROM</span> employees e <span class="keyword">INNER</span> <span class="keyword">JOIN</span> employee_tree et <span class="keyword">ON</span> e.manager_id <span class="operator">=</span> et.id</span><br><span class="line">)</span><br><span class="line"><span class="keyword">SELECT</span> id, name, level <span class="keyword">FROM</span> employee_tree;</span><br></pre></td></tr></table></figure></div></li>
+</ul>
+<h1 id="索引支持"><a href="#索引支持" class="headerlink" title="索引支持"></a>索引支持</h1><ul>
+<li>默认B+树</li>
+<li>hash索引：只支持等值查找，处理大量等值查找时性能优秀</li>
+<li>GIN：倒排索引，适用于包含数组、JSON和其他复杂数据类型的查询。基于倒排索引允许处理多值列。</li>
+<li>GIST：相似度匹配、全文搜索、空间数据。</li>
+<li>BRIN、SP-GIST…..</li>
+</ul>
+<p>场景：每个文字都有多个标签</p>
+<div class="code-container" data-rel="Sql"><figure class="iseeu highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> articles (</span><br><span class="line">  id SERIAL <span class="keyword">PRIMARY</span> KEY,</span><br><span class="line">  title <span class="type">VARCHAR</span>(<span class="number">100</span>),</span><br><span class="line">  tags TEXT[]</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> articles (title, tags)</span><br><span class="line"><span class="keyword">VALUES</span></span><br><span class="line">  (<span class="string">&#x27;Getting Started with PostgreSQL&#x27;</span>, <span class="keyword">ARRAY</span>[<span class="string">&#x27;database&#x27;</span>, <span class="string">&#x27;PostgreSQL&#x27;</span>, <span class="string">&#x27;tutorial&#x27;</span>]),</span><br><span class="line">  (<span class="string">&#x27;Introduction to Machine Learning&#x27;</span>, <span class="keyword">ARRAY</span>[<span class="string">&#x27;machine learning&#x27;</span>, <span class="string">&#x27;data science&#x27;</span>]),</span><br><span class="line">  (<span class="string">&#x27;Web Development Best Practices&#x27;</span>, <span class="keyword">ARRAY</span>[<span class="string">&#x27;web development&#x27;</span>, <span class="string">&#x27;programming&#x27;</span>, <span class="string">&#x27;best practices&#x27;</span>]);</span><br></pre></td></tr></table></figure></div>
+
+<ol>
+<li>查询包含特定标签的文章： <div class="code-container" data-rel="Sql"><figure class="iseeu highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> articles <span class="keyword">WHERE</span> <span class="string">&#x27;web development&#x27;</span> <span class="operator">=</span> <span class="keyword">ANY</span>(tags);</span><br></pre></td></tr></table></figure></div></li>
+<li>查询包含多个标签的文章： <div class="code-container" data-rel="Sql"><figure class="iseeu highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> articles <span class="keyword">WHERE</span> <span class="keyword">ARRAY</span>[<span class="string">&#x27;database&#x27;</span>, <span class="string">&#x27;PostgreSQL&#x27;</span>] <span class="operator">&lt;</span>@ tags;</span><br></pre></td></tr></table></figure></div></li>
+<li>查询具有特定标签的文章数量： <div class="code-container" data-rel="Sql"><figure class="iseeu highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="keyword">FROM</span> articles <span class="keyword">WHERE</span> <span class="string">&#x27;programming&#x27;</span> <span class="operator">=</span> <span class="keyword">ANY</span>(tags);</span><br></pre></td></tr></table></figure></div></li>
+</ol>
+]]></content>
+      <categories>
+        <category>数据库</category>
+      </categories>
+      <tags>
+        <tag>PosgreSQL</tag>
+      </tags>
   </entry>
   <entry>
     <title>scrapy个人循序渐进</title>
@@ -4770,6 +4770,146 @@ D1 --> E3(功能不满足用户的需求)</pre>
     <content><![CDATA[<h1 id="共产党宣言"><a href="#共产党宣言" class="headerlink" title="共产党宣言"></a>共产党宣言</h1><h1 id="娱乐至死"><a href="#娱乐至死" class="headerlink" title="娱乐至死"></a>娱乐至死</h1><h1 id="我们时代的神经症人格"><a href="#我们时代的神经症人格" class="headerlink" title="我们时代的神经症人格"></a>我们时代的神经症人格</h1><h1 id="1234"><a href="#1234" class="headerlink" title="1234"></a>1234</h1>]]></content>
   </entry>
   <entry>
+    <title>以撒的结合攻略</title>
+    <url>/2025/01/19/%E4%BB%A5%E6%92%92%E7%9A%84%E7%BB%93%E5%90%88%E6%94%BB%E7%95%A5/</url>
+    <content><![CDATA[<h1 id="解锁boss流程"><a href="#解锁boss流程" class="headerlink" title="解锁boss流程"></a>解锁boss流程</h1><h1 id="怎么丢物品"><a href="#怎么丢物品" class="headerlink" title="怎么丢物品"></a>怎么丢物品</h1><h1 id="某些特殊地形怎么走"><a href="#某些特殊地形怎么走" class="headerlink" title="某些特殊地形怎么走"></a>某些特殊地形怎么走</h1><h1 id="某些道具和饰品的搭配"><a href="#某些道具和饰品的搭配" class="headerlink" title="某些道具和饰品的搭配"></a>某些道具和饰品的搭配</h1><h1 id="一些跑图的流程怎么最大化"><a href="#一些跑图的流程怎么最大化" class="headerlink" title="一些跑图的流程怎么最大化"></a>一些跑图的流程怎么最大化</h1><h1 id="贪婪模式技巧"><a href="#贪婪模式技巧" class="headerlink" title="贪婪模式技巧"></a>贪婪模式技巧</h1>]]></content>
+      <categories>
+        <category>游戏</category>
+      </categories>
+      <tags>
+        <tag>游戏</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>华山一日游</title>
+    <url>/2025/01/10/%E5%8D%8E%E5%B1%B1%E4%B8%80%E6%97%A5%E6%B8%B8/</url>
+    <content><![CDATA[<p>接下来的几年就离开西安去广研院了，趁着还能留几天，把著名的华山爬了。</p>
+<p>9号考完最后一门，在这之前已经在小红书查完攻略，麻溜地把票买了。虽然研究生不享受学生票优惠，但是淡季门票也可以省一点钱，325元的西上北下套餐，还行。由于冬天夜爬太折磨人了，所以我还是选择白天爬山。至于结伴出行？我不想把脑子用于为旅行同伴着想，因此还是一如既往的独行。</p>
+<p>除了门票，自然还要准备爬山所需。一个是保暖，虽然小红书上一些女生说穿的冲锋衣、羽绒服，但我上身穿了一个羽绒马甲、卫衣和薄外套，下身穿了休闲长裤和两条秋裤，感觉还挺好(不过我体质也比较好就是了)。不过口罩和手套是必须带的，山上有几块地方风特别特别大，脸和耳朵刮的生疼，戴口罩挡脸，帽子我是用的外套或者卫衣上的，所以没专门带。手套肯定必须要带，很多地方要抓锁链不然不安全，而锁链又冰凉，抓久了手都冻僵了。</p>
+<p>然后是吃的，山上的水都是10块以上，更别说热食了。由于我一个人爬，比较随意，带了3根士力架和2根火腿肠，然后两瓶小怡宝，装在我的斜挎包里刚刚好。</p>
+<p>从太白南路地铁站出发，到西安北也要50分钟。在要坐1个多小时、10多块钱的绿皮和半个小时、50多块钱的高铁，我选择坐高铁，可以多睡半个小时，到达时间还差不多。</p>
+<p>6点半从宿舍的床上起来，匆忙洗漱，把东西都拿好，已经6点45了，需要赶8点20的高铁，还挺急的，提前买的泡面都没在宿舍吃，赶紧骑单车去地铁站。结果骑到一半发现太冷了，在市区都这么冷，何况山上？又回头去多穿了条秋裤(这就是为啥我穿了两条秋裤😂)。</p>
+<p>到高铁站已经是8点了，我寻思如果换另一趟8点半的(没提前买，因为肯定有票)，还能吃上口泡面，于是买了个7块钱的老坛酸菜(真贵)，刚泡好，解个手，回来就看见8点半这个开始检票了😅比预想的检票还早了5分钟，只好拿起泡面检票上车，哈哈哈。不过一上车，五六口就解决了，亏我还拿了一路。</p>
+<p>到达华阴北站，本来想找所谓的“免费公交”，不过这地方又冷又肉眼可见的贫瘠，不知道什么时候等的到，在路边上了个3块钱的私人小巴士，倒也还行。从华山北到游客中心是一条主干道，不用拐来拐去，倒也还行。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/%E5%8D%8E%E5%B1%B1%E4%B8%80%E6%97%A5%E6%B8%B8/1.png"
+                     
+                ></p>
+<p>到达游客中心之后，便是进去检票、坐摆渡车上山。摆渡车在一些正在开发的烂路上走，十分颠簸，但由于起太早了，我好几次眼一闭就睡着了，甚至开始做梦了，不过也会立马惊醒，想到这是难得的旅游经历，不能被睡觉耽误了。大概3、40分钟之后到达山脚下，便可以开始爬山了。哦我是西上北下，所以坐的是去西峰的摆渡车。</p>
+<p>剩下的就是爬山了，往几个峰顶爬，拍个照留个纪念，如果累了饿了就来口士力架或者火腿，倒也舒坦。哦可惜我的手套不翼而飞了，可能在收起来的时候没放好，掉地上然后被风吹跑了，我在嫌疑最大的地方来回找了几遍都没找到，不过还好丢的是右手手套，是我的惯用手，不妨碍我抓铁链啥的。然后就是在一些类似观景台的无遮挡或者凸出的位置拍照，不得不说不愧是淡季，虽然有雪但不是很多，没有那种深厚雪白的感觉；也不像秋天有漫山红叶，更没有春夏的郁郁葱葱，总得来说就是山景很干。</p>
+<p>最印象深刻的还是鹞子翻身。一路有铁索，我们需要把身上的挂钩挂在铁索上以防掉落。走的路都是垂直于山崖的，但是有一些槽能放一只或两只前脚掌，如果从上往下爬，看不到下一个放脚的槽，脚在空中摸索，光靠另一个脚掌支撑，还挺吓人的。所以工作人员也跟我们强调了两个挂钩同时只能解一个，不能两个都解。而且由于我手套丢了一只，干脆不带手套下去。结果摸铁索摸得我手冻得没知觉了，而且手背经常和山壁摩擦，好几条白印子。然后就是鹞子翻身只有一条上下的路，但允许在有人没回来之前就下人，所以我和几个人在返回中途，由于有人要下来，被迫等了30多分钟才开始上去，我还没戴手套，太折磨了。上去就比较舒服了，看得到下一步踩哪，来回大概50分钟，还是比较舒服的，不过时间和长空栈道冲突了，但我也没预约(鹞子翻身也没预约，但人少所以直接让下了)，所以就没去了(还好没去，不然赶不上下山索道了)。有一说一这三十块钱还是挺值的。</p>
+<p>由于北下，一直在下楼梯，楼梯还是细的那种，放脚要外八字才堪堪，很多地方我都是摸着锁链或者珠子才下来。那个柱子手感还不错，感觉是故意设计的，刚好让手包住且没有硌手的感觉。一路下来感觉膝盖都受伤而不是单纯的磨损了。最后到游客中心的广场，才想起来有人接，没人送，只有10块钱的出租车司机。上车之后还是走这条直道回西安北站，这时才在车上观察附近，感觉挺破落的，不过可能也因为这边比较偏。</p>
+<p>最后坐了个7点多发车的高铁回西安，在小寨找了个韩式石锅拌饭，贼难吃。从小寨一路骑车回宿舍，在一阵阵哀嚎中洗澡、洗衣、晾衣、上床，算是一日游结束了。晚上的打卡步数有3w多，也挺惊喜的。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/%E5%8D%8E%E5%B1%B1%E4%B8%80%E6%97%A5%E6%B8%B8/%E6%89%93%E5%8D%A1.png"
+                     
+                ></p>
+<p>第二天起来，下半身没有不痛的地方，还骑车出去吃午饭。哈哈，年轻就是好！</p>
+<p>附上一些图。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/%E5%8D%8E%E5%B1%B1%E4%B8%80%E6%97%A5%E6%B8%B8/2.png"
+                     
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/%E5%8D%8E%E5%B1%B1%E4%B8%80%E6%97%A5%E6%B8%B8/3.png"
+                     
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/%E5%8D%8E%E5%B1%B1%E4%B8%80%E6%97%A5%E6%B8%B8/4.png"
+                     
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/%E5%8D%8E%E5%B1%B1%E4%B8%80%E6%97%A5%E6%B8%B8/5.png"
+                     
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/%E5%8D%8E%E5%B1%B1%E4%B8%80%E6%97%A5%E6%B8%B8/6.png"
+                     
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/%E5%8D%8E%E5%B1%B1%E4%B8%80%E6%97%A5%E6%B8%B8/7.png"
+                     
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/%E5%8D%8E%E5%B1%B1%E4%B8%80%E6%97%A5%E6%B8%B8/8.png"
+                     
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/%E5%8D%8E%E5%B1%B1%E4%B8%80%E6%97%A5%E6%B8%B8/9.png"
+                     
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/%E5%8D%8E%E5%B1%B1%E4%B8%80%E6%97%A5%E6%B8%B8/10.png"
+                     
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/%E5%8D%8E%E5%B1%B1%E4%B8%80%E6%97%A5%E6%B8%B8/11.png"
+                     
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/%E5%8D%8E%E5%B1%B1%E4%B8%80%E6%97%A5%E6%B8%B8/12.png"
+                     
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/%E5%8D%8E%E5%B1%B1%E4%B8%80%E6%97%A5%E6%B8%B8/13.png"
+                     
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/%E5%8D%8E%E5%B1%B1%E4%B8%80%E6%97%A5%E6%B8%B8/14.png"
+                     
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/%E5%8D%8E%E5%B1%B1%E4%B8%80%E6%97%A5%E6%B8%B8/15.png"
+                     
+                ></p>
+]]></content>
+      <tags>
+        <tag>旅游记录</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>人生计划与习惯培养</title>
+    <url>/2024/10/09/%E5%9F%B9%E5%85%BB%E5%A5%BD%E4%B9%A0%E6%83%AF/</url>
+    <content><![CDATA[
+<div class="hbe hbe-container" id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">
+  <script id="hbeData" type="hbeData" data-hmacdigest="bf594c4a1fa99987a2b3fa668e2bb975b0a768250abc5bdcf601060bd0bc13f6">59caac7809943a14ad708e50cc02dd4d40c6d05a8dc08382b7dad3f29d2c75514ce92f970f577220087672570b49571b</script>
+  <div class="hbe hbe-content">
+    <div class="hbe hbe-input hbe-input-default">
+      <input class="hbe hbe-input-field hbe-input-field-default" type="password" id="hbePass">
+      <label class="hbe hbe-input-label hbe-input-label-default" for="hbePass">
+        <span class="hbe hbe-input-label-content hbe-input-label-content-default">Hey, password is required here.</span>
+      </label>
+    </div>
+  </div>
+</div>
+<link href="/css/hbe.style.css" rel="stylesheet" type="text/css"><script data-swup-reload-script type="module" src="/js/plugins/hbe.js"></script>
+<script data-swup-reload-script type="module">
+import {initHBE} from "/js/plugins/hbe.js";
+  console.log("hexo-blog-encrypt: loaded.");
+    initHBE();
+</script>
+]]></content>
+  </entry>
+  <entry>
     <title>分布式相关知识入门学习(待续)</title>
     <url>/2022/11/15/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/</url>
     <content><![CDATA[<blockquote>
@@ -5052,29 +5192,6 @@ D1 --> E3(功能不满足用户的需求)</pre>
 ]]></content>
   </entry>
   <entry>
-    <title>人生计划与习惯培养</title>
-    <url>/2024/10/09/%E5%9F%B9%E5%85%BB%E5%A5%BD%E4%B9%A0%E6%83%AF/</url>
-    <content><![CDATA[
-<div class="hbe hbe-container" id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">
-  <script id="hbeData" type="hbeData" data-hmacdigest="bf594c4a1fa99987a2b3fa668e2bb975b0a768250abc5bdcf601060bd0bc13f6">59caac7809943a14ad708e50cc02dd4d40c6d05a8dc08382b7dad3f29d2c75514ce92f970f577220087672570b49571b</script>
-  <div class="hbe hbe-content">
-    <div class="hbe hbe-input hbe-input-default">
-      <input class="hbe hbe-input-field hbe-input-field-default" type="password" id="hbePass">
-      <label class="hbe hbe-input-label hbe-input-label-default" for="hbePass">
-        <span class="hbe hbe-input-label-content hbe-input-label-content-default">Hey, password is required here.</span>
-      </label>
-    </div>
-  </div>
-</div>
-<link href="/css/hbe.style.css" rel="stylesheet" type="text/css"><script data-swup-reload-script type="module" src="/js/plugins/hbe.js"></script>
-<script data-swup-reload-script type="module">
-import {initHBE} from "/js/plugins/hbe.js";
-  console.log("hexo-blog-encrypt: loaded.");
-    initHBE();
-</script>
-]]></content>
-  </entry>
-  <entry>
     <title>学习资料记录</title>
     <url>/2023/01/01/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99%E8%AE%B0%E5%BD%95/</url>
     <content><![CDATA[<ul>
@@ -5085,6 +5202,35 @@ import {initHBE} from "/js/plugins/hbe.js";
 </ul>
 <p>-<a class="link"   href="https://blog.csdn.net/weixin_41865866/article/details/130541120?spm=1001.2101.3001.6650.2&utm_medium=distribute.pc_relevant.none-task-blog-2~default~CTRLIST~Rate-2-130541120-blog-125434743.235%5Ev43%5Epc_blog_bottom_relevance_base6&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2~default~CTRLIST~Rate-2-130541120-blog-125434743.235%5Ev43%5Epc_blog_bottom_relevance_base6&utm_relevant_index=5" >linux系统(进程间通信)06_IPC概念,pipe管道，fifo通信，mmap 共享映射区<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
 ]]></content>
+  </entry>
+  <entry>
+    <title>网站收藏</title>
+    <url>/2023/05/10/%E5%AE%9E%E7%94%A8%E7%BD%91%E7%AB%99%E8%AE%B0%E5%BD%95/</url>
+    <content><![CDATA[<h1 id="学习类"><a href="#学习类" class="headerlink" title="学习类"></a>学习类</h1><ul>
+<li><a class="link"   href="https://go.dev/tour/list" >go入门练习<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   href="https://pdos.csail.mit.edu/6.824/schedule.html" >6.5840课程官网(前6.824)<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   href="https://google.github.io/comprehensive-rust/hello-world.html#speaker-notes" >rust教程<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   href="https://zhuanlan.zhihu.com/p/139789982?ivk_sa=1024320u" >希腊字母表(写latex)<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   href="https://blog.csdn.net/kangkanglhb88008/article/details/125547204" >Latex打空格<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   href="https://zhuanlan.zhihu.com/p/578601816" >数学资料<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   href="https://css-loaders.com/" >css-loaders<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   href="https://csdiy.wiki/" >计算机自学指南<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+<h1 id="工具类"><a href="#工具类" class="headerlink" title="工具类"></a>工具类</h1><ul>
+<li><a class="link"   href="https://docsmall.com/image-compress" >图片大小压缩<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   href="https://www.sojson.com/image/change.html#google_vignette" >图片尺寸修改和格式转换<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   href="https://pan.baidu.com/s/1BWEFf8zeLnud98fy5hOTiQ?pwd=qwer" >Jetbrains全家桶破解插件<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   href="http://www.52jingtanhao.win/auth/login##" >科学上网<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   href="http://www.taodudu.cc/news/show-4234631.html" >字符画<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   href="http://zhongguose.com/#meiguihui" >中国传统颜色<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>trick</category>
+      </categories>
+      <tags>
+        <tag>不时之需</tag>
+      </tags>
   </entry>
   <entry>
     <title>学在西电录播课使用python下载，通过解析m3u8协议、多线程下载ts视频块以及ffmpeg合并</title>
@@ -5172,44 +5318,15 @@ import {initHBE} from "/js/plugins/hbe.js";
 ]]></content>
   </entry>
   <entry>
-    <title>网站收藏</title>
-    <url>/2023/05/10/%E5%AE%9E%E7%94%A8%E7%BD%91%E7%AB%99%E8%AE%B0%E5%BD%95/</url>
-    <content><![CDATA[<h1 id="学习类"><a href="#学习类" class="headerlink" title="学习类"></a>学习类</h1><ul>
-<li><a class="link"   href="https://go.dev/tour/list" >go入门练习<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li><a class="link"   href="https://pdos.csail.mit.edu/6.824/schedule.html" >6.5840课程官网(前6.824)<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li><a class="link"   href="https://google.github.io/comprehensive-rust/hello-world.html#speaker-notes" >rust教程<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li><a class="link"   href="https://zhuanlan.zhihu.com/p/139789982?ivk_sa=1024320u" >希腊字母表(写latex)<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li><a class="link"   href="https://blog.csdn.net/kangkanglhb88008/article/details/125547204" >Latex打空格<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li><a class="link"   href="https://zhuanlan.zhihu.com/p/578601816" >数学资料<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li><a class="link"   href="https://css-loaders.com/" >css-loaders<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li><a class="link"   href="https://csdiy.wiki/" >计算机自学指南<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-</ul>
-<h1 id="工具类"><a href="#工具类" class="headerlink" title="工具类"></a>工具类</h1><ul>
-<li><a class="link"   href="https://docsmall.com/image-compress" >图片大小压缩<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li><a class="link"   href="https://www.sojson.com/image/change.html#google_vignette" >图片尺寸修改和格式转换<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li><a class="link"   href="https://pan.baidu.com/s/1BWEFf8zeLnud98fy5hOTiQ?pwd=qwer" >Jetbrains全家桶破解插件<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li><a class="link"   href="http://www.52jingtanhao.win/auth/login##" >科学上网<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li><a class="link"   href="http://www.taodudu.cc/news/show-4234631.html" >字符画<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li><a class="link"   href="http://zhongguose.com/#meiguihui" >中国传统颜色<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-</ul>
-]]></content>
-      <categories>
-        <category>trick</category>
-      </categories>
-      <tags>
-        <tag>不时之需</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>对程序员来说，技术能力和业务逻辑哪个更重要？</title>
-    <url>/2023/10/08/%E5%AF%B9%E7%A8%8B%E5%BA%8F%E5%91%98%E6%9D%A5%E8%AF%B4%EF%BC%8C%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E5%92%8C%E4%B8%9A%E5%8A%A1%E9%80%BB%E8%BE%91%E5%93%AA%E4%B8%AA%E6%9B%B4%E9%87%8D%E8%A6%81%EF%BC%9F.md/</url>
+    <title>对程序员来说，技术能力和业务逻辑哪个更重要</title>
+    <url>/2023/10/08/%E5%AF%B9%E7%A8%8B%E5%BA%8F%E5%91%98%E6%9D%A5%E8%AF%B4%EF%BC%8C%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E5%92%8C%E4%B8%9A%E5%8A%A1%E9%80%BB%E8%BE%91%E5%93%AA%E4%B8%AA%E6%9B%B4%E9%87%8D%E8%A6%81%EF%BC%9F/</url>
     <content><![CDATA[<blockquote>
-<p>转载自<a class="link"   href="https://blog.csdn.net/qq_43270074/article/details/133632205?spm=1000.2115.3001.5928" >对程序员来说，技术能力和业务逻辑哪个更重要？<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<p>转载自<a class="link"   href="https://blog.csdn.net/qq_43270074/article/details/133632205?spm=1000.2115.3001.5928" >对程序员来说，技术能力和业务逻辑哪个更重要<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
 </blockquote>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/./../article_images/%E5%AF%B9%E7%A8%8B%E5%BA%8F%E5%91%98%E6%9D%A5%E8%AF%B4%EF%BC%8C%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E5%92%8C%E4%B8%9A%E5%8A%A1%E9%80%BB%E8%BE%91%E5%93%AA%E4%B8%AA%E6%9B%B4%E9%87%8D%E8%A6%81%EF%BC%9F.md/27640fd18d90415088d0968b143f237d.png"
+                     data-src="/./../article_images/%E5%AF%B9%E7%A8%8B%E5%BA%8F%E5%91%98%E6%9D%A5%E8%AF%B4%EF%BC%8C%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E5%92%8C%E4%B8%9A%E5%8A%A1%E9%80%BB%E8%BE%91%E5%93%AA%E4%B8%AA%E6%9B%B4%E9%87%8D%E8%A6%81/27640fd18d90415088d0968b143f237d.png"
                       alt="在这里插入图片描述"
                 ></p>
 <h1 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h1><p>大家好，我是苍何。话说，小明和小华都是程序员，小明今年刚毕业在一家小金融公司实习，小华是工作了 8 年的 Java 开发，他们两最近都面临同样的问题「技术能力和业务逻辑哪个更重要？」，于是他们都向大师求道。</p>
@@ -5222,7 +5339,7 @@ import {initHBE} from "/js/plugins/hbe.js";
 <h1 id="二、技术能力的重要性"><a href="#二、技术能力的重要性" class="headerlink" title="二、技术能力的重要性"></a>二、技术能力的重要性</h1><h2 id="2-1、技术能力的定义"><a href="#2-1、技术能力的定义" class="headerlink" title="2.1、技术能力的定义"></a>2.1、技术能力的定义</h2><p>我们在谈技术和业务谁更重要之前，先理清一点是不管怎么说，技术能力是我们作为程序员这个职业的根基，基础扎实是积累经验和进一步成长的基石。技术能力确保我们有能力构建、优化和维护软件，使其具有高性能、高可用性和可扩展性。<br><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/./../article_images/%E5%AF%B9%E7%A8%8B%E5%BA%8F%E5%91%98%E6%9D%A5%E8%AF%B4%EF%BC%8C%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E5%92%8C%E4%B8%9A%E5%8A%A1%E9%80%BB%E8%BE%91%E5%93%AA%E4%B8%AA%E6%9B%B4%E9%87%8D%E8%A6%81%EF%BC%9F.md/0fb0a3e7116d45f786a095b243d3f6dc.png"
+                     data-src="/./../article_images/%E5%AF%B9%E7%A8%8B%E5%BA%8F%E5%91%98%E6%9D%A5%E8%AF%B4%EF%BC%8C%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E5%92%8C%E4%B8%9A%E5%8A%A1%E9%80%BB%E8%BE%91%E5%93%AA%E4%B8%AA%E6%9B%B4%E9%87%8D%E8%A6%81/0fb0a3e7116d45f786a095b243d3f6dc.png"
                       alt="在这里插入图片描述"
                 ></p>
 <ul>
@@ -5238,7 +5355,7 @@ import {initHBE} from "/js/plugins/hbe.js";
 <h2 id="2-2、技术强的优势"><a href="#2-2、技术强的优势" class="headerlink" title="2.2、技术强的优势"></a>2.2、技术强的优势</h2><p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/./../article_images/%E5%AF%B9%E7%A8%8B%E5%BA%8F%E5%91%98%E6%9D%A5%E8%AF%B4%EF%BC%8C%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E5%92%8C%E4%B8%9A%E5%8A%A1%E9%80%BB%E8%BE%91%E5%93%AA%E4%B8%AA%E6%9B%B4%E9%87%8D%E8%A6%81%EF%BC%9F.md/3f714db777c1417f87b70b147a6769b2.png"
+                     data-src="/./../article_images/%E5%AF%B9%E7%A8%8B%E5%BA%8F%E5%91%98%E6%9D%A5%E8%AF%B4%EF%BC%8C%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E5%92%8C%E4%B8%9A%E5%8A%A1%E9%80%BB%E8%BE%91%E5%93%AA%E4%B8%AA%E6%9B%B4%E9%87%8D%E8%A6%81/3f714db777c1417f87b70b147a6769b2.png"
                       alt="在这里插入图片描述"
                 ></p>
 <p>李白的 “兴酣落笔摇五岳，诗成笑傲凌沧州” 正表明技术强走遍天南地北都不怕，于我们程序员来说，也有一定的适用性。技术强不仅受人尊重而且往往能独当一面，成为某个系统的 owner，独立负责某系统，往往也能得到领导公司的喜欢，在公司内部的晋升很多都是技术实力表现非凡并做出突出贡献者。</p>
@@ -5250,7 +5367,7 @@ import {initHBE} from "/js/plugins/hbe.js";
 <h3 id="2-3-2、开展个人项目并参与开源社区"><a href="#2-3-2、开展个人项目并参与开源社区" class="headerlink" title="2.3.2、开展个人项目并参与开源社区"></a>2.3.2、开展个人项目并参与开源社区</h3><p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/./../article_images/%E5%AF%B9%E7%A8%8B%E5%BA%8F%E5%91%98%E6%9D%A5%E8%AF%B4%EF%BC%8C%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E5%92%8C%E4%B8%9A%E5%8A%A1%E9%80%BB%E8%BE%91%E5%93%AA%E4%B8%AA%E6%9B%B4%E9%87%8D%E8%A6%81%EF%BC%9F.md/3c82e524f1c64c48948bbb9c01124afb.png"
+                     data-src="/./../article_images/%E5%AF%B9%E7%A8%8B%E5%BA%8F%E5%91%98%E6%9D%A5%E8%AF%B4%EF%BC%8C%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E5%92%8C%E4%B8%9A%E5%8A%A1%E9%80%BB%E8%BE%91%E5%93%AA%E4%B8%AA%E6%9B%B4%E9%87%8D%E8%A6%81/3c82e524f1c64c48948bbb9c01124afb.png"
                       alt="在这里插入图片描述"
                 ><br><strong>开发自己的个人项目或者参与到开源项目的共建上。</strong>开发一个自己的个人项目可以把学到的新的或者你认为比较有创新的技术框架、设计模式运用到你自己项目中，可以的话发布到开源社区，让全世界的开发者来检验你的项目，是提升技术能力的一个重要手段。</p>
 <p>我们平时工作中的业务代码可能没法使用到新学的技术或者因为企业追求稳定的原因并不能应用，那我们自己开源的项目完全可以，而且开源项目也可反映我们的技术能力和水平，在找工作面试也有一定帮助。</p>
@@ -5266,18 +5383,18 @@ import {initHBE} from "/js/plugins/hbe.js";
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/./../article_images/%E5%AF%B9%E7%A8%8B%E5%BA%8F%E5%91%98%E6%9D%A5%E8%AF%B4%EF%BC%8C%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E5%92%8C%E4%B8%9A%E5%8A%A1%E9%80%BB%E8%BE%91%E5%93%AA%E4%B8%AA%E6%9B%B4%E9%87%8D%E8%A6%81%EF%BC%9F.md/efd9dffbd8054a92ba31ac1a53a9a745.png"
+                     data-src="/./../article_images/%E5%AF%B9%E7%A8%8B%E5%BA%8F%E5%91%98%E6%9D%A5%E8%AF%B4%EF%BC%8C%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E5%92%8C%E4%B8%9A%E5%8A%A1%E9%80%BB%E8%BE%91%E5%93%AA%E4%B8%AA%E6%9B%B4%E9%87%8D%E8%A6%81/efd9dffbd8054a92ba31ac1a53a9a745.png"
                       alt="在这里插入图片描述"
                 ></p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/./../article_images/%E5%AF%B9%E7%A8%8B%E5%BA%8F%E5%91%98%E6%9D%A5%E8%AF%B4%EF%BC%8C%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E5%92%8C%E4%B8%9A%E5%8A%A1%E9%80%BB%E8%BE%91%E5%93%AA%E4%B8%AA%E6%9B%B4%E9%87%8D%E8%A6%81%EF%BC%9F.md/f6e1555c601b4b0cab3b3b401bf28d78.png"
+                     data-src="/./../article_images/%E5%AF%B9%E7%A8%8B%E5%BA%8F%E5%91%98%E6%9D%A5%E8%AF%B4%EF%BC%8C%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E5%92%8C%E4%B8%9A%E5%8A%A1%E9%80%BB%E8%BE%91%E5%93%AA%E4%B8%AA%E6%9B%B4%E9%87%8D%E8%A6%81/f6e1555c601b4b0cab3b3b401bf28d78.png"
                       alt="在这里插入图片描述"
                 ><br><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/./../article_images/%E5%AF%B9%E7%A8%8B%E5%BA%8F%E5%91%98%E6%9D%A5%E8%AF%B4%EF%BC%8C%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E5%92%8C%E4%B8%9A%E5%8A%A1%E9%80%BB%E8%BE%91%E5%93%AA%E4%B8%AA%E6%9B%B4%E9%87%8D%E8%A6%81%EF%BC%9F.md/c7126425a6094ba8a73bf93cb334b0e0.png"
+                     data-src="/./../article_images/%E5%AF%B9%E7%A8%8B%E5%BA%8F%E5%91%98%E6%9D%A5%E8%AF%B4%EF%BC%8C%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E5%92%8C%E4%B8%9A%E5%8A%A1%E9%80%BB%E8%BE%91%E5%93%AA%E4%B8%AA%E6%9B%B4%E9%87%8D%E8%A6%81/c7126425a6094ba8a73bf93cb334b0e0.png"
                       alt="在这里插入图片描述"
                 ></p>
 <p>可以看到招聘上对于 1-3 年的开发并未要求有业务经验，而对于 10 年以上招聘要求中就列明了「有相关经验者优先」。业务能力强在某一领域更有权威性，经常我们出去开会，看到演讲的嘉宾张口闭口都是，我在这个行业干了 10 年 ，意思是恕我直言，在座的各位，你们没人比我更了解这个行业，开始听我吹逼吧…</p>
@@ -5290,7 +5407,7 @@ import {initHBE} from "/js/plugins/hbe.js";
 <p>特别是对于刚毕业的同学来说，去了一家公司发现技术落后，于是想换工作，想找个高并发的项目，换来换去发现，为什么现实中和我想象中差距这么大？不是现在都人手微服务分布式了吗？我这样怎么提升？<br><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/./../article_images/%E5%AF%B9%E7%A8%8B%E5%BA%8F%E5%91%98%E6%9D%A5%E8%AF%B4%EF%BC%8C%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E5%92%8C%E4%B8%9A%E5%8A%A1%E9%80%BB%E8%BE%91%E5%93%AA%E4%B8%AA%E6%9B%B4%E9%87%8D%E8%A6%81%EF%BC%9F.md/b1302504c10547f1a34fa095796fa7fe.png"
+                     data-src="/./../article_images/%E5%AF%B9%E7%A8%8B%E5%BA%8F%E5%91%98%E6%9D%A5%E8%AF%B4%EF%BC%8C%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E5%92%8C%E4%B8%9A%E5%8A%A1%E9%80%BB%E8%BE%91%E5%93%AA%E4%B8%AA%E6%9B%B4%E9%87%8D%E8%A6%81/b1302504c10547f1a34fa095796fa7fe.png"
                       alt="在这里插入图片描述"
                 ></p>
 <p>没有业务的技术不是好技术<br>任何一门技术一定是服务于业务的，如果没有业务场景的技术，那这个技术是个空的技术，技术的诞生本来就是用来解决实际问题的，要用好的技术来服务于业务，在我们过度关注技术精进时，静下心来，把手头的业务逻辑梳理清楚，想清楚哪些可用技术优化的点，而非单纯的考虑技术先进性而不考虑适应性。就比如，不是每个系统上来就得分布式微服务的，一个简单的内部系统，QPS 不到 40，你说整个微服务上去有什么用？</p>
@@ -5305,7 +5422,7 @@ import {initHBE} from "/js/plugins/hbe.js";
 <h2 id="4-3、后期注重业务深耕和沉淀"><a href="#4-3、后期注重业务深耕和沉淀" class="headerlink" title="4.3、后期注重业务深耕和沉淀"></a>4.3、后期注重业务深耕和沉淀</h2><p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/./../article_images/%E5%AF%B9%E7%A8%8B%E5%BA%8F%E5%91%98%E6%9D%A5%E8%AF%B4%EF%BC%8C%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E5%92%8C%E4%B8%9A%E5%8A%A1%E9%80%BB%E8%BE%91%E5%93%AA%E4%B8%AA%E6%9B%B4%E9%87%8D%E8%A6%81%EF%BC%9F.md/ab47c8b1f4e5471791ef62ee3ac7f225.png"
+                     data-src="/./../article_images/%E5%AF%B9%E7%A8%8B%E5%BA%8F%E5%91%98%E6%9D%A5%E8%AF%B4%EF%BC%8C%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E5%92%8C%E4%B8%9A%E5%8A%A1%E9%80%BB%E8%BE%91%E5%93%AA%E4%B8%AA%E6%9B%B4%E9%87%8D%E8%A6%81/ab47c8b1f4e5471791ef62ee3ac7f225.png"
                       alt="在这里插入图片描述"
                 ></p>
 <p><strong>在工作 5 年之后，我们积累了一定的技术能力和项目经验，这个时候需要更关注业务。</strong>我们在换工作的时候，可选择性就不很多了，最好是切合该领域的选择跳槽。在某一个细分领域去沉淀，打造该领域下的 IP，做业务专家。这个时候不管是做了架构师，还是做了技术管理，亦或是还在一线奋斗，最重要的是要从代码中抽离出来，形成自己的业务闭环。需要把积累的业务知识通过互联网分享出来，多参加行业论坛和会议，并能作为嘉宾发言，多分享行业认知，积累行业人脉和资源。</p>
@@ -5315,6 +5432,24 @@ import {initHBE} from "/js/plugins/hbe.js";
       <categories>
         <category>个人成长</category>
       </categories>
+  </entry>
+  <entry>
+    <title>操作系统导论笔记</title>
+    <url>/2023/07/25/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AF%BC%E8%AE%BA%E7%AC%94%E8%AE%B0/</url>
+    <content><![CDATA[<p>自制思维导图</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AF%BC%E8%AE%BA%E7%AC%94%E8%AE%B0/963d8c4090504751b1c538865434a8cd.png"
+                      alt="在这里插入图片描述"
+                ></p>
+]]></content>
+      <categories>
+        <category>读书笔记</category>
+      </categories>
+      <tags>
+        <tag>操作系统</tag>
+      </tags>
   </entry>
   <entry>
     <title>思考</title>
@@ -5338,24 +5473,6 @@ import {initHBE} from "/js/plugins/hbe.js";
     initHBE();
 </script>
 ]]></content>
-  </entry>
-  <entry>
-    <title>操作系统导论笔记</title>
-    <url>/2023/07/25/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AF%BC%E8%AE%BA%E7%AC%94%E8%AE%B0/</url>
-    <content><![CDATA[<p>自制思维导图</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/./../article_images/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AF%BC%E8%AE%BA%E7%AC%94%E8%AE%B0/963d8c4090504751b1c538865434a8cd.png"
-                      alt="在这里插入图片描述"
-                ></p>
-]]></content>
-      <categories>
-        <category>读书笔记</category>
-      </categories>
-      <tags>
-        <tag>操作系统</tag>
-      </tags>
   </entry>
   <entry>
     <title>手写简易神经网络</title>
@@ -5539,26 +5656,6 @@ import {initHBE} from "/js/plugins/hbe.js";
       </categories>
   </entry>
   <entry>
-    <title>禁忌搜索求TSP</title>
-    <url>/2023/06/27/%E7%A6%81%E5%BF%8C%E6%90%9C%E7%B4%A2%E6%B1%82TSP/</url>
-    <content><![CDATA[<ul>
-<li>邻域：将当前解通过某种算子得到新的解的集合就是这个解的邻域，比如通过交换算子将1234-&gt;1324，那么1324就是1234的邻域的一部分</li>
-<li>邻域移动是进行解转移的关键，影响整个算法的搜索速度</li>
-<li>禁忌表：记录被禁止的对象，防止出现搜索循环和局部最优。一般使用FIFO</li>
-<li>禁忌步长:多久之后禁忌失效，设计很关键。小了会局部最优，大了会限制搜索，错过好的解</li>
-<li>候选解（candidate）：从邻域中选择若干个目标值或评价值最佳的邻居作为候选解。候选解集合的生成规则一定程度上决定了搜索的方向和邻域大小，十分关键。候选集过大增加计算内存和计算时间，过小容易过早陷入局部最优。候选集的选择一般由邻域中的邻居组成，可以选择所有邻居，也可以选择表现较好的邻居，还可以随机选择几个邻居。这里我们采用两两交换法则生成候选解集合。</li>
-<li>选择邻域的策略：最好解优先，即比较所有邻域，耗时久但收敛更好。第一个改进解，即发现对一个改进解就转移，耗时少但收敛差。</li>
-<li>藐视准则(特赦准则)：当某个被禁忌的移动由优于未被禁忌的移动得到的最优邻域解和历史最优解时，算法接收该移动。</li>
-<li>停止准则：如最大迭代数、运行时间等</li>
-</ul>
-<p>视频：<a href='https://www.bilibili.com/video/BV1v24y117Sj/?spm_id_from=333.337.search-card.all.click&vd_source=43b6af819307ca6bdad60477a02d8d1c'></a></p>
-<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">make_data</span>(<span class="params">dim</span>):</span><br><span class="line">    mp = np.ndarray((dim,dim))</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(dim):</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>,i+<span class="number">1</span>):</span><br><span class="line">            <span class="keyword">if</span> i==j:</span><br><span class="line">                mp[i,j]=<span class="number">0</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                v = np.random.randint(<span class="number">10</span>,<span class="number">500</span>)</span><br><span class="line">                mp[i,j] = v</span><br><span class="line">                mp[j,i] = v</span><br><span class="line">    <span class="keyword">return</span> mp</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">TabuSearch</span>:</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self,max_tabu_size=<span class="number">10</span>,candidate_num=<span class="number">11</span>,asp_iter=<span class="number">100</span></span>):</span><br><span class="line">        <span class="variable language_">self</span>.max_tabu_size = max_tabu_size</span><br><span class="line">        <span class="variable language_">self</span>.candidate_num = candidate_num</span><br><span class="line">        <span class="variable language_">self</span>.asp_iter = asp_iter</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 获得x通过某种操作(这里是交换)能到达的所有邻域</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">get_neighbor</span>(<span class="params">self,x</span>):</span><br><span class="line">        neighbors = []</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(x)):</span><br><span class="line">            <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(i + <span class="number">1</span>, <span class="built_in">len</span>(x)):</span><br><span class="line">                neighbor = x.copy()</span><br><span class="line">                neighbor[i], neighbor[j] = neighbor[j], neighbor[i]</span><br><span class="line">                neighbors.append(neighbor)</span><br><span class="line">        <span class="keyword">return</span> neighbors</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 取部分邻域作为候选集</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">get_candidates</span>(<span class="params">self,neighbors</span>):</span><br><span class="line">        <span class="comment"># 升序，返回新数组</span></span><br><span class="line">        sorted_neighbors = <span class="built_in">sorted</span>(neighbors,key=<span class="keyword">lambda</span> item:<span class="variable language_">self</span>.target_function(item))</span><br><span class="line">        <span class="keyword">return</span> sorted_neighbors[:<span class="variable language_">self</span>.candidate_num]</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 如果全部对象都被禁忌、或某对象的解禁能带来很好的影响</span></span><br><span class="line">    <span class="comment"># 此时会让他们重新可选</span></span><br><span class="line">    <span class="comment"># 特赦规则(藐视禁忌准则)</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">aspiration_criterion</span>(<span class="params">self,x,best_x,cur_iter,asp_iter</span>):</span><br><span class="line">        res1,res2 = <span class="variable language_">self</span>.target_function(x) , <span class="variable language_">self</span>.target_function(best_x)</span><br><span class="line">        <span class="comment"># 得出的解比当前最优解还好 并且 迭代进行到一定次数</span></span><br><span class="line">        <span class="keyword">return</span> res1 &lt; res2 <span class="keyword">and</span> cur_iter &gt; asp_iter</span><br><span class="line">    <span class="comment"># 目标函数</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">target_function</span>(<span class="params">self,x:<span class="built_in">list</span></span>):</span><br><span class="line">        path = [<span class="variable language_">self</span>.start] + x + [<span class="variable language_">self</span>.start]</span><br><span class="line">        cur = path[<span class="number">0</span>]</span><br><span class="line">        res = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> nex <span class="keyword">in</span> path[<span class="number">1</span>:]:</span><br><span class="line">            res += <span class="variable language_">self</span>.mp[cur,nex]</span><br><span class="line">            cur = nex</span><br><span class="line">        <span class="keyword">return</span> res</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 传入图、起始点、迭代次数</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">run</span>(<span class="params">self,mp:np.ndarray,start,iter_num=<span class="number">1000</span></span>):</span><br><span class="line">        <span class="comment"># 初始化禁忌空表</span></span><br><span class="line">        tabu_table = []</span><br><span class="line">        <span class="comment"># 获得解维度</span></span><br><span class="line">        dim = mp.shape[<span class="number">0</span>]</span><br><span class="line">        <span class="variable language_">self</span>.start = start</span><br><span class="line">        <span class="variable language_">self</span>.mp = mp</span><br><span class="line">        <span class="comment"># 初始化最初的解,注意起始点是不变的</span></span><br><span class="line">        x = <span class="built_in">filter</span>(<span class="keyword">lambda</span> i:i != start,<span class="built_in">range</span>(<span class="number">0</span>,dim))</span><br><span class="line">        <span class="comment"># 一个是当前解，一个是全历史最优解</span></span><br><span class="line">        x = <span class="built_in">list</span>(x)</span><br><span class="line">        best_x = x.copy()</span><br><span class="line">        <span class="comment"># 记录过程量</span></span><br><span class="line">        records = []</span><br><span class="line">        <span class="keyword">for</span> <span class="built_in">iter</span> <span class="keyword">in</span> <span class="built_in">range</span>(iter_num):</span><br><span class="line">            <span class="comment"># 选出neighbors中所有的长度为2的子集，通过按值交换，起到2-opt的效果</span></span><br><span class="line">            <span class="comment"># 获得邻域</span></span><br><span class="line">            neighbors = <span class="variable language_">self</span>.get_neighbor(x)</span><br><span class="line">            <span class="comment"># 可以再选取一部分邻域作为候选集，避免在大规模邻域中搜索</span></span><br><span class="line">            <span class="comment"># 注意和这个</span></span><br><span class="line">            candidates = <span class="variable language_">self</span>.get_candidates(neighbors)</span><br><span class="line">            <span class="comment"># 选最优解</span></span><br><span class="line">            best_candidate = candidates[<span class="number">0</span>]</span><br><span class="line">            <span class="comment"># 不在禁忌表里直接设为当前解</span></span><br><span class="line">            <span class="keyword">if</span> best_candidate <span class="keyword">not</span> <span class="keyword">in</span> tabu_table:</span><br><span class="line">                <span class="comment"># 不需要将他与先前的x进行比较</span></span><br><span class="line">                <span class="comment"># 从而有能力跳出局部最优解</span></span><br><span class="line">                x = best_candidate</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="comment"># 可赦免就用</span></span><br><span class="line">                <span class="keyword">if</span> <span class="variable language_">self</span>.aspiration_criterion(best_candidate,best_x,<span class="built_in">iter</span>,<span class="variable language_">self</span>.asp_iter):</span><br><span class="line">                    x = best_candidate</span><br><span class="line">                    <span class="comment"># 先清除，防止表中同时出现两个</span></span><br><span class="line">                    tabu_table.remove(best_candidate)</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    <span class="comment"># 这个最优解都不能赦免，只能用没被禁的了</span></span><br><span class="line">                    <span class="comment"># 所以我感觉candidate_num要比max_tabu_size大一点</span></span><br><span class="line">                    <span class="comment"># 不然会死循环？</span></span><br><span class="line">                    <span class="keyword">for</span> candidate <span class="keyword">in</span> candidates:</span><br><span class="line">                        <span class="keyword">if</span> candidate <span class="keyword">not</span> <span class="keyword">in</span> tabu_table:</span><br><span class="line">                            x = candidate</span><br><span class="line">                            <span class="keyword">break</span></span><br><span class="line">            <span class="comment"># 定长禁忌表的FIFO</span></span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">len</span>(tabu_table) &gt; <span class="variable language_">self</span>.max_tabu_size:</span><br><span class="line">                tabu_table.pop(<span class="number">0</span>)</span><br><span class="line">            <span class="comment"># 禁忌</span></span><br><span class="line">            <span class="comment"># 这里存入的是交换后的路径，但其实存交换操作就行(交换的下标x和y)</span></span><br><span class="line">            tabu_table.append(x)</span><br><span class="line">            <span class="comment"># 判断当前最优是否能替代历史最优</span></span><br><span class="line">            <span class="keyword">if</span> <span class="variable language_">self</span>.target_function(x) &lt; <span class="variable language_">self</span>.target_function(best_x):</span><br><span class="line">                best_x = x</span><br><span class="line">            records.append(<span class="variable language_">self</span>.target_function(best_x))</span><br><span class="line">        <span class="keyword">return</span> [start] + best_x +[start] , <span class="variable language_">self</span>.target_function(best_x) , records</span><br><span class="line"></span><br><span class="line">np.random.seed(<span class="number">100</span>)</span><br><span class="line">city_num = <span class="number">10</span></span><br><span class="line"><span class="comment"># mp = make_data(city_num)</span></span><br><span class="line">mp = np.array([[  <span class="number">0</span>,  <span class="number">18</span>, <span class="number">290</span>, <span class="number">333</span>, <span class="number">369</span>, <span class="number">353</span>,  <span class="number">89</span>, <span class="number">442</span>, <span class="number">404</span>, <span class="number">360</span>,],</span><br><span class="line"> [ <span class="number">18</span>,   <span class="number">0</span>, <span class="number">446</span>, <span class="number">364</span>,  <span class="number">63</span>,  <span class="number">76</span>, <span class="number">236</span>,  <span class="number">24</span>, <span class="number">300</span>, <span class="number">250</span>,],</span><br><span class="line"> [<span class="number">290</span>, <span class="number">446</span>,   <span class="number">0</span>, <span class="number">290</span>, <span class="number">153</span>, <span class="number">238</span>, <span class="number">373</span>, <span class="number">326</span>,  <span class="number">68</span>, <span class="number">410</span>,],</span><br><span class="line"> [<span class="number">333</span>, <span class="number">364</span>, <span class="number">290</span>,   <span class="number">0</span>, <span class="number">147</span>, <span class="number">103</span>,  <span class="number">96</span>, <span class="number">396</span>, <span class="number">165</span>, <span class="number">374</span>,],</span><br><span class="line"> [<span class="number">369</span>,  <span class="number">63</span>, <span class="number">153</span>, <span class="number">147</span>,   <span class="number">0</span>, <span class="number">398</span>, <span class="number">425</span>, <span class="number">395</span>, <span class="number">151</span>, <span class="number">255</span>,],</span><br><span class="line"> [<span class="number">353</span>,  <span class="number">76</span>, <span class="number">238</span>, <span class="number">103</span>, <span class="number">398</span>,   <span class="number">0</span>, <span class="number">221</span>, <span class="number">110</span>,  <span class="number">14</span>, <span class="number">101</span>,],</span><br><span class="line"> [ <span class="number">89</span>, <span class="number">236</span>, <span class="number">373</span>,  <span class="number">96</span>, <span class="number">425</span>, <span class="number">221</span>,   <span class="number">0</span>, <span class="number">453</span>, <span class="number">333</span>, <span class="number">145</span>,],</span><br><span class="line"> [<span class="number">442</span>,  <span class="number">24</span>, <span class="number">326</span>, <span class="number">396</span>, <span class="number">395</span>, <span class="number">110</span>, <span class="number">453</span>,   <span class="number">0</span>,  <span class="number">59</span>, <span class="number">441</span>,],</span><br><span class="line"> [<span class="number">404</span>, <span class="number">300</span>,  <span class="number">68</span>, <span class="number">165</span>, <span class="number">151</span>,  <span class="number">14</span>, <span class="number">333</span>,  <span class="number">59</span>,   <span class="number">0</span>, <span class="number">203</span>,],</span><br><span class="line"> [<span class="number">360</span>, <span class="number">250</span>, <span class="number">410</span>, <span class="number">374</span>, <span class="number">255</span>, <span class="number">101</span>, <span class="number">145</span>, <span class="number">441</span>, <span class="number">203</span>,   <span class="number">0</span>,]] )</span><br><span class="line"><span class="comment"># print(mp)</span></span><br><span class="line">tbs = TabuSearch()</span><br><span class="line">best_x,best_y,records = tbs.run(mp,<span class="number">0</span>,<span class="number">10</span>)</span><br><span class="line"><span class="built_in">print</span>(best_x,best_y)</span><br><span class="line">plt.plot(<span class="built_in">range</span>(<span class="built_in">len</span>(records)),records)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure></div>
-]]></content>
-      <categories>
-        <category>启发式算法</category>
-      </categories>
-  </entry>
-  <entry>
     <title>粒子群算法学习</title>
     <url>/2023/06/24/%E7%B2%92%E5%AD%90%E7%BE%A4%E7%AE%97%E6%B3%95%E7%AE%80%E5%8D%95%E5%AD%A6%E4%B9%A0/</url>
     <content><![CDATA[<p>粒子群算法是一门新兴算法，此算法与遗传算法有很多相似之处，其收敛于全局最优解的概率很大。</p>
@@ -5600,6 +5697,26 @@ import {initHBE} from "/js/plugins/hbe.js";
 <li>停止准则<br> a. 最大迭代次数<br> b. 可以接受的满意解（通过fitness function判断是否满意）</li>
 <li>粒子空间的初始化<br>较好地选择粒子的初始化空间，将大大缩短收敛时间．初始化空间根据具体问题的不同而不同，根据具体问题进行设定． 该算法为数不多的关键参数的设置却对算法的精度和效率有<br>着显著影响．</li>
 </ol>
+]]></content>
+      <categories>
+        <category>启发式算法</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>禁忌搜索求TSP</title>
+    <url>/2023/06/27/%E7%A6%81%E5%BF%8C%E6%90%9C%E7%B4%A2%E6%B1%82TSP/</url>
+    <content><![CDATA[<ul>
+<li>邻域：将当前解通过某种算子得到新的解的集合就是这个解的邻域，比如通过交换算子将1234-&gt;1324，那么1324就是1234的邻域的一部分</li>
+<li>邻域移动是进行解转移的关键，影响整个算法的搜索速度</li>
+<li>禁忌表：记录被禁止的对象，防止出现搜索循环和局部最优。一般使用FIFO</li>
+<li>禁忌步长:多久之后禁忌失效，设计很关键。小了会局部最优，大了会限制搜索，错过好的解</li>
+<li>候选解（candidate）：从邻域中选择若干个目标值或评价值最佳的邻居作为候选解。候选解集合的生成规则一定程度上决定了搜索的方向和邻域大小，十分关键。候选集过大增加计算内存和计算时间，过小容易过早陷入局部最优。候选集的选择一般由邻域中的邻居组成，可以选择所有邻居，也可以选择表现较好的邻居，还可以随机选择几个邻居。这里我们采用两两交换法则生成候选解集合。</li>
+<li>选择邻域的策略：最好解优先，即比较所有邻域，耗时久但收敛更好。第一个改进解，即发现对一个改进解就转移，耗时少但收敛差。</li>
+<li>藐视准则(特赦准则)：当某个被禁忌的移动由优于未被禁忌的移动得到的最优邻域解和历史最优解时，算法接收该移动。</li>
+<li>停止准则：如最大迭代数、运行时间等</li>
+</ul>
+<p>视频：<a href='https://www.bilibili.com/video/BV1v24y117Sj/?spm_id_from=333.337.search-card.all.click&vd_source=43b6af819307ca6bdad60477a02d8d1c'></a></p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">make_data</span>(<span class="params">dim</span>):</span><br><span class="line">    mp = np.ndarray((dim,dim))</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(dim):</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>,i+<span class="number">1</span>):</span><br><span class="line">            <span class="keyword">if</span> i==j:</span><br><span class="line">                mp[i,j]=<span class="number">0</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                v = np.random.randint(<span class="number">10</span>,<span class="number">500</span>)</span><br><span class="line">                mp[i,j] = v</span><br><span class="line">                mp[j,i] = v</span><br><span class="line">    <span class="keyword">return</span> mp</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">TabuSearch</span>:</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self,max_tabu_size=<span class="number">10</span>,candidate_num=<span class="number">11</span>,asp_iter=<span class="number">100</span></span>):</span><br><span class="line">        <span class="variable language_">self</span>.max_tabu_size = max_tabu_size</span><br><span class="line">        <span class="variable language_">self</span>.candidate_num = candidate_num</span><br><span class="line">        <span class="variable language_">self</span>.asp_iter = asp_iter</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 获得x通过某种操作(这里是交换)能到达的所有邻域</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">get_neighbor</span>(<span class="params">self,x</span>):</span><br><span class="line">        neighbors = []</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(x)):</span><br><span class="line">            <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(i + <span class="number">1</span>, <span class="built_in">len</span>(x)):</span><br><span class="line">                neighbor = x.copy()</span><br><span class="line">                neighbor[i], neighbor[j] = neighbor[j], neighbor[i]</span><br><span class="line">                neighbors.append(neighbor)</span><br><span class="line">        <span class="keyword">return</span> neighbors</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 取部分邻域作为候选集</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">get_candidates</span>(<span class="params">self,neighbors</span>):</span><br><span class="line">        <span class="comment"># 升序，返回新数组</span></span><br><span class="line">        sorted_neighbors = <span class="built_in">sorted</span>(neighbors,key=<span class="keyword">lambda</span> item:<span class="variable language_">self</span>.target_function(item))</span><br><span class="line">        <span class="keyword">return</span> sorted_neighbors[:<span class="variable language_">self</span>.candidate_num]</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 如果全部对象都被禁忌、或某对象的解禁能带来很好的影响</span></span><br><span class="line">    <span class="comment"># 此时会让他们重新可选</span></span><br><span class="line">    <span class="comment"># 特赦规则(藐视禁忌准则)</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">aspiration_criterion</span>(<span class="params">self,x,best_x,cur_iter,asp_iter</span>):</span><br><span class="line">        res1,res2 = <span class="variable language_">self</span>.target_function(x) , <span class="variable language_">self</span>.target_function(best_x)</span><br><span class="line">        <span class="comment"># 得出的解比当前最优解还好 并且 迭代进行到一定次数</span></span><br><span class="line">        <span class="keyword">return</span> res1 &lt; res2 <span class="keyword">and</span> cur_iter &gt; asp_iter</span><br><span class="line">    <span class="comment"># 目标函数</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">target_function</span>(<span class="params">self,x:<span class="built_in">list</span></span>):</span><br><span class="line">        path = [<span class="variable language_">self</span>.start] + x + [<span class="variable language_">self</span>.start]</span><br><span class="line">        cur = path[<span class="number">0</span>]</span><br><span class="line">        res = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> nex <span class="keyword">in</span> path[<span class="number">1</span>:]:</span><br><span class="line">            res += <span class="variable language_">self</span>.mp[cur,nex]</span><br><span class="line">            cur = nex</span><br><span class="line">        <span class="keyword">return</span> res</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 传入图、起始点、迭代次数</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">run</span>(<span class="params">self,mp:np.ndarray,start,iter_num=<span class="number">1000</span></span>):</span><br><span class="line">        <span class="comment"># 初始化禁忌空表</span></span><br><span class="line">        tabu_table = []</span><br><span class="line">        <span class="comment"># 获得解维度</span></span><br><span class="line">        dim = mp.shape[<span class="number">0</span>]</span><br><span class="line">        <span class="variable language_">self</span>.start = start</span><br><span class="line">        <span class="variable language_">self</span>.mp = mp</span><br><span class="line">        <span class="comment"># 初始化最初的解,注意起始点是不变的</span></span><br><span class="line">        x = <span class="built_in">filter</span>(<span class="keyword">lambda</span> i:i != start,<span class="built_in">range</span>(<span class="number">0</span>,dim))</span><br><span class="line">        <span class="comment"># 一个是当前解，一个是全历史最优解</span></span><br><span class="line">        x = <span class="built_in">list</span>(x)</span><br><span class="line">        best_x = x.copy()</span><br><span class="line">        <span class="comment"># 记录过程量</span></span><br><span class="line">        records = []</span><br><span class="line">        <span class="keyword">for</span> <span class="built_in">iter</span> <span class="keyword">in</span> <span class="built_in">range</span>(iter_num):</span><br><span class="line">            <span class="comment"># 选出neighbors中所有的长度为2的子集，通过按值交换，起到2-opt的效果</span></span><br><span class="line">            <span class="comment"># 获得邻域</span></span><br><span class="line">            neighbors = <span class="variable language_">self</span>.get_neighbor(x)</span><br><span class="line">            <span class="comment"># 可以再选取一部分邻域作为候选集，避免在大规模邻域中搜索</span></span><br><span class="line">            <span class="comment"># 注意和这个</span></span><br><span class="line">            candidates = <span class="variable language_">self</span>.get_candidates(neighbors)</span><br><span class="line">            <span class="comment"># 选最优解</span></span><br><span class="line">            best_candidate = candidates[<span class="number">0</span>]</span><br><span class="line">            <span class="comment"># 不在禁忌表里直接设为当前解</span></span><br><span class="line">            <span class="keyword">if</span> best_candidate <span class="keyword">not</span> <span class="keyword">in</span> tabu_table:</span><br><span class="line">                <span class="comment"># 不需要将他与先前的x进行比较</span></span><br><span class="line">                <span class="comment"># 从而有能力跳出局部最优解</span></span><br><span class="line">                x = best_candidate</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="comment"># 可赦免就用</span></span><br><span class="line">                <span class="keyword">if</span> <span class="variable language_">self</span>.aspiration_criterion(best_candidate,best_x,<span class="built_in">iter</span>,<span class="variable language_">self</span>.asp_iter):</span><br><span class="line">                    x = best_candidate</span><br><span class="line">                    <span class="comment"># 先清除，防止表中同时出现两个</span></span><br><span class="line">                    tabu_table.remove(best_candidate)</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    <span class="comment"># 这个最优解都不能赦免，只能用没被禁的了</span></span><br><span class="line">                    <span class="comment"># 所以我感觉candidate_num要比max_tabu_size大一点</span></span><br><span class="line">                    <span class="comment"># 不然会死循环？</span></span><br><span class="line">                    <span class="keyword">for</span> candidate <span class="keyword">in</span> candidates:</span><br><span class="line">                        <span class="keyword">if</span> candidate <span class="keyword">not</span> <span class="keyword">in</span> tabu_table:</span><br><span class="line">                            x = candidate</span><br><span class="line">                            <span class="keyword">break</span></span><br><span class="line">            <span class="comment"># 定长禁忌表的FIFO</span></span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">len</span>(tabu_table) &gt; <span class="variable language_">self</span>.max_tabu_size:</span><br><span class="line">                tabu_table.pop(<span class="number">0</span>)</span><br><span class="line">            <span class="comment"># 禁忌</span></span><br><span class="line">            <span class="comment"># 这里存入的是交换后的路径，但其实存交换操作就行(交换的下标x和y)</span></span><br><span class="line">            tabu_table.append(x)</span><br><span class="line">            <span class="comment"># 判断当前最优是否能替代历史最优</span></span><br><span class="line">            <span class="keyword">if</span> <span class="variable language_">self</span>.target_function(x) &lt; <span class="variable language_">self</span>.target_function(best_x):</span><br><span class="line">                best_x = x</span><br><span class="line">            records.append(<span class="variable language_">self</span>.target_function(best_x))</span><br><span class="line">        <span class="keyword">return</span> [start] + best_x +[start] , <span class="variable language_">self</span>.target_function(best_x) , records</span><br><span class="line"></span><br><span class="line">np.random.seed(<span class="number">100</span>)</span><br><span class="line">city_num = <span class="number">10</span></span><br><span class="line"><span class="comment"># mp = make_data(city_num)</span></span><br><span class="line">mp = np.array([[  <span class="number">0</span>,  <span class="number">18</span>, <span class="number">290</span>, <span class="number">333</span>, <span class="number">369</span>, <span class="number">353</span>,  <span class="number">89</span>, <span class="number">442</span>, <span class="number">404</span>, <span class="number">360</span>,],</span><br><span class="line"> [ <span class="number">18</span>,   <span class="number">0</span>, <span class="number">446</span>, <span class="number">364</span>,  <span class="number">63</span>,  <span class="number">76</span>, <span class="number">236</span>,  <span class="number">24</span>, <span class="number">300</span>, <span class="number">250</span>,],</span><br><span class="line"> [<span class="number">290</span>, <span class="number">446</span>,   <span class="number">0</span>, <span class="number">290</span>, <span class="number">153</span>, <span class="number">238</span>, <span class="number">373</span>, <span class="number">326</span>,  <span class="number">68</span>, <span class="number">410</span>,],</span><br><span class="line"> [<span class="number">333</span>, <span class="number">364</span>, <span class="number">290</span>,   <span class="number">0</span>, <span class="number">147</span>, <span class="number">103</span>,  <span class="number">96</span>, <span class="number">396</span>, <span class="number">165</span>, <span class="number">374</span>,],</span><br><span class="line"> [<span class="number">369</span>,  <span class="number">63</span>, <span class="number">153</span>, <span class="number">147</span>,   <span class="number">0</span>, <span class="number">398</span>, <span class="number">425</span>, <span class="number">395</span>, <span class="number">151</span>, <span class="number">255</span>,],</span><br><span class="line"> [<span class="number">353</span>,  <span class="number">76</span>, <span class="number">238</span>, <span class="number">103</span>, <span class="number">398</span>,   <span class="number">0</span>, <span class="number">221</span>, <span class="number">110</span>,  <span class="number">14</span>, <span class="number">101</span>,],</span><br><span class="line"> [ <span class="number">89</span>, <span class="number">236</span>, <span class="number">373</span>,  <span class="number">96</span>, <span class="number">425</span>, <span class="number">221</span>,   <span class="number">0</span>, <span class="number">453</span>, <span class="number">333</span>, <span class="number">145</span>,],</span><br><span class="line"> [<span class="number">442</span>,  <span class="number">24</span>, <span class="number">326</span>, <span class="number">396</span>, <span class="number">395</span>, <span class="number">110</span>, <span class="number">453</span>,   <span class="number">0</span>,  <span class="number">59</span>, <span class="number">441</span>,],</span><br><span class="line"> [<span class="number">404</span>, <span class="number">300</span>,  <span class="number">68</span>, <span class="number">165</span>, <span class="number">151</span>,  <span class="number">14</span>, <span class="number">333</span>,  <span class="number">59</span>,   <span class="number">0</span>, <span class="number">203</span>,],</span><br><span class="line"> [<span class="number">360</span>, <span class="number">250</span>, <span class="number">410</span>, <span class="number">374</span>, <span class="number">255</span>, <span class="number">101</span>, <span class="number">145</span>, <span class="number">441</span>, <span class="number">203</span>,   <span class="number">0</span>,]] )</span><br><span class="line"><span class="comment"># print(mp)</span></span><br><span class="line">tbs = TabuSearch()</span><br><span class="line">best_x,best_y,records = tbs.run(mp,<span class="number">0</span>,<span class="number">10</span>)</span><br><span class="line"><span class="built_in">print</span>(best_x,best_y)</span><br><span class="line">plt.plot(<span class="built_in">range</span>(<span class="built_in">len</span>(records)),records)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure></div>
 ]]></content>
       <categories>
         <category>启发式算法</category>
@@ -5652,6 +5769,8 @@ import {initHBE} from "/js/plugins/hbe.js";
 <p>不介入本身就是一种介入。</p>
 <hr>
 <p>要爱具体的人，<br>不要爱抽象的人，<br>要爱生活<br>不要爱生活的意义。</p>
+<hr>
+<p>慌张，是因为准备不足。<br>急躁，是因为经历不够。<br>心乱，是因为思路不清。</p>
 <hr>
 <p>对生活感到疲惫时，有一种小技巧叫做“迷你<br>逃跑”。去陌生的街道，大脑放空什么都不做，<br>或者是住酒店，在浴缸里泡澡，喝一点啤酒，<br>把自己从熟悉得有些厌倦的环境里拯救出来。</p>
 <p>有空的时候，建议去附近没去过的车站。我在一<br>个看似空无一人的车站下车，然后去了我不知道<br>的公园和咖啡店。当你在那里读书时，经常会有<br>不错的想法和灵光一闪。</p>
@@ -5981,23 +6100,6 @@ import {initHBE} from "/js/plugins/hbe.js";
       </tags>
   </entry>
   <entry>
-    <title>解决方案记录</title>
-    <url>/2023/05/10/%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%E8%AE%B0%E5%BD%95/</url>
-    <content><![CDATA[<h1 id="前端"><a href="#前端" class="headerlink" title="前端"></a>前端</h1><ul>
-<li><a class="link"   href="https://zhuanlan.zhihu.com/p/600213330" >踩坑日记：如何修复“Issues with peer dependencies found ”错误<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-</ul>
-<h1 id="后端"><a href="#后端" class="headerlink" title="后端"></a>后端</h1><ul>
-<li><a class="link"   href="https://blog.csdn.net/qq_51955445/article/details/128699557?spm=1001.2014.3001.5502" >AttributeError: module ‘numpy‘ has no attribute ‘long‘<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-</ul>
-<h1 id="运维"><a href="#运维" class="headerlink" title="运维"></a>运维</h1><h1 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h1><h1 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h1><ul>
-<li><a class="link"   href="https://blog.csdn.net/qq_51955445/article/details/125869125?spm=1001.2014.3001.5502" >windows查看并杀死进程<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-</ul>
-]]></content>
-      <categories>
-        <category>trick</category>
-      </categories>
-  </entry>
-  <entry>
     <title>蚁群算法求TSP</title>
     <url>/2023/06/27/%E8%9A%81%E7%BE%A4%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0/</url>
     <content><![CDATA[
@@ -6054,6 +6156,23 @@ import {initHBE} from "/js/plugins/hbe.js";
 ]]></content>
       <categories>
         <category>启发式算法</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>解决方案记录</title>
+    <url>/2023/05/10/%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%E8%AE%B0%E5%BD%95/</url>
+    <content><![CDATA[<h1 id="前端"><a href="#前端" class="headerlink" title="前端"></a>前端</h1><ul>
+<li><a class="link"   href="https://zhuanlan.zhihu.com/p/600213330" >踩坑日记：如何修复“Issues with peer dependencies found ”错误<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+<h1 id="后端"><a href="#后端" class="headerlink" title="后端"></a>后端</h1><ul>
+<li><a class="link"   href="https://blog.csdn.net/qq_51955445/article/details/128699557?spm=1001.2014.3001.5502" >AttributeError: module ‘numpy‘ has no attribute ‘long‘<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+<h1 id="运维"><a href="#运维" class="headerlink" title="运维"></a>运维</h1><h1 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h1><h1 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h1><ul>
+<li><a class="link"   href="https://blog.csdn.net/qq_51955445/article/details/125869125?spm=1001.2014.3001.5502" >windows查看并杀死进程<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>trick</category>
       </categories>
   </entry>
   <entry>
