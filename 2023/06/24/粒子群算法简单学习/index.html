@@ -466,7 +466,15 @@
 <li>粒子群算法适用于连续函数极值问题，对于非线性、多峰问题均有较强的全局搜索能力。</li>
 </ol>
 <p>他的问题主要在于容易产生早熟收敛（尤其是在处理复杂的修峰搜索问题中）、局寻优能力较差等。PSO算法<br>陷入局最小，主要归咎于种群在搜索空间中多样性的丢失。</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">graph TD;</span><br><span class="line">  START[粒子规模和位置和速度的初始化]--&gt;A[计算适应度]</span><br><span class="line">  A--&gt;B[计算个体最优值和群体最优值];</span><br><span class="line">  B--&gt;C[更新速度和更新位置];</span><br><span class="line">  C--&gt;D[更新适应度函数];</span><br><span class="line">  D--&gt;E[更新个体最优值和群体最优值]</span><br><span class="line">  E--&gt;F&#123;满足条件?&#125;</span><br><span class="line">  F--&gt;|N|B</span><br><span class="line">  F--&gt;|Y|G(输出最优解)</span><br><span class="line">  </span><br></pre></td></tr></table></figure></div>
+<pre class="mermaid">  graph TD;
+    START[粒子规模和位置和速度的初始化]-->A[计算适应度]
+    A-->B[计算个体最优值和群体最优值];
+    B-->C[更新速度和更新位置];
+    C-->D[更新适应度函数];
+    D-->E[更新个体最优值和群体最优值]
+    E-->F{满足条件?}
+    F-->|N|B
+    F-->|Y|G(输出最优解)</pre>
 
 <p>假设求解下面函数的最优解</p>
 <p>$$<br>\begin{array}{c}<br>\min f(x) &#x3D; \sum_{i&#x3D;1}^{3}[100(x_{i+1}-x_i^2)^2+(x_i-1)^2] \<br>x_i \in <a href="i=1,2,3,4">-30,30</a><br>\end{array}<br>$$</p>

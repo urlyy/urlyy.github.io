@@ -552,7 +552,33 @@
 </li>
 </ul>
 <h1 id="利于思考的工具"><a href="#利于思考的工具" class="headerlink" title="利于思考的工具"></a>利于思考的工具</h1><p>下面是一系列帮助解决问题、做出决策、理解系统的思维工具和框架<br>(译者：下面是我用Mermaid画的图)</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">graph LR</span><br><span class="line">All --&gt; A[理解系统]</span><br><span class="line">A --&gt; A1&#123;概念图&#125;</span><br><span class="line">A --&gt; A2&#123;关系环&#125;</span><br><span class="line">A --&gt; A3&#123;冰山模型&#125;</span><br><span class="line">A --&gt; A4&#123;平衡反馈回路&#125;</span><br><span class="line">A --&gt; A5&#123;强化反馈回路&#125;</span><br><span class="line">All --&gt; B[做出决策]</span><br><span class="line">B --&gt; B1&#123;Cynefin框架&#125;</span><br><span class="line">B --&gt; B2&#123;六顶思维帽&#125;</span><br><span class="line">B --&gt; B3&#123;二阶思维&#125;</span><br><span class="line">B --&gt; B4&#123;艾森豪威尔矩阵&#125;</span><br><span class="line">B --&gt; B5&#123;推理阶梯&#125;</span><br><span class="line">B --&gt; B6&#123;决策矩阵&#125;</span><br><span class="line">B --&gt; B7&#123;信心决定速度还是质量&#125;</span><br><span class="line">B --&gt; B8&#123;艰难抉择模型&#125;</span><br><span class="line">All --&gt; C[解决问题]</span><br><span class="line">C --&gt; C1[鱼骨图]</span><br><span class="line">C --&gt; C2[冲突解决图]</span><br><span class="line">C --&gt; C3[生产性思维模型]</span><br><span class="line">C --&gt; C4[抽象阶梯]</span><br><span class="line">C --&gt; C5[反演]</span><br><span class="line">C --&gt; C6[问题树]</span><br><span class="line">C --&gt; C7[第一原则]</span><br><span class="line">All --&gt; D[沟通]</span><br><span class="line">D --&gt; D1[明托金字塔]</span><br><span class="line">D --&gt; D2[情况-行为-影响]</span><br></pre></td></tr></table></figure></div>
+<pre class="mermaid">graph LR
+All --> A[理解系统]
+A --> A1{概念图}
+A --> A2{关系环}
+A --> A3{冰山模型}
+A --> A4{平衡反馈回路}
+A --> A5{强化反馈回路}
+All --> B[做出决策]
+B --> B1{Cynefin框架}
+B --> B2{六顶思维帽}
+B --> B3{二阶思维}
+B --> B4{艾森豪威尔矩阵}
+B --> B5{推理阶梯}
+B --> B6{决策矩阵}
+B --> B7{信心决定速度还是质量}
+B --> B8{艰难抉择模型}
+All --> C[解决问题]
+C --> C1[鱼骨图]
+C --> C2[冲突解决图]
+C --> C3[生产性思维模型]
+C --> C4[抽象阶梯]
+C --> C5[反演]
+C --> C6[问题树]
+C --> C7[第一原则]
+All --> D[沟通]
+D --> D1[明托金字塔]
+D --> D2[情况-行为-影响]</pre>
 <h2 id="理解系统"><a href="#理解系统" class="headerlink" title="理解系统"></a>理解系统</h2><h3 id="概念图"><a href="#概念图" class="headerlink" title="概念图"></a>概念图<span id="Concept-map"/></h3><blockquote>
 <p><img  
                      lazyload
@@ -1326,7 +1352,17 @@
 <li>创建的原则是互斥、详尽</li>
 </ul>
 <p>Example<br>您正在开发一种产品，您的客户很少使用您的一个功能。</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">graph LR</span><br><span class="line">A[某功能不被使用] --&gt;  B(客户不知道这个功能)</span><br><span class="line">A --&gt; B1(客户知道但是仍然不用)</span><br><span class="line">B --&gt; C(这个功能在产品中不可见)</span><br><span class="line">B1 --&gt; C1(客户没有学习这个功能)</span><br><span class="line">C --&gt; D(客户还没试用这个功能)</span><br><span class="line">C --&gt; D1(客户试用了但是不准备继续用)</span><br><span class="line">D --&gt; E(客户不相信这个功能是有用的)</span><br><span class="line">D1 --&gt; E1(功能不可用)</span><br><span class="line">D1 --&gt; E2(功能有Bug)</span><br><span class="line">D1 --&gt; E3(功能不满足用户的需求)</span><br></pre></td></tr></table></figure></div>
+<pre class="mermaid">graph LR
+A[某功能不被使用] -->  B(客户不知道这个功能)
+A --> B1(客户知道但是仍然不用)
+B --> C(这个功能在产品中不可见)
+B1 --> C1(客户没有学习这个功能)
+C --> D(客户还没试用这个功能)
+C --> D1(客户试用了但是不准备继续用)
+D --> E(客户不相信这个功能是有用的)
+D1 --> E1(功能不可用)
+D1 --> E2(功能有Bug)
+D1 --> E3(功能不满足用户的需求)</pre>
 <h3 id="第一原则"><a href="#第一原则" class="headerlink" title="第一原则"></a>第一原则<span id="First-principles"></span></h3><blockquote>
 <p><img  
                      lazyload
