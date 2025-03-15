@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>urlyy - 个人主页</title>
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+    <script src="./lib/rellax@1.12.1/rellax.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+         body {
+            font-family: Arial, sans-serif;
+             display: flex;
+             flex-direction: column;
+            /*justify-content: center;
+            align-items: center; */
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <span>独立的个人简历主页,在建中</span>
+        <a href="https://www.bilibili.com/video/BV1vNzJYUE5G/?vd_source=43b6af819307ca6bdad60477a02d8d1c#reply248859005313">参考这个视频</a>
+        <a href="https://urlyy.github.io">返回</a>
+    </div>
+    <div>
+        <div id="typed-strings">
+            <p>Typed.js is a <strong>JavaScript</strong> library.</p>
+            <p>It <em>types</em> out sentences.</p>
+        </div>
+        <div id="typed"/>
+    </div>
+
+    
+<script>
+    var rellax = new Rellax('.rellax', {
+        center:true
+    });
+    var typed = new Typed('#typed', {
+        stringsElement: '#typed-strings',
+        typeSpeed: 50,  // 每个字符输入的速度（单位是毫秒）
+        backSpeed: 25,  // 每个字符删除的速度
+        backDelay: 1000,  // 删除前等待的时间（单位是毫秒）
+        startDelay: 500,  // 打字开始前的延迟时间
+        loop: true,  // 是否循环播放
+    });
+
+    // three
+    // 1. 创建场景
+    const scene = new THREE.Scene();
+
+    // 2. 创建相机（透视相机）
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 5;
+
+    // 3. 创建渲染器
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // 4. 创建立方体
+    const geometry = new THREE.BoxGeometry();
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    const cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
+
+    // 5. 渲染循环
+    function animate() {
+        requestAnimationFrame(animate);
+
+        // 旋转立方体
+        cube.rotation.x += 0.01;
+        cube.rotation.y += 0.01;
+
+        // 渲染场景
+        renderer.render(scene, camera);
+    }
+
+    // 启动动画
+    animate();
+
+</script>
+
+</body>
+</html>
