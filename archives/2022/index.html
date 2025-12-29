@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="urlyy">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set data attribute for CSS variables
+                root.setAttribute("data-theme", theme);
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes once DOM is ready
+            if (document.readyState !== "loading") {
+                document.body.classList.add(theme + "-mode");
+            } else {
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add(theme + "-mode");
+                    document.body.classList.remove((theme === DARK ? LIGHT : DARK) + "-mode");
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Critical CSS to prevent flash -->
+    <style>
+        :root[data-theme="dark"] {
+            --background-color: #202124;
+            --background-color-transparent: rgba(32, 33, 36, 0.6);
+            --second-background-color: #2d2e32;
+            --third-background-color: #34353a;
+            --third-background-color-transparent: rgba(32, 33, 36, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #ffffff;
+            --second-text-color: #eeeeee;
+            --third-text-color: #bebec6;
+            --fourth-text-color: #999999;
+            --default-text-color: #bebec6;
+            --invert-text-color: #373D3F;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(255, 255, 255, 0.08);
+            --shadow-color-2: rgba(255, 255, 255, 0.05);
+        }
+        
+        :root[data-theme="light"] {
+            --background-color: #fff;
+            --background-color-transparent: rgba(255, 255, 255, 0.6);
+            --second-background-color: #f8f8f8;
+            --third-background-color: #f2f2f2;
+            --third-background-color-transparent: rgba(241, 241, 241, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #16171a;
+            --second-text-color: #2f3037;
+            --third-text-color: #5e5e5e;
+            --fourth-text-color: #eeeeee;
+            --default-text-color: #373D3F;
+            --invert-text-color: #bebec6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(0, 0, 0, 0.08);
+            --shadow-color-2: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+        
+        /* Apply body classes as soon as DOM is ready */
+        :root[data-theme="dark"] body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+    </style>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://urlyy.github.io/archives/2022/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta property="og:type" content="website">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://urlyy.github.io/archives/2022/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/avatar.jpg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.jpg">
+    <meta name="theme-color" content="#5c701a">
+    <link rel="shortcut icon" href="/images/avatar.jpg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            归档: 2022 | urlyy的小窝
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+        <link href="" rel="stylesheet">
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"urlyy.github.io","root":"/","language":"zh-CN","path":"search.json"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":false,"auto":false,"list":[""]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":true},"copyright":true,"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#5c701a","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":true,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":false},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"side_tools":{"gear_rotation":true,"auto_expand":false},"open_graph":true,"google_analytics":{"enable":false,"id":null},"busuanzi_counter":{"enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"pjax":true},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/bg/1.jpg","dark":"/images/bg/1.jpg"},"title":"urlyy的小窝","subtitle":{"text":["Loading..."],"hitokoto":{"enable":true,"show_author":false,"api":"https://v1.hitokoto.cn?c=a&c=b&c=d&c=k"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"style":"default","links":{"github":"https://github.com/urlyy?tab=repositories","instagram":null,"zhihu":null,"twitter":null,"email":"2213732736@qq.com"},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":true,"version":"9.3.0"}},"version":"2.8.5","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Categories":{"icon":"fa-regular fa-folder","path":"/categories/"},"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Github":{"path":"https://github.com/urlyy","icon":"fa-brands fa-github"},"个人介绍":{"path":"/personal/profile.html","icon":"fa-regular fa-user"}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"cloud"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":null},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2021/9/7 16:55:00"};
+    window.lang_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 个月前","year":"%s 年前"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                urlyy的小窝
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    首页
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/categories/"
+                                        >
+                                    <i class="fa-regular fa-folder fa-fw"></i>
+                                    分类
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class="active"
+                                   href="/archives"
+                                        >
+                                    <i class="fa-regular fa-archive fa-fw"></i>
+                                    归档
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   target="_blank" rel="noopener" href="https://github.com/urlyy"
+                                        >
+                                    <i class="fa-brands fa-github fa-fw"></i>
+                                    GITHUB
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/personal/profile.html"
+                                        >
+                                    <i class="fa-regular fa-user fa-fw"></i>
+                                    个人介绍
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                首页
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/categories/"
+                        >
+                            <span>
+                                分类
+                            </span>
+                            
+                                <i class="fa-regular fa-folder fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full active"
+                           href="/archives"
+                        >
+                            <span>
+                                归档
+                            </span>
+                            
+                                <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           target="_blank" rel="noopener" href="https://github.com/urlyy"
+                        >
+                            <span>
+                                GITHUB
+                            </span>
+                            
+                                <i class="fa-brands fa-github fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/personal/profile.html"
+                        >
+                            <span>
+                                个人介绍
+                            </span>
+                            
+                                <i class="fa-regular fa-user fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">25</div>
+        <div class="label text-third-text-color text-sm">标签</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">29</div>
+        <div class="label text-third-text-color text-sm">分类</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">78</div>
+        <div class="label text-third-text-color text-sm">文章</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="archive-container shadow-none hover:shadow-none sm:shadow-redefine sm:hover:shadow-redefine-hover">
+	
+<div class="archive-list-container">
+    
+        <section class="archive-item mb-spacing-unit last:mb-0">
+            <div class="archive-item-header flex flex-row items-center mb-2">
+                <span class="archive-year font-semibold text-3xl mr-2">2025</span>
+                <span class="archive-year-post-count text-xs md:text-sm font-bold rounded-small bg-third-background-color py-[2px] px-[10px] border border-border-color">13</span>
+            </div>
+            
+            <ul class="article-list pl-0 md:pl-8 text-lg leading-[1.5]">
+                
+                    
+                    
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='07-15'>
+                    
+                    <a href="/2025/07/15/nixos%E5%AE%89%E8%A3%85/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">nixos安装</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='05-12'>
+                    
+                    <a href="/2025/05/12/%E3%80%8A%E6%B2%A1%E6%9C%89%E7%90%86%E6%83%B3%E7%9A%84%E4%BA%BA%E4%B8%8D%E4%BC%A4%E5%BF%83%E3%80%8B/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">《没有理想的人不伤心》</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='05-10'>
+                    
+                    <a href="/2025/05/10/%E6%B5%B7%E8%B4%BC%E7%8E%8B%E8%A7%82%E7%9C%8B%E6%9C%89%E6%84%9F/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">海贼王观看有感</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='04-14'>
+                    
+                    <a href="/2025/04/14/2025-04-15/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">2025-04-14有感</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='03-12'>
+                    
+                    <a href="/2025/03/12/%E5%93%A5%E5%93%A5%E5%B8%A6%E6%88%91%E6%B8%B8%E7%8E%A9%E5%B9%BF%E5%B7%9E/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">哥哥带我游玩广州</span>
+                    </a>
+                    
+                
+                    
+                    
+                    <a href="/2025/03/12/%E6%AF%8F%E6%9C%88%E4%B8%80%E5%BC%A0%E7%85%A7%E7%89%87/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">每月一张照片</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='02-08'>
+                    
+                    <a href="/2025/02/08/%E5%8F%AF%E7%99%BD%E5%AB%96%E7%9A%84serverless%E6%9C%8D%E5%8A%A1/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">可白嫖的serverless服务</span>
+                    </a>
+                    
+                
+                    
+                    
+                    <a href="/2025/02/08/%E5%B7%A5%E5%85%B7%E8%AE%B0%E5%BD%95/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">工具记录</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='01-27'>
+                    
+                    <a href="/2025/01/27/special-experiences/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">special-experiences</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='01-20'>
+                    
+                    <a href="/2025/01/20/%E5%BD%95%E8%A7%86%E9%A2%91%E8%AE%A1%E5%88%92/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">录视频计划</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='01-19'>
+                    
+                    <a href="/2025/01/19/%E4%BB%A5%E6%92%92%E7%9A%84%E7%BB%93%E5%90%88%E6%94%BB%E7%95%A5/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">以撒的结合攻略</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='01-13'>
+                    
+                    <a href="/2025/01/13/%E5%85%AC%E4%BC%97%E5%8F%B7%E8%AE%A1%E5%88%92/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">公众号计划</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='01-10'>
+                    
+                    <a href="/2025/01/10/%E5%8D%8E%E5%B1%B1%E4%B8%80%E6%97%A5%E6%B8%B8/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">华山一日游</span>
+                    </a>
+                    
+                
+                </li> <!-- Ensure the last item is properly closed -->
+            </ul>
+        </section>
+    
+        <section class="archive-item mb-spacing-unit last:mb-0">
+            <div class="archive-item-header flex flex-row items-center mb-2">
+                <span class="archive-year font-semibold text-3xl mr-2">2024</span>
+                <span class="archive-year-post-count text-xs md:text-sm font-bold rounded-small bg-third-background-color py-[2px] px-[10px] border border-border-color">25</span>
+            </div>
+            
+            <ul class="article-list pl-0 md:pl-8 text-lg leading-[1.5]">
+                
+                    
+                    
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='12-31'>
+                    
+                    <a href="/2024/12/31/2025%E6%96%B0%E5%B9%B4%E5%BF%AB%E4%B9%90/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">2025新年快乐</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='12-28'>
+                    
+                    <a href="/2024/12/28/ubuntu%E4%BD%BF%E7%94%A8vpn/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">ubuntu使用vpn</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='12-16'>
+                    
+                    <a href="/2024/12/16/%E5%9B%9E%E8%AE%BF%E6%97%A7%E5%AE%B6/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">回访旧家</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='12-08'>
+                    
+                    <a href="/2024/12/08/%E6%80%9D%E8%80%83/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">思考</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='12-05'>
+                    
+                    <a href="/2024/12/05/%E5%AD%A6%E5%9C%A8%E8%A5%BF%E7%94%B5%E5%BD%95%E6%92%AD%E8%AF%BE%E4%BD%BF%E7%94%A8python%E4%B8%8B%E8%BD%BD%EF%BC%8C%E9%80%9A%E8%BF%87%E8%A7%A3%E6%9E%90m3u8%E5%8D%8F%E8%AE%AE%E3%80%81%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E8%BD%BDts%E8%A7%86%E9%A2%91%E5%9D%97%E4%BB%A5%E5%8F%8Affmpeg%E5%90%88%E5%B9%B6/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">学在西电录播课使用python下载，通过解析m3u8协议、多线程下载ts视频块以及ffmpeg合并</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='12-04'>
+                    
+                    <a href="/2024/12/04/%E3%80%8A%E6%BC%AB%E6%AD%A5%E4%BA%BA%E7%94%9F%E8%B7%AF%E3%80%8B/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">《漫步人生路》</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='12-03'>
+                    
+                    <a href="/2024/12/03/%E4%B9%A6%E7%B1%8D%E8%AF%BB%E5%90%8E%E6%84%9F/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">书籍读后感</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='11-26'>
+                    
+                    <a href="/2024/11/26/2024%E5%AD%97%E8%8A%82%E9%9D%92%E8%AE%AD%E8%90%A5%E7%AC%94%E8%AE%B0-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E4%B8%8E%E4%BC%81%E4%B8%9A%E7%BA%A7%E5%90%8E%E7%AB%AF%E6%9E%B6%E6%9E%84/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">2024字节青训营笔记-微服务与企业级后端架构</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='11-24'>
+                    
+                    <a href="/2024/11/24/2024%E5%AD%97%E8%8A%82%E9%9D%92%E8%AE%AD%E8%90%A5%E7%AC%94%E8%AE%B0-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E4%B8%8E%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">2024字节青训营笔记-消息队列与定时任务</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='11-20'>
+                    
+                    <a href="/2024/11/20/mooctest%E5%85%A8%E5%9B%BD%E5%A4%A7%E5%AD%A6%E7%94%9F%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E5%A4%A7%E8%B5%9B%E5%BC%80%E5%8F%91%E8%80%85%E8%B5%9B%E9%81%93%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%E8%AE%B0%E5%BD%95(Junit4)/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">mooctest全国大学生软件测试大赛开发者赛道相关知识记录(Junit 4)</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='11-13'>
+                    
+                    <a href="/2024/11/13/2024%E5%AD%97%E8%8A%82%E9%9D%92%E8%AE%AD%E8%90%A5%E7%AC%94%E8%AE%B0-Golang%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E4%B8%8EGC/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">2024字节青训营笔记-Golang性能优化与GC</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='11-12'>
+                    
+                    <a href="/2024/11/12/2024%E5%AD%97%E8%8A%82%E9%9D%92%E8%AE%AD%E8%90%A5%E7%AC%94%E8%AE%B0-Golang%E4%BE%9D%E8%B5%96%E7%AE%A1%E7%90%86%E3%80%81%E6%B5%8B%E8%AF%95%E4%B8%8E%E9%AB%98%E8%B4%A8%E9%87%8F%E7%BC%96%E7%A8%8B/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">2024字节青训营笔记-Golang依赖管理、测试与高质量编程</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='10-31'>
+                    
+                    <a href="/2024/10/31/bcompare%E4%BD%BF%E7%94%A8/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">bcompare使用</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='10-18'>
+                    
+                    <a href="/2024/10/18/%E7%BF%A0%E5%8D%8E%E5%B1%B1%E6%B8%B8%E7%8E%A9/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">翠华山游玩</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='10-16'>
+                    
+                    <a href="/2024/10/16/gal_butter_reflection/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">gal/butter reflection</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='10-09'>
+                    
+                    <a href="/2024/10/09/anime_movie_reflection/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">动漫/电影观后感</span>
+                    </a>
+                    
+                
+                    
+                    
+                    <a href="/2024/10/09/%E5%9F%B9%E5%85%BB%E5%A5%BD%E4%B9%A0%E6%83%AF/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">人生计划与习惯培养</span>
+                    </a>
+                    
+                
+                    
+                    
+                    <a href="/2024/10/09/%E8%87%AA%E5%8B%89/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">自勉</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='08-03'>
+                    
+                    <a href="/2024/08/03/Datawhale-AI-%E5%A4%8F%E4%BB%A4%E8%90%A5%EF%BC%882024%E7%AC%AC%E4%B8%89%E6%9C%9F%EF%BC%89AI-%E9%80%BB%E8%BE%91%E6%8E%A8%E7%90%86%E6%96%B9%E5%90%91-%E6%A8%A1%E5%9E%8B%E5%BE%AE%E8%B0%83%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">Datawhale AI 夏令营（2024第三期）AI+逻辑推理方向 模型微调学习笔记</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='07-03'>
+                    
+                    <a href="/2024/07/03/datawhale%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E5%A4%8F%E4%BB%A4%E8%90%A5%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%80/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">datawhale大模型应用开发夏令营学习笔记一</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='06-16'>
+                    
+                    <a href="/2024/06/16/%E5%BA%90%E5%B1%B1%E6%B8%B8%E7%8E%A9/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">庐山游玩</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='06-04'>
+                    
+                    <a href="/2024/06/04/C%E8%AF%AD%E8%A8%80%E7%9A%84OJ%E5%88%A4%E9%A2%98%E6%9C%BA%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">C语言的OJ判题机设计与实现</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='04-21'>
+                    
+                    <a href="/2024/04/21/%E5%A4%A7%E5%9B%9B%E7%AC%AC%E4%B8%80%E6%AC%A1%E6%9D%A5%E5%A4%A9%E9%97%A8%E5%B1%B1/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">天门山游玩</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='04-05'>
+                    
+                    <a href="/2024/04/05/Lightfm%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">Lightfm学习记录</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='03-26'>
+                    
+                    <a href="/2024/03/26/%E4%B8%AA%E4%BA%BA%E7%BC%96%E7%A8%8B%E5%BF%83%E5%BE%97%E8%AE%B0%E5%BD%95/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">个人编程心得记录</span>
+                    </a>
+                    
+                
+                </li> <!-- Ensure the last item is properly closed -->
+            </ul>
+        </section>
+    
+        <section class="archive-item mb-spacing-unit last:mb-0">
+            <div class="archive-item-header flex flex-row items-center mb-2">
+                <span class="archive-year font-semibold text-3xl mr-2">2023</span>
+                <span class="archive-year-post-count text-xs md:text-sm font-bold rounded-small bg-third-background-color py-[2px] px-[10px] border border-border-color">22</span>
+            </div>
+            
+            <ul class="article-list pl-0 md:pl-8 text-lg leading-[1.5]">
+                
+                    
+                    
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='10-08'>
+                    
+                    <a href="/2023/10/08/%E5%AF%B9%E7%A8%8B%E5%BA%8F%E5%91%98%E6%9D%A5%E8%AF%B4%EF%BC%8C%E6%8A%80%E6%9C%AF%E8%83%BD%E5%8A%9B%E5%92%8C%E4%B8%9A%E5%8A%A1%E9%80%BB%E8%BE%91%E5%93%AA%E4%B8%AA%E6%9B%B4%E9%87%8D%E8%A6%81%EF%BC%9F/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">对程序员来说，技术能力和业务逻辑哪个更重要</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='08-20'>
+                    
+                    <a href="/2023/08/20/%E6%89%8B%E5%86%99%E7%AE%80%E6%98%93%E7%89%88%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">手写简易神经网络</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='08-16'>
+                    
+                    <a href="/2023/08/16/%E4%B8%80%E6%96%87%E6%90%9E%E5%AE%9A%E9%AB%98%E6%80%A7%E8%83%BDAPI%E8%AE%BE%E8%AE%A1/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">一文搞定高性能API设计</span>
+                    </a>
+                    
+                
+                    
+                    
+                    <a href="/2023/08/16/MIT6-5840%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">MIT6.5840分布式系统课程笔记</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='07-25'>
+                    
+                    <a href="/2023/07/25/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AF%BC%E8%AE%BA%E7%AC%94%E8%AE%B0/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">操作系统导论笔记</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='07-15'>
+                    
+                    <a href="/2023/07/15/d3-js%E6%95%B0%E6%8D%AE%E5%8F%AF%E8%A7%86%E5%8C%96%E5%AD%A6%E4%B9%A0/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">d3.js数据可视化学习</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='06-27'>
+                    
+                    <a href="/2023/06/27/%E8%9A%81%E7%BE%A4%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">蚁群算法求TSP</span>
+                    </a>
+                    
+                
+                    
+                    
+                    <a href="/2023/06/27/%E7%A6%81%E5%BF%8C%E6%90%9C%E7%B4%A2%E6%B1%82TSP/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">禁忌搜索求TSP</span>
+                    </a>
+                    
+                
+                    
+                    
+                    <a href="/2023/06/27/%E6%A8%A1%E6%8B%9F%E9%80%80%E7%81%AB%E7%AE%97%E6%B3%95%E6%B1%82%E6%9E%81%E5%80%BC/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">模拟退火算法求极值</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='06-24'>
+                    
+                    <a href="/2023/06/24/%E7%B2%92%E5%AD%90%E7%BE%A4%E7%AE%97%E6%B3%95%E7%AE%80%E5%8D%95%E5%AD%A6%E4%B9%A0/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">粒子群算法学习</span>
+                    </a>
+                    
+                
+                    
+                    
+                    <a href="/2023/06/24/%E9%81%97%E4%BC%A0%E7%AE%97%E6%B3%95%E6%B1%82%E8%A7%A301%E8%83%8C%E5%8C%85%E9%97%AE%E9%A2%98%E8%AE%B0%E5%BD%95/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">遗传算法求解01背包问题记录</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='06-08'>
+                    
+                    <a href="/2023/06/08/%E8%93%9D%E6%A1%A5%E5%9B%BD%E8%B5%9B%E5%A4%8D%E5%81%A5/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">蓝桥国赛复健</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='05-10'>
+                    
+                    <a href="/2023/05/10/%E5%AE%9E%E7%94%A8%E7%BD%91%E7%AB%99%E8%AE%B0%E5%BD%95/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">网站收藏</span>
+                    </a>
+                    
+                
+                    
+                    
+                    <a href="/2023/05/10/%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%E8%AE%B0%E5%BD%95/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">解决方案记录</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='05-08'>
+                    
+                    <a href="/2023/05/08/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">deepin搭建go开发环境（git、go、neovim、nvchad、nerd)</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='03-03'>
+                    
+                    <a href="/2023/03/03/pq%E5%88%9D%E4%BA%86%E8%A7%A3/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">pq初了解</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='02-25'>
+                    
+                    <a href="/2023/02/25/6-5840-raft-lab2%E8%AE%B0%E5%BD%95/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">6.5840-lab2-raft记录</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='02-19'>
+                    
+                    <a href="/2023/02/19/6-5840-mr-lab1%E8%AE%B0%E5%BD%95/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">6.5840-lab1-mr记录</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='01-23'>
+                    
+                    <a href="/2023/01/23/casbin%E6%9D%83%E9%99%90%E5%92%8C%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E7%90%86%E8%A7%A3/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">casbin权限和配置文件的理解</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='01-10'>
+                    
+                    <a href="/2023/01/10/thinking/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">Tools for better thinking</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='01-01'>
+                    
+                    <a href="/2023/01/01/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99%E8%AE%B0%E5%BD%95/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">学习资料记录</span>
+                    </a>
+                    
+                
+                    
+                    
+                    <a href="/2023/01/01/CSDN%E6%96%87%E7%AB%A0%E5%AE%8C%E7%BE%8E%E7%B2%98%E8%B4%B4%E5%88%B0Hexo%E4%B8%8A/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">CSDN文章完美粘贴到Hexo上</span>
+                    </a>
+                    
+                
+                </li> <!-- Ensure the last item is properly closed -->
+            </ul>
+        </section>
+    
+        <section class="archive-item mb-spacing-unit last:mb-0">
+            <div class="archive-item-header flex flex-row items-center mb-2">
+                <span class="archive-year font-semibold text-3xl mr-2">2022</span>
+                <span class="archive-year-post-count text-xs md:text-sm font-bold rounded-small bg-third-background-color py-[2px] px-[10px] border border-border-color">14</span>
+            </div>
+            
+            <ul class="article-list pl-0 md:pl-8 text-lg leading-[1.5]">
+                
+                    
+                    
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='11-29'>
+                    
+                    <a href="/2022/11/29/Airtest%E6%89%8B%E6%9C%BAAPP%E8%87%AA%E5%8A%A8%E5%8C%96-%E6%93%8D%E4%BD%9C%E5%BE%AE%E4%BF%A1%EF%BC%88%E5%B0%8F%E7%B1%B311%EF%BC%89/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">Airtest手机APP自动化--操作微信（小米11）</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='11-15'>
+                    
+                    <a href="/2022/11/15/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">分布式相关知识入门学习(待续)</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='09-14'>
+                    
+                    <a href="/2022/09/14/Centos7-6%E9%83%A8%E7%BD%B2fabric%E4%BB%A5%E5%8F%8A%E9%93%BE%E7%A0%81/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">Centos7.6部署fabric以及链码</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='08-14'>
+                    
+                    <a href="/2022/08/14/scrapy%E4%B8%AA%E4%BA%BA%E5%BE%AA%E5%BA%8F%E6%B8%90%E8%BF%9B/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">scrapy个人循序渐进</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='07-15'>
+                    
+                    <a href="/2022/07/15/java%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AD%A6%E4%B9%A0/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">java线程池学习</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='07-03'>
+                    
+                    <a href="/2022/07/03/MySQL%E5%B8%B8%E9%97%AE%E8%80%83%E7%82%B9%E5%AD%A6%E4%B9%A0/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">MySQL常问考点总结</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='05-05'>
+                    
+                    <a href="/2022/05/05/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">MySQL实战45讲学习笔记（二）</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='02-28'>
+                    
+                    <a href="/2022/02/28/Linux%E4%B8%8BDocker%E5%AE%89%E8%A3%85%E5%87%A0%E7%A7%8DNoSQL%E5%92%8CMQ/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">Linux下Docker安装几种NoSQL和MQ和DB</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='02-26'>
+                    
+                    <a href="/2022/02/26/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E4%B9%8B%E7%BE%8E%E7%AC%94%E8%AE%B0%E4%B9%8B%E5%A6%82%E4%BD%95%E6%9D%83%E8%A1%A1%E9%80%89%E6%8B%A9%E4%BD%BF%E7%94%A8%E5%93%AA%E7%A7%8D%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%92%8C%E7%AE%97%E6%B3%95/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">数据结构与算法之美笔记之如何权衡选择使用哪种数据结构和算法</span>
+                    </a>
+                    
+                
+                    
+                    
+                    <a href="/2022/02/26/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">MySQL实战45讲学习笔记（一）</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='02-22'>
+                    
+                    <a href="/2022/02/22/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E4%B9%8B%E7%BE%8E%E7%AC%94%E8%AE%B0%E4%B9%8B%E7%B4%A2%E5%BC%95%E3%80%81%E5%B9%B6%E8%A1%8C%E7%AE%97%E6%B3%95/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">数据结构与算法之美笔记之索引、并行算法</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='02-19'>
+                    
+                    <a href="/2022/02/19/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E4%B9%8B%E7%BE%8E%E7%AC%94%E8%AE%B0%E4%B9%8B%E4%BD%8D%E5%9B%BE%E3%80%81%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">数据结构与算法之美笔记之位图、布隆过滤器</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='02-05'>
+                    
+                    <a href="/2022/02/05/AVL%E6%A0%91%E7%BB%83%E4%B9%A0/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">AVL树实现练习</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='02-02'>
+                    
+                    <a href="/2022/02/02/%E8%B7%B3%E8%A1%A8%E7%BB%83%E4%B9%A0/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">跳表练习</span>
+                    </a>
+                    
+                
+                </li> <!-- Ensure the last item is properly closed -->
+            </ul>
+        </section>
+    
+        <section class="archive-item mb-spacing-unit last:mb-0">
+            <div class="archive-item-header flex flex-row items-center mb-2">
+                <span class="archive-year font-semibold text-3xl mr-2">2021</span>
+                <span class="archive-year-post-count text-xs md:text-sm font-bold rounded-small bg-third-background-color py-[2px] px-[10px] border border-border-color">4</span>
+            </div>
+            
+            <ul class="article-list pl-0 md:pl-8 text-lg leading-[1.5]">
+                
+                    
+                    
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='10-11'>
+                    
+                    <a href="/2021/10/11/%E8%B5%84%E6%BA%90%E5%8E%8B%E7%BC%A9%E6%8F%92%E4%BB%B6%E6%8A%A5%E9%94%99/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">Hexo安装资源压缩插件报错，Command failed: C:\Windows\system32\cmd.exe /s /c &#34;autoreconf -ivf&#34;</span>
+                    </a>
+                    
+                
+                    
+                    
+                    <a href="/2021/10/11/hexo%E6%A0%87%E9%A2%98%E7%9A%84%E5%86%92%E5%8F%B7%E9%97%AE%E9%A2%98/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">解决Hexo标题的冒号问题</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='09-07'>
+                    
+                    <a href="/2021/09/07/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E5%AD%A6%E4%B9%A0/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">设计模式学习</span>
+                    </a>
+                    
+                
+                    
+                    
+                        
+                            </li>
+                         <!-- Close the previous LI if not the first item -->
+                        <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='09-06'>
+                    
+                    <a href="/2021/09/06/hello-world/" class="block w-fit">
+                        <span class="article-title my-0.5 text-2xl">Hello World</span>
+                    </a>
+                    
+                
+                </li> <!-- Ensure the last item is properly closed -->
+            </ul>
+        </section>
+    
+</div>
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2021</span>
+              -
+            
+            2025&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">urlyy</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        共撰写了 78 篇文章
+                    </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">访问人数</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">总访问量</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">由 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a> 驱动</span>
+            <span class="text-sm lg:block">主题&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.5</a></span>
+        </div>
+        
+        
+            <div>
+                博客已运行 <span class="odometer" id="runtime_days" ></span> 天 <span class="odometer" id="runtime_hours"></span> 小时 <span class="odometer" id="runtime_minutes"></span> 分钟 <span class="odometer" id="runtime_seconds"></span> 秒
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="fa-regular fa-arrow-up"></i>
+		</li>
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+	<div class="search-pop-overlay">
+	<div class="popup search-popup">
+		<div class="search-header">
+			<span class="search-input-field-pre">
+				<i class="fa-solid fa-keyboard"></i>
+			</span>
+			<div class="search-input-container">
+				<input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="站内搜索您需要的内容..." spellcheck="false" type="search" class="search-input">
+			</div>
+			<span class="popup-btn-close">
+				<i class="fa-solid fa-times"></i>
+			</span>
+		</div>
+		<div id="search-result">
+			<div id="no-result">
+				<i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>
+			</div>
+		</div>
+	</div>
+</div>
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+	
+<script src="/js/build/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/build/utils.js" type="module"></script>
+
+<script src="/js/build/main.js" type="module"></script>
+
+<script src="/js/build/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/build/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/build/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/build/layouts/categoryList.js" type="module"></script>
+
+
+
+    
+<script src="/js/build/tools/localSearch.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/layouts/lazyload.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/runtime.js"></script>
+
+    
+<script src="/js/build/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+  
+<script src="/js/build/plugins/typed.js" type="module"></script>
+
+
+
+
+    
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@9.3.0/dist/mermaid.min.js"></script>
+    
+    
+<script src="/js/build/plugins/mermaid.js"></script>
+
+
+
+
+
+
+    
+<script src="/js/build/libs/anime.min.js"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/tocToggle.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/layouts/toc.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/plugins/tabs.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+<script src="/js/build/layouts/essays.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+
+	
+</body>
+
+</html>

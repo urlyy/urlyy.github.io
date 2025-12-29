@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="urlyy">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set data attribute for CSS variables
+                root.setAttribute("data-theme", theme);
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes once DOM is ready
+            if (document.readyState !== "loading") {
+                document.body.classList.add(theme + "-mode");
+            } else {
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add(theme + "-mode");
+                    document.body.classList.remove((theme === DARK ? LIGHT : DARK) + "-mode");
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Critical CSS to prevent flash -->
+    <style>
+        :root[data-theme="dark"] {
+            --background-color: #202124;
+            --background-color-transparent: rgba(32, 33, 36, 0.6);
+            --second-background-color: #2d2e32;
+            --third-background-color: #34353a;
+            --third-background-color-transparent: rgba(32, 33, 36, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #ffffff;
+            --second-text-color: #eeeeee;
+            --third-text-color: #bebec6;
+            --fourth-text-color: #999999;
+            --default-text-color: #bebec6;
+            --invert-text-color: #373D3F;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(255, 255, 255, 0.08);
+            --shadow-color-2: rgba(255, 255, 255, 0.05);
+        }
+        
+        :root[data-theme="light"] {
+            --background-color: #fff;
+            --background-color-transparent: rgba(255, 255, 255, 0.6);
+            --second-background-color: #f8f8f8;
+            --third-background-color: #f2f2f2;
+            --third-background-color-transparent: rgba(241, 241, 241, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #16171a;
+            --second-text-color: #2f3037;
+            --third-text-color: #5e5e5e;
+            --fourth-text-color: #eeeeee;
+            --default-text-color: #373D3F;
+            --invert-text-color: #bebec6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(0, 0, 0, 0.08);
+            --shadow-color-2: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+        
+        /* Apply body classes as soon as DOM is ready */
+        :root[data-theme="dark"] body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+    </style>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://urlyy.github.io/2022/07/03/mysql常问考点学习/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta name="description" content="范式 第一范式（1NF）：数据库表中的每个属性都是原子、不可再分的。 第二范式（2NF）：第二范式要求满足第一范式的基础上，非主键属性完全依赖于主键。也就是说，表中的非主键属性必须完全依赖于主键，而不能部分依赖于主键，即不能依赖于组合键的一部分。下表就不符合2NF，学生姓名和课程名会重复出现。     StudentID CourseID StudentName CourseName Grade">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL常问考点总结">
+<meta property="og:url" content="http://urlyy.github.io/2022/07/03/MySQL%E5%B8%B8%E9%97%AE%E8%80%83%E7%82%B9%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="范式 第一范式（1NF）：数据库表中的每个属性都是原子、不可再分的。 第二范式（2NF）：第二范式要求满足第一范式的基础上，非主键属性完全依赖于主键。也就是说，表中的非主键属性必须完全依赖于主键，而不能部分依赖于主键，即不能依赖于组合键的一部分。下表就不符合2NF，学生姓名和课程名会重复出现。     StudentID CourseID StudentName CourseName Grade">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-07-03T04:20:41.000Z">
+<meta property="article:modified_time" content="2025-12-21T10:39:57.268Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="MySQL">
+<meta name="twitter:card" content="summary">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/avatar.jpg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.jpg">
+    <meta name="theme-color" content="#5c701a">
+    <link rel="shortcut icon" href="/images/avatar.jpg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            MySQL常问考点总结 | urlyy的小窝
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+        <link href="" rel="stylesheet">
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"urlyy.github.io","root":"/","language":"zh-CN","path":"search.json"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":false,"auto":false,"list":[""]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":true},"copyright":true,"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#5c701a","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":true,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":false},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"side_tools":{"gear_rotation":true,"auto_expand":false},"open_graph":true,"google_analytics":{"enable":false,"id":null},"busuanzi_counter":{"enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"pjax":true},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/bg/1.jpg","dark":"/images/bg/1.jpg"},"title":"urlyy的小窝","subtitle":{"text":["Loading..."],"hitokoto":{"enable":true,"show_author":false,"api":"https://v1.hitokoto.cn?c=a&c=b&c=d&c=k"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"style":"default","links":{"github":"https://github.com/urlyy?tab=repositories","instagram":null,"zhihu":null,"twitter":null,"email":"2213732736@qq.com"},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":true,"version":"9.3.0"}},"version":"2.8.5","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Categories":{"icon":"fa-regular fa-folder","path":"/categories/"},"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Github":{"path":"https://github.com/urlyy","icon":"fa-brands fa-github"},"个人介绍":{"path":"/personal/profile.html","icon":"fa-regular fa-user"}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"cloud"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":null},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2021/9/7 16:55:00"};
+    window.lang_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 个月前","year":"%s 年前"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                urlyy的小窝
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    首页
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/categories/"
+                                        >
+                                    <i class="fa-regular fa-folder fa-fw"></i>
+                                    分类
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/archives"
+                                        >
+                                    <i class="fa-regular fa-archive fa-fw"></i>
+                                    归档
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   target="_blank" rel="noopener" href="https://github.com/urlyy"
+                                        >
+                                    <i class="fa-brands fa-github fa-fw"></i>
+                                    GITHUB
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/personal/profile.html"
+                                        >
+                                    <i class="fa-regular fa-user fa-fw"></i>
+                                    个人介绍
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                首页
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/categories/"
+                        >
+                            <span>
+                                分类
+                            </span>
+                            
+                                <i class="fa-regular fa-folder fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/archives"
+                        >
+                            <span>
+                                归档
+                            </span>
+                            
+                                <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           target="_blank" rel="noopener" href="https://github.com/urlyy"
+                        >
+                            <span>
+                                GITHUB
+                            </span>
+                            
+                                <i class="fa-brands fa-github fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/personal/profile.html"
+                        >
+                            <span>
+                                个人介绍
+                            </span>
+                            
+                                <i class="fa-regular fa-user fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">25</div>
+        <div class="label text-third-text-color text-sm">标签</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">29</div>
+        <div class="label text-third-text-color text-sm">分类</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">78</div>
+        <div class="label text-third-text-color text-sm">文章</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">MySQL常问考点总结</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/avatar.jpg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">urlyy</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2022-07-03 12:20:41</span>
+        <span class="mobile">2022-07-03 12:20:41</span>
+        <span class="hover-info">创建</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2025-12-21 18:39:57</span>
+            <span class="mobile">2025-12-21 18:39:57</span>
+            <span class="hover-info">更新</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa-regular fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/MySQL/">MySQL</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<h1 id="范式"><a href="#范式" class="headerlink" title="范式"></a>范式</h1><ul>
+<li>第一范式（1NF）：数据库表中的每个属性都是<strong>原子、不可再分</strong>的。</li>
+<li>第二范式（2NF）：第二范式要求满足第一范式的基础上，<strong>非主键属性完全依赖于主键</strong>。也就是说，表中的非主键属性必须完全依赖于主键，而<strong>不能部分依赖于主键</strong>，即不能依赖于<strong>组合键的一部分</strong>。<br>下表就不符合2NF，学生姓名和课程名会重复出现。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>StudentID</th>
+<th>CourseID</th>
+<th>StudentName</th>
+<th>CourseName</th>
+<th>Grade</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>101</td>
+<td>Alice</td>
+<td>Math</td>
+<td>A</td>
+</tr>
+<tr>
+<td>1</td>
+<td>102</td>
+<td>Alice</td>
+<td>Science</td>
+<td>B</td>
+</tr>
+<tr>
+<td>2</td>
+<td>101</td>
+<td>Bob</td>
+<td>Math</td>
+<td>B</td>
+</tr>
+<tr>
+<td>2</td>
+<td>103</td>
+<td>Bob</td>
+<td>History</td>
+<td>A</td>
+</tr>
+<tr>
+<td>3</td>
+<td>102</td>
+<td>Charlie</td>
+<td>Science</td>
+<td>C</td>
+</tr>
+</tbody></table>
+<ul>
+<li>第三范式（3NF）：第三范式要求满足第二范式的基础上，消除表中的<strong>传递依赖</strong>。传递依赖是指非主键属性<strong>通过其他非主键属性</strong>传递依赖于主键。<br>下表不符合3NF。部门名和部门名传递依赖于部门ID	，而不是主键(员工ID)</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>EmployeeID</th>
+<th>EmployeeName</th>
+<th>DepartmentID</th>
+<th>DepartmentName</th>
+<th>DepartmentManager</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Alice</td>
+<td>101</td>
+<td>Sales</td>
+<td>John</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Bob</td>
+<td>102</td>
+<td>Marketing</td>
+<td>Kate</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Charlie</td>
+<td>101</td>
+<td>Sales</td>
+<td>John</td>
+</tr>
+<tr>
+<td>4</td>
+<td>David</td>
+<td>103</td>
+<td>Finance</td>
+<td>Mary</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Emma</td>
+<td>102</td>
+<td>Marketing</td>
+<td>Kate</td>
+</tr>
+</tbody></table>
+<ul>
+<li>还有其他范式如BCNF（Boyce-Codd范式）、第四范式（4NF）和第五范式（5NF）。这些范式的目标是<strong>进一步减少冗余和数据异常</strong>，但随着范式的提高，设计和查询复杂度也会增加。</li>
+<li>范式设计需要在<strong>满足业务需求和性能要求</strong>之间进行权衡。在某些情况下，可以通过<strong>反范式</strong>化来优化性能，即有意地引入一定程度的<strong>冗余数据来减少查询</strong>的复杂性和提高性能。</li>
+</ul>
+<h1 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h1><p>事务是<strong>一系列数据库操作</strong>的逻辑单元。</p>
+<ul>
+<li><p>ACID:</p>
+<ul>
+<li><strong>原子性</strong>（Atomicity）：<strong>全部成功或全部回滚</strong>。事务执行期间的所有操作记录到<strong>日志</strong>中，失败时可以使用日志进行回滚操作。</li>
+<li><strong>一致性</strong>（Consistency）：事务的执行不会破坏数据库的<strong>完整性</strong>约束。设计数据库时定义约束、触发器等以保证数据一致性。</li>
+<li><strong>隔离性</strong>（Isolation）：<strong>并发执行</strong>的事务之间应该相互隔离，一个事务的<strong>中间结果对其他事务</strong>是<strong>不可见</strong>的。使用**锁和MVCC(多版本并发控制)**等。MVCC可以使每个事务只看到自己的视图。</li>
+<li><strong>持久性</strong>（Durability）：事务一旦提交，对数据库的改变应该是<strong>永久性</strong>的，即使发生系统故障也不会丢失。使用<strong>日志</strong>记录事务的操作信息，即使故障重启也能恢复。</li>
+</ul>
+</li>
+<li><p>事务隔离级别</p>
+<ul>
+<li><strong>读未提交</strong>（Read Uncommitted）：最低的隔离级别，允许<strong>一个事务读取另一个事务未提交的数据</strong>，可能导致脏读、不可重复读和幻读问题。</li>
+<li><strong>读已提交</strong>（Read Committed）：要求一个事务<strong>只能读取另一个事务已提交的数据</strong>，解决了脏读问题，但可能会出现不可重复读和幻读问题。</li>
+<li><strong>可重复读</strong>（Repeatable Read）：要求一个事务<strong>在整个过程中看到的数据保持一致</strong>，解决了不可重复读问题，但可能会出现幻读问题。</li>
+<li><strong>串行化</strong>（Serializable）：最高的隔离级别，要求事务<strong>串行执行</strong>，避免了脏读、不可重复读和幻读问题。</li>
+</ul>
+</li>
+<li><p>事务隔离性问题</p>
+<ul>
+<li><strong>脏读</strong>：事务B对数据<strong>进行了修改</strong>，但是<strong>又回滚</strong>了。事务A<strong>读了数据</strong>并<strong>正常执行结束</strong>，那么数据是有误、脏的。</li>
+<li><strong>不可重复读</strong>：事务<strong>A读取数据</strong>，事务<strong>B修改或删除该数据</strong>并执行结束，<strong>事务A再读取</strong>时，两次数据读取不一致</li>
+<li><strong>幻读</strong>：通常发生在<strong>范围查询</strong>时，不可重复读是因为实现可重复读时是对查询范围内的每个数据进行锁定，但是其他事务<strong>新增或删除</strong>(与不可重复读的区别)的数据没有锁定，当前事务仍然可以查询到查询范围内其他事务新插入的数据，那么事务A读、事务B增删、事务A读，事务A两次读取会不一致。</li>
+</ul>
+<p>  隔离级别的增加在增加安全的同时，也增加系统开销和并发性降低，在实际应用中需要根据业务需求和性能要求来选择适当的隔离级别。</p>
+</li>
+<li><p>数据库的锁</p>
+<ul>
+<li><strong>读锁</strong>：可以多个事务同时读。但是只要有一个读，其他人就不能获取写锁。</li>
+<li><strong>写锁</strong>：只要有一个事务持有写锁，其他事务就不能获取读锁和写锁。</li>
+<li>意向锁</li>
+<li><strong>行锁</strong>：事务只锁定访问的行。</li>
+<li><strong>表锁</strong> ：事务锁定整张表，性能比行锁好，但是更容易锁冲突和阻塞。<ul>
+<li>行锁细粒度更高，锁管理开销较大。而表锁粒度较粗，容易发生阻塞。选择时需要考虑并发读和并发写的多少、业务需要的并发控制细粒度。<br>  数据库根据<strong>并发控制算法</strong>和事务<strong>隔离级别</strong>来管理<strong>锁机制</strong>，常见的并发控制算法包括两段锁协议、多版本并发控制（MVCC）等。</li>
+</ul>
+</li>
+<li>页级锁</li>
+</ul>
+</li>
+<li><p>两段锁协议<br>指所有的事务必须分两个阶段对数据项加锁和解锁</p>
+<ul>
+<li>加锁：在对任何数据进行读操作之前要申请并获得S锁（共享锁），在进行写操作之前要申请并获得X锁（排它锁）。加锁不成功，则事务进入等待状态，直到加锁成功才继续执行。</li>
+<li>解锁：当事务释放了一个封锁以后，事务进入解锁阶段，在该阶段只能进行解锁操作不能再进行加锁操作。</li>
+</ul>
+</li>
+<li><p>MVCC<br>维护多个版本以实现并发控制。<br>每个数据行关联一个版本号和时间戳。</p>
+<ul>
+<li>读操作：每个事务有一个全局唯一时间戳，无法读取时间戳晚于他自己的时间戳的数据版本。</li>
+<li>写操作：创建一个新的数据版本，并为他分配一个新的时间戳。旧版本的数据仍可以被旧版本事务读取。在该事务提交后，该新版本才可以对新事务可见。</li>
+<li>垃圾回收：旧版本数据会根据垃圾回收算法，即时回收空间。</li>
+</ul>
+</li>
+<li><p>日志：</p>
+<ul>
+<li>redo log：<code>物理操作日志</code>，如<code>页号xxx，偏移量yyy写入了’zzz’数据</code>。可以崩溃恢复时<code>重新执行未提交</code>的事务或恢复已提交事务的修改。用于保证<strong>持久性</strong>。</li>
+<li>undo log：<code>逻辑操作日志</code>，记录<code>反操作</code>用于<code>回滚</code>。比如<code>进行了INSERT操作</code>，那么就记录一条<code>DELETE</code>操作，以便在<code>回滚</code>事务或进行<code>崩溃恢复时撤销已提交</code>的事务修改。保证一致性、原子性。回滚到特定的版本即MVCC。能实现事务的隔离性。</li>
+<li>bin log:记录所有的<code>修改(写)操作</code>，不记录读操作。用于<code>数据恢复和数据复制</code>。</li>
+<li>慢查询日志：记录了执行时间超过预设阈值的查询语句。可以找到潜在的<code>性能瓶颈并进行优化</code>。</li>
+<li>其他的还有什么查询日志、错误日志啥的</li>
+<li>在事务执行<code>修改操作</code>之前，MySQL会将修改操作记录到<code>Redo Log</code>中，以确保事务的持久性。<br>在事务<code>提交之前</code>，MySQL会将修改操作记录到<code>Undo Log</code>中，以便在回滚事务或崩溃恢复时撤销已提交事务的修改。<br>在事务<code>提交后</code>，MySQL将<code>Redo Log</code>中的修改操作<code>应用</code>到数据库中的数据页，确保数据的持久性。<br>在事务<code>回滚或崩溃恢复</code>时，MySQL根据<code>Undo Log</code>中的信息撤销或重做事务的修改，恢复数据库到一致状态。</li>
+</ul>
+</li>
+</ul>
+<h1 id="数据库的备份和恢复机制"><a href="#数据库的备份和恢复机制" class="headerlink" title="数据库的备份和恢复机制"></a>数据库的备份和恢复机制</h1><p>全量备份(全部数据)和增量备份(新写的数据)</p>
+<h1 id="数据库扩容"><a href="#数据库扩容" class="headerlink" title="数据库扩容"></a>数据库扩容</h1><ul>
+<li>垂直硬件扩容：增加CPU、内存、磁盘</li>
+<li>水平扩展：集群、负载均衡(一致性hash)</li>
+<li>数据分片：将数据分散存储(垂直拆分和水平拆分)，每个节点只存储部分数据</li>
+<li>数据库复制：创建冗余副本</li>
+</ul>
+<h1 id="底层数据结构和索引"><a href="#底层数据结构和索引" class="headerlink" title="底层数据结构和索引"></a>底层数据结构和索引</h1><p>一般使用InnoDB作为存储引擎，ACID、MVCC</p>
+<h2 id="B-树"><a href="#B-树" class="headerlink" title="B+树"></a>B+树</h2><ul>
+<li>多叉树，而且修改操作要服务于降低层数的目的，减少IO</li>
+<li>只有叶节点存放数据</li>
+</ul>
+<h2 id="存储引擎相关"><a href="#存储引擎相关" class="headerlink" title="存储引擎相关"></a>存储引擎相关</h2><ul>
+<li>每种索引都是一棵B+树，分为主键索引(聚簇索引)、非主键索引(二级索引)</li>
+<li>一般来说要先把二级索引扫描完得到数据对应的ID，然后拿ID去主键索引上找<ul>
+<li>回到主键上找的操作叫做回表。要回表的原因是：由于查询结果所需要的数据只在主键索引上有，所以不得不回表。</li>
+<li>覆盖索引：如果二级索引上已经存了要查的数据(联合索引、冗余索引)，那么就查完二级索引就直接返回数据，不需要回表</li>
+</ul>
+</li>
+<li>最左前缀：索引上搜索时，会从左到右看索引(联合索引)的内容，所以最左的字段最好是能快速命中的，比如就要将经常<code>LIKE</code>的数据放在索引靠右的位置，让左边索引先精准命中，然后缩小范围去<code>LIKE</code></li>
+<li>索引下推：如果二级索引是个联合索引 ( id , age )，那么在有<code>where age=10</code>的条件时，本来<code>MySQL 5.6</code>之前是一个一个拿着id去回表，然后再检查主键索引上的age字段。<code>MySQL 5.6</code>开始，因为二级索引有age字段，所以会age的判断操作放在二级索引上进行，少了回表。</li>
+</ul>
+<h1 id="2PC协议"><a href="#2PC协议" class="headerlink" title="2PC协议"></a>2PC协议</h1><p>分布式事务协议<br>下面是2PC协议的工作流程：</p>
+<ol>
+<li><p>准备阶段（Prepare Phase）：</p>
+<p> 1.1 协调者（Coordinator）向所有参与者（Participants）发送事务的准备请求。</p>
+</li>
+</ol>
+<p>1.2 参与者执行事务的操作，并将操作的结果记录在本地的事务日志中。<br>1.3 参与者向协调者发送“准备就绪”（Ready）或“中止”（Abort）的响应。<br>1.4 如果所有参与者都发送了“准备就绪”响应，协调者进入下一个阶段。否则，协调者发送“中止”消息，终止事务。<br>2. 提交阶段（Commit Phase）：<br>    2.1 协调者向所有参与者发送“提交”（Commit）请求。<br>    2.2 参与者收到“提交”请求后，将事务的操作结果应用到持久化存储中。<br>    2.3 参与者向协调者发送“完成”（Done）的响应。<br>    2.4 协调者收到所有参与者的“完成”响应后，事务被提交，协调者发送“提交完成”（Commit Done）消息给所有参与者。</p>
+<p>如果在任何阶段发生故障或参与者无法完成操作，2PC协议具有回滚机制来确保事务的一致性。</p>
+<p>2PC简单，可以实现强一致性<br>缺点:</p>
+<ul>
+<li>同步阻塞：在2PC的准备阶段和提交阶段，所有参与者都需要<strong>等待协调者的指令</strong>，这会导致同步阻塞，影响性能和可伸缩性。</li>
+<li>单点故障：协调者是2PC协议的中心节点，一旦<strong>协调者发生故障</strong>，整个协议无法继续执行。</li>
+<li>阻塞等待：如果有<strong>一个参与者无法正常响应或发生故障</strong>，<strong>其他参与者</strong>可能会一直<strong>阻塞等待</strong>，造成资源浪费和延迟。</li>
+</ul>
+<h1 id="MySQL的分布式部署"><a href="#MySQL的分布式部署" class="headerlink" title="MySQL的分布式部署"></a>MySQL的分布式部署</h1><p>通过日志复制实现异步数据同步</p>
+<h1 id="分布式集群"><a href="#分布式集群" class="headerlink" title="分布式集群"></a>分布式集群</h1><ul>
+<li>主从复制、读写分离：主节点接收写操作，将操作记录到binlog，从节点复制主节点的binlog保持数据一致性。从节点处理只读操作。可以实现高可用、可伸缩(增加从节点分担读压力)、数据备份。</li>
+</ul>
+<h1 id="MySQL的安全机制"><a href="#MySQL的安全机制" class="headerlink" title="MySQL的安全机制"></a>MySQL的安全机制</h1><ul>
+<li>访问控制<ul>
+<li>用户认证、密码加密</li>
+<li>管理员分配权限，权限包括数据库级别、表级别、列级别</li>
+<li>安全连接：支持SSL&#x2F;TLS协议，加密网络连接</li>
+</ul>
+</li>
+<li>审计<ul>
+<li>日志记录：错误日志、查询日志</li>
+<li>支持审计插件：记录和监控数据库操作</li>
+</ul>
+</li>
+<li>数据加密</li>
+<li>定期备份</li>
+</ul>
+<h1 id="数据库连接池和连接管理"><a href="#数据库连接池和连接管理" class="headerlink" title="数据库连接池和连接管理"></a>数据库连接池和连接管理</h1><p>连接管理涉及连接的创建、获取、释放和销毁等操作，它负责确保连接的可用性和有效性，并管理连接的生命周期。通过重复利用连接，避免了频繁创建和销毁连接的开销，提高了数据库访问的效率。</p>
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>标题:</strong> MySQL常问考点总结</li>
+        <li><strong>作者:</strong> urlyy</li>
+        <li><strong>创建于
+                :</strong> 2022-07-03 12:20:41</li>
+        
+            <li>
+                <strong>更新于
+                    :</strong> 2025-12-21 18:39:57
+            </li>
+        
+        <li>
+            <strong>链接:</strong> https://urlyy.github.io/2022/07/03/MySQL常问考点学习/
+        </li>
+        <li>
+            <strong>
+                版权声明:
+            </strong>
+            
+
+            
+                本文章采用 <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a> 进行许可。
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+		<ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/MySQL/">#MySQL</a>&nbsp;
+			</li>
+			
+		</ul>
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="prev" rel="prev" href="/2022/07/15/java%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AD%A6%E4%B9%A0/">
+					<span class="left arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-left"></i>
+					</span>
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">java线程池学习</span>
+						<span class="post-nav-item">上一篇</span>
+					</span>
+				</a>
+			</div>
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2022/05/05/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">MySQL实战45讲学习笔记（二）</span>
+						<span class="post-nav-item">下一篇</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        评论
+    </div>
+    
+
+        
+            
+    <div id="giscus-container"></div>
+    <script data-swup-reload-script defer>
+        async function loadGiscus() {
+            const giscusConfig = {
+                'src': 'https://giscus.app/client.js',
+                'data-repo': 'urlyy/urlyy_blog_comments',
+                'data-repo-id': 'R_kgDONo8nwQ',
+                'data-category': 'Announcements',
+                'data-category-id': 'DIC_kwDONo8nwc4Cl7pw',
+                'data-mapping': 'title',
+                'data-strict': '0',
+                'data-reactions-enabled': '1',
+                'data-emit-metadata': '1',
+                'data-theme': 'preferred_color_scheme',
+                'data-lang': 'zh-CN',
+                'data-input-position': 'top',
+                'data-loading': 'lazy',
+                'crossorigin': 'anonymous',
+                'async': true
+            }
+            const giscusScript = document.createElement('script');
+            for (const key in giscusConfig) {
+                giscusScript.setAttribute(key, giscusConfig[key]);
+            }
+            document.getElementById('giscus-container').appendChild(giscusScript);
+        }
+        if ('true') {
+            let loadGiscusTimeout = setTimeout(() => {
+                loadGiscus();
+                clearTimeout(loadGiscusTimeout);
+            }, 1000);
+        } else {
+            document.addEventListener('DOMContentLoaded', loadGiscus);
+        }
+    </script>
+
+
+        
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">目录</div>
+		<div class="page-title">MySQL常问考点总结</div>
+		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%8C%83%E5%BC%8F"><span class="nav-text">范式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8B%E5%8A%A1"><span class="nav-text">事务</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E5%A4%87%E4%BB%BD%E5%92%8C%E6%81%A2%E5%A4%8D%E6%9C%BA%E5%88%B6"><span class="nav-text">数据库的备份和恢复机制</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E6%89%A9%E5%AE%B9"><span class="nav-text">数据库扩容</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BA%95%E5%B1%82%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%92%8C%E7%B4%A2%E5%BC%95"><span class="nav-text">底层数据结构和索引</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#B-%E6%A0%91"><span class="nav-text">B+树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E7%9B%B8%E5%85%B3"><span class="nav-text">存储引擎相关</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2PC%E5%8D%8F%E8%AE%AE"><span class="nav-text">2PC协议</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#MySQL%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E9%83%A8%E7%BD%B2"><span class="nav-text">MySQL的分布式部署</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E9%9B%86%E7%BE%A4"><span class="nav-text">分布式集群</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#MySQL%E7%9A%84%E5%AE%89%E5%85%A8%E6%9C%BA%E5%88%B6"><span class="nav-text">MySQL的安全机制</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%9E%E6%8E%A5%E6%B1%A0%E5%92%8C%E8%BF%9E%E6%8E%A5%E7%AE%A1%E7%90%86"><span class="nav-text">数据库连接池和连接管理</span></a></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2021</span>
+              -
+            
+            2025&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">urlyy</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        共撰写了 78 篇文章
+                    </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">访问人数</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">总访问量</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">由 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a> 驱动</span>
+            <span class="text-sm lg:block">主题&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.5</a></span>
+        </div>
+        
+        
+            <div>
+                博客已运行 <span class="odometer" id="runtime_days" ></span> 天 <span class="odometer" id="runtime_hours"></span> 小时 <span class="odometer" id="runtime_minutes"></span> 分钟 <span class="odometer" id="runtime_seconds"></span> 秒
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="fa-regular fa-arrow-up"></i>
+		</li>
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+	<div class="search-pop-overlay">
+	<div class="popup search-popup">
+		<div class="search-header">
+			<span class="search-input-field-pre">
+				<i class="fa-solid fa-keyboard"></i>
+			</span>
+			<div class="search-input-container">
+				<input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="站内搜索您需要的内容..." spellcheck="false" type="search" class="search-input">
+			</div>
+			<span class="popup-btn-close">
+				<i class="fa-solid fa-times"></i>
+			</span>
+		</div>
+		<div id="search-result">
+			<div id="no-result">
+				<i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>
+			</div>
+		</div>
+	</div>
+</div>
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+	
+<script src="/js/build/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/build/utils.js" type="module"></script>
+
+<script src="/js/build/main.js" type="module"></script>
+
+<script src="/js/build/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/build/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/build/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/build/layouts/categoryList.js" type="module"></script>
+
+
+
+    
+<script src="/js/build/tools/localSearch.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/layouts/lazyload.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/runtime.js"></script>
+
+    
+<script src="/js/build/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+  
+<script src="/js/build/plugins/typed.js" type="module"></script>
+
+
+
+
+    
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@9.3.0/dist/mermaid.min.js"></script>
+    
+    
+<script src="/js/build/plugins/mermaid.js"></script>
+
+
+
+
+
+
+    
+<script src="/js/build/libs/anime.min.js"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/tocToggle.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/layouts/toc.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/plugins/tabs.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+<script src="/js/build/layouts/essays.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+
+	
+</body>
+
+</html>

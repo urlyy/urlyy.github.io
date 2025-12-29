@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="urlyy">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set data attribute for CSS variables
+                root.setAttribute("data-theme", theme);
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes once DOM is ready
+            if (document.readyState !== "loading") {
+                document.body.classList.add(theme + "-mode");
+            } else {
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add(theme + "-mode");
+                    document.body.classList.remove((theme === DARK ? LIGHT : DARK) + "-mode");
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Critical CSS to prevent flash -->
+    <style>
+        :root[data-theme="dark"] {
+            --background-color: #202124;
+            --background-color-transparent: rgba(32, 33, 36, 0.6);
+            --second-background-color: #2d2e32;
+            --third-background-color: #34353a;
+            --third-background-color-transparent: rgba(32, 33, 36, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #ffffff;
+            --second-text-color: #eeeeee;
+            --third-text-color: #bebec6;
+            --fourth-text-color: #999999;
+            --default-text-color: #bebec6;
+            --invert-text-color: #373D3F;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(255, 255, 255, 0.08);
+            --shadow-color-2: rgba(255, 255, 255, 0.05);
+        }
+        
+        :root[data-theme="light"] {
+            --background-color: #fff;
+            --background-color-transparent: rgba(255, 255, 255, 0.6);
+            --second-background-color: #f8f8f8;
+            --third-background-color: #f2f2f2;
+            --third-background-color-transparent: rgba(241, 241, 241, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #16171a;
+            --second-text-color: #2f3037;
+            --third-text-color: #5e5e5e;
+            --fourth-text-color: #eeeeee;
+            --default-text-color: #373D3F;
+            --invert-text-color: #bebec6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(0, 0, 0, 0.08);
+            --shadow-color-2: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+        
+        /* Apply body classes as soon as DOM is ready */
+        :root[data-theme="dark"] body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+    </style>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://urlyy.github.io/2022/02/26/mysql实战45讲学习笔记（一）/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta name="description" content="查询语句执行过程  （select * from T where ID&#x3D;10;）mysql的逻辑架构图大体来说，MySQL 可以分为 Server 层和存储引擎层两部分，不同的存储引擎共用一个Server 层。 Server 层包括连接器、查询缓存、分析器、优化器、执行器等，涵盖 MySQL 的大多数核心服务功能，以及所有的内置函数（如日期、时间、数学和加密函数等），所有跨存储引擎的功能">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL实战45讲学习笔记（一）">
+<meta property="og:url" content="http://urlyy.github.io/2022/02/26/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="查询语句执行过程  （select * from T where ID&#x3D;10;）mysql的逻辑架构图大体来说，MySQL 可以分为 Server 层和存储引擎层两部分，不同的存储引擎共用一个Server 层。 Server 层包括连接器、查询缓存、分析器、优化器、执行器等，涵盖 MySQL 的大多数核心服务功能，以及所有的内置函数（如日期、时间、数学和加密函数等），所有跨存储引擎的功能">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://urlyy.github.io/article_images/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_20,color_FFFFFF,t_70,g_se,x_16.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/2f6d2709e4cd489787ebf9a573c266af.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_20,color_FFFFFF,t_70,g_se,x_16-1688269691960-1.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_20,color_FFFFFF,t_70,g_se,x_16-1688269691960-2.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_10,color_FFFFFF,t_70,g_se,x_16.png">
+<meta property="article:published_time" content="2022-02-26T03:46:27.000Z">
+<meta property="article:modified_time" content="2025-12-21T10:39:57.268Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="MySQL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://urlyy.github.io/article_images/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_20,color_FFFFFF,t_70,g_se,x_16.png">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/avatar.jpg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.jpg">
+    <meta name="theme-color" content="#5c701a">
+    <link rel="shortcut icon" href="/images/avatar.jpg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            MySQL实战45讲学习笔记（一） | urlyy的小窝
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+        <link href="" rel="stylesheet">
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"urlyy.github.io","root":"/","language":"zh-CN","path":"search.json"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":false,"auto":false,"list":[""]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":true},"copyright":true,"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#5c701a","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":true,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":false},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"side_tools":{"gear_rotation":true,"auto_expand":false},"open_graph":true,"google_analytics":{"enable":false,"id":null},"busuanzi_counter":{"enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"pjax":true},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/bg/1.jpg","dark":"/images/bg/1.jpg"},"title":"urlyy的小窝","subtitle":{"text":["Loading..."],"hitokoto":{"enable":true,"show_author":false,"api":"https://v1.hitokoto.cn?c=a&c=b&c=d&c=k"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"style":"default","links":{"github":"https://github.com/urlyy?tab=repositories","instagram":null,"zhihu":null,"twitter":null,"email":"2213732736@qq.com"},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":true,"version":"9.3.0"}},"version":"2.8.5","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Categories":{"icon":"fa-regular fa-folder","path":"/categories/"},"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Github":{"path":"https://github.com/urlyy","icon":"fa-brands fa-github"},"个人介绍":{"path":"/personal/profile.html","icon":"fa-regular fa-user"}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"cloud"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":null},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2021/9/7 16:55:00"};
+    window.lang_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 个月前","year":"%s 年前"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                urlyy的小窝
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    首页
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/categories/"
+                                        >
+                                    <i class="fa-regular fa-folder fa-fw"></i>
+                                    分类
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/archives"
+                                        >
+                                    <i class="fa-regular fa-archive fa-fw"></i>
+                                    归档
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   target="_blank" rel="noopener" href="https://github.com/urlyy"
+                                        >
+                                    <i class="fa-brands fa-github fa-fw"></i>
+                                    GITHUB
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/personal/profile.html"
+                                        >
+                                    <i class="fa-regular fa-user fa-fw"></i>
+                                    个人介绍
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                首页
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/categories/"
+                        >
+                            <span>
+                                分类
+                            </span>
+                            
+                                <i class="fa-regular fa-folder fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/archives"
+                        >
+                            <span>
+                                归档
+                            </span>
+                            
+                                <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           target="_blank" rel="noopener" href="https://github.com/urlyy"
+                        >
+                            <span>
+                                GITHUB
+                            </span>
+                            
+                                <i class="fa-brands fa-github fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/personal/profile.html"
+                        >
+                            <span>
+                                个人介绍
+                            </span>
+                            
+                                <i class="fa-regular fa-user fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">25</div>
+        <div class="label text-third-text-color text-sm">标签</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">29</div>
+        <div class="label text-third-text-color text-sm">分类</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">78</div>
+        <div class="label text-third-text-color text-sm">文章</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">MySQL实战45讲学习笔记（一）</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/avatar.jpg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">urlyy</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2022-02-26 11:46:27</span>
+        <span class="mobile">2022-02-26 11:46:27</span>
+        <span class="hover-info">创建</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2025-12-21 18:39:57</span>
+            <span class="mobile">2025-12-21 18:39:57</span>
+            <span class="hover-info">更新</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa-regular fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/MySQL/">MySQL</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<h1 id="查询语句执行过程-（select-from-T-where-ID-10-）"><a href="#查询语句执行过程-（select-from-T-where-ID-10-）" class="headerlink" title="查询语句执行过程  （select * from T where ID&#x3D;10;）"></a>查询语句执行过程  （select * from T where ID&#x3D;10;）</h1><h2 id="mysql的逻辑架构图"><a href="#mysql的逻辑架构图" class="headerlink" title="mysql的逻辑架构图"></a>mysql的逻辑架构图</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_20,color_FFFFFF,t_70,g_se,x_16.png"
+                      alt="在这里插入图片描述"
+                ><br>大体来说，MySQL 可以分为 <strong>Server 层</strong>和<strong>存储引擎层</strong>两部分，不同的存储引擎共用一个Server 层。</p>
+<p><strong>Server 层</strong>包括连接器、查询缓存、分析器、优化器、执行器等，涵盖 MySQL 的<strong>大多数核心服务功能</strong>，以及所有的<strong>内置函数</strong>（如日期、时间、数学和加密函数等），所有<strong>跨存储引擎的功能</strong>都在这一层实现，比如存储过程、触发器、视图等。</p>
+<p>而<strong>存储引擎层</strong>负责<strong>数据的存储和提取</strong>。其架构模式是<strong>插件式</strong>的，支持 InnoDB、MyISAM、Memory 等多个存储引擎。现在最常用的存储引擎是 <strong>InnoDB</strong>，它从 MySQL 5.5.5 版本开始成为了默认存储引擎。不过可以在 <code>create table</code> 语句中使用 <code>engine=xxx</code>来指定引擎</p>
+<p>下文涉及到的是<code>select * from T where ID=10；</code>这条SQL运行的过程</p>
+<h2 id="1-连接器"><a href="#1-连接器" class="headerlink" title="1. 连接器"></a>1. 连接器</h2><p>连接器负责跟客户端建立连接、获取权限、维持和管理连接。<br>连接命令：</p>
+<div class="code-container" data-rel="Sql"><figure class="iseeu highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mysql <span class="operator">-</span>h$ip <span class="operator">-</span>P$port <span class="operator">-</span>u$<span class="keyword">user</span> <span class="operator">-</span>p</span><br><span class="line">如</span><br><span class="line">mysql <span class="operator">-</span>hlocalhost <span class="operator">-</span>uroot <span class="operator">-</span>proot</span><br></pre></td></tr></table></figure></div>
+<p>可以只写个<code>-p</code>并换行再输密码，这样安全一些。如果你连的是生产服务器，强烈建议你这么做。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/2f6d2709e4cd489787ebf9a573c266af.png"
+                      alt="在这里插入图片描述"
+                ><br>命令中的<code>mysql</code>是客户端工具，用来跟服务端建立连接。<br>在输入用户名和密码后，如果有误，则报错<code>Access denied for user</code> 否则在权限表内<strong>查出你的权限</strong>，你接下来的操作就限于这个权限内了<br>但是，如果一个用户<strong>已经登录</strong>了，那即便管理员修改了他的权限，他当前的权限也<strong>不会收到影响</strong>，除非他重新登录，建立新的连接</p>
+<p>连接完成后如果不在这个连接上进行操作，那么这个连接就处于空闲状态，可以在 <code>show processlist</code> 命令中看到它。</p>
+<p>客户端超过8h没响应，就会断开这个连接，这个时间是由参数<code>wait_timeout</code>控制的，即默认是8h<br>此时再次发送请求的话，就会收到一个错误提醒： <code>Lost connection to MySQL server during query。</code></p>
+<p>在使用中肯定要尽量使用长连接，但是<strong>长连接也有弊端</strong>：MySQL 在执行过程中<strong>临时使用的内存</strong>是管理在<strong>连接对象</strong>里面的。这些资源会在<strong>连接断开</strong>的时候才释放。这些内存累计起来就可能导致进程被系统杀死，即异常重启<br>对此有两种解决方案：</p>
+<ol>
+<li>规定一个最长连接时间，连接时间<strong>超过这个时间</strong>的连接就断开；如果刚刚执行过了一个<strong>占内存很大的操作</strong>，就断开。</li>
+<li>如果你用的是 MySQL 5.7 或更新版本，可以在每次执行一个比较大的操作后，通过执行 mysql_reset_connection 来<strong>重新初始化连接资源</strong>。这个过程不需要重连和重新做权限验证，但是会将连接<strong>恢复到刚刚创建完时的状态</strong>。</li>
+</ol>
+<h2 id="2-查询缓存"><a href="#2-查询缓存" class="headerlink" title="2. 查询缓存"></a>2. 查询缓存</h2><p>大多数情况下作者不建议使用查询缓存，因为弊大于利<br>原因：只要你对一张表进行了<strong>更新</strong>，这张表的<strong>查询缓存就会清空</strong>，所以除非是很长时间都不会更改的、近似静态或就是静态的表，就推荐用这个查询缓存。<br>需要注意的是，MySQL 8.0 版本直接将查询缓存的整块功能删掉了，也就是说 <strong>8.0 开始彻底没有这个功能</strong>了。</p>
+<h2 id="3-分析器"><a href="#3-分析器" class="headerlink" title="3. 分析器"></a>3. 分析器</h2><p>即解析SQL语句</p>
+<ol>
+<li>词法分析：提取出”select”这个查询操作关键词，”T”这个表名</li>
+<li>语法分析：分析SQL是否符合语法，不符合就会<code>You have an error in your SQL syntax</code>，查错要关注的是紧接<code>use near</code>之后的内容。</li>
+</ol>
+<h2 id="4-优化器"><a href="#4-优化器" class="headerlink" title="4. 优化器"></a>4. 优化器</h2><p>优化器是在表里面有<strong>多个索引</strong>的时候，<strong>决定使用哪个</strong>索引；或者在一个语句有多表关联（<strong>join</strong>）的时候，决定各个表的<strong>连接顺序</strong>。有时候几个执行方法的<strong>逻辑结果是一样</strong>的，但是执行的<strong>效率会有不同</strong>，而优化器的作用就是<strong>决定选择使用哪一个</strong>方案。</p>
+<h2 id="5-执行器"><a href="#5-执行器" class="headerlink" title="5. 执行器"></a>5. 执行器</h2><p>先判断用户有没有对表T进行查询操作的<strong>权限</strong><br>如果有权限，就打开表继续执行，执行器就会根据表的<strong>引擎</strong>定义，去使用这个引擎提供的<strong>接口</strong>，获得结果集返回给客户端。</p>
+<p>你会在数据库的慢查询日志中看到一个 <code>rows_examined</code> 的字段，表示这个语句执行过程中扫描了<strong>多少行</strong>。这个值就是在执行器每次调用引擎获取数据行的时候<strong>累加</strong>的，但是引擎扫描行数跟 <code>rows_examined</code> <strong>并不是完全相同</strong>的。</p>
+<p><strong>课后问题：</strong><br>如果表 T 中没有字段 k，而你执行了这个语句 <code>select * from T where k=1</code>, 那肯定是会报<code>Unknown column ‘k’ in ‘where clause</code>，这个错误是在我们上面提到的哪个阶段报出来的呢？<br>答：分析器。分析器会提取出输入的SQL的关键词，并且判断语句是否正确，表是否存在，列是否存在等。</p>
+<h1 id="更新操作过程中的日志模块-（update-T-set-c-c-1-where-ID-2-）"><a href="#更新操作过程中的日志模块-（update-T-set-c-c-1-where-ID-2-）" class="headerlink" title="更新操作过程中的日志模块 （update T set c&#x3D;c+1 where ID&#x3D;2;）"></a>更新操作过程中的日志模块 （update T set c&#x3D;c+1 where ID&#x3D;2;）</h1><p>与查询流程不一样的是，更新流程还涉及两个重要的日志模块，<code>redo log（重做日志）</code>和 <code>binlog（归档日志）</code>。<br><code>redo log</code> 是 <strong>InnoDB</strong> 引擎特有的日志， <code>binlog</code>是server层的日志<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_20,color_FFFFFF,t_70,g_se,x_16-1688269691960-1.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h2 id="redo-log"><a href="#redo-log" class="headerlink" title="redo log"></a>redo log</h2><p>如果每一次的更新操作都需要写进磁盘，然后磁盘也要找到对应的那条记录，然后再更新，<strong>整个过程 IO 成本、查找成本都很高</strong>。</p>
+<p>所以有了Mysql的<code>WAL(Write-Ahead Logging)</code>技术，即<strong>先写日志，再写磁盘</strong>。当有一条记录需要<strong>更新的时候</strong>，InnoDB 引擎就会<strong>先把记录</strong>写到 <code>redo log</code> 里面，并<strong>更新内存</strong>，这个时候更新就算<strong>完成了</strong>。同时，InnoDB 引擎会在适当的时候，将这个操作记录<strong>更新到磁盘</strong>里面，而这个更新往往是在系统<strong>比较空闲的时候做</strong>，</p>
+<p>当然，<code>redo log</code>也有大小限制，当大小不足时会先停下来把一部分记录更新到磁盘，以空出空间给后面的操作用</p>
+<p>有了 <code>redo log</code>，InnoDB 就可以保证即使数据库发生<strong>异常重启</strong>，之前提交的记录<strong>都不会丢失</strong>，这个能力称为<code>crash-safe</code>。</p>
+<h2 id="两个日志模块的比较"><a href="#两个日志模块的比较" class="headerlink" title="两个日志模块的比较"></a>两个日志模块的比较</h2><p>有两个日志模块的原因：Mysql自带的MyISAM引擎不能<code>crash-safe</code>，**<code>binlog</code> 日志只能用于归档**，所以那个写了innoDB的公司就在innoDB里写了具有<code>crash-safe</code>能力的redo log</p>
+<p>两种日志的不同：</p>
+<ol>
+<li><p><code>redo log</code> 是<strong>InnoDB 引擎</strong>特有的；<code>binlog</code> 是 MySQL 的 <strong>Server 层</strong>实现的，所有引擎都可以使用。</p>
+</li>
+<li><p><code>redo log</code> 是<strong>物理日志</strong>，记录的是“在某个<strong>数据页</strong>上做了什么修改”；&#96;binlog1 是<strong>逻辑日志</strong>，记录的是这个<strong>SQL语句</strong>的原始逻辑，比如“给 ID&#x3D;2 这一行的 c 字段加 1 ”。</p>
+</li>
+<li><p><code>redo log</code> 是<strong>循环写</strong>的，空间固定会用完；<code>binlog</code> 是可以<strong>追加写</strong>入的。“追加写”是指 binlog 文件<strong>写到一定大小后会切换到下一个</strong>，并不会覆盖以前的日志。</p>
+</li>
+<li><p>redo log（重做日志）让InnoDB存储引擎拥有了崩溃恢复能力。<br>binlog（归档日志）保证了MySQL集群架构的数据一致性。</p>
+</li>
+</ol>
+<h2 id="执行器在用innoDB引擎执行这个update操作的流程"><a href="#执行器在用innoDB引擎执行这个update操作的流程" class="headerlink" title="执行器在用innoDB引擎执行这个update操作的流程"></a>执行器在用innoDB引擎执行这个update操作的流程</h2><ol>
+<li>执行器先从引擎中找到数据，如果在内存则直接返回，如果不在内存查询后返回</li>
+<li>执行器拿到数据后，会先修改数据，然后调用引擎接口重新写入数据</li>
+<li>引擎将数据更新到内存，同时写入<code>redo log</code>，此时处于<code>prepare</code>状态</li>
+<li>执行器生成这个操作的<code>binlog</code></li>
+<li>执行器调用引擎的事务提交接口，将<code>redo log</code>状态改成<code>commit</code>状态，更新完成</li>
+</ol>
+<p>作者的图<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_20,color_FFFFFF,t_70,g_se,x_16-1688269691960-2.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h3 id="两阶段提交"><a href="#两阶段提交" class="headerlink" title="两阶段提交"></a>两阶段提交</h3><p>注意最下面的这三个<br>发现一个记将录写入<code>redo log</code>的操作，愣是先把先设为<code>prepare</code>状态，、再设置为<code>commit</code>状态，难道不能直接设置吗？<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/MySQL%E5%AE%9E%E6%88%9845%E8%AE%B2%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_10,color_FFFFFF,t_70,g_se,x_16.png"
+                      alt="在这里插入图片描述"
+                ><br>我们假设不搞两阶段提交，并且举出两种情况</p>
+<ol>
+<li><p>先写binlog，再写redo log<br>当前事务提交后，写入binlog成功，之后主节点崩溃。在主节点重启后，由于没有写入redo log，因此不会恢复该条数据。<br>而从节点依据binlog在本地回放后，<strong>会相对于主节点多出来一条数据</strong>，从而产生主从不一致。</p>
+</li>
+<li><p>先写redo log，再写binlog<br>当前事务提交后，写入redo log成功，之后主节点崩溃。在主节点重启后，主节点利用redo log进行恢复，就会<strong>相对于从节点多出来一条数据</strong>，造成主从数据不一致。</p>
+</li>
+</ol>
+<p>因此，只写一次redo log与binlog，无法保证这两种日志在事务提交后的一致性。也就是无法保证主节点崩溃恢复与从节点本地回放数据的一致性。</p>
+<p><strong>不只是</strong>误操作后需要用这个过程来恢复数据。当你需要<strong>扩容</strong>的时候，也就是需要再多搭建一些备库来增加系统的读能力的时候，现在常见的做法也是用<strong>全量备份加上应用 binlog</strong> 来实现的，这个“不一致”就会导致你的线上出现主从数据库不一致的情况。</p>
+<p><code>redo log</code> 和 <code>binlog</code> 都可以用于表示事务的提交状态，而两阶段提交就是让这两个状态保持逻辑上的一致。<br>即：</p>
+<ol>
+<li><code>redo</code> 还没写入之前崩溃，这时<code>binlog</code>也还没写入，恢复数据不受影响</li>
+<li><code>redo</code>写好了，<code>binlog</code>还没写入之前崩溃，这是<code>redo</code>处于<code>prepare</code>状态，还没有提交，恢复时事务会回滚，<code>binlog</code>也还没有记录，所以不会影响</li>
+<li><code>redo</code>写好了，<code>binlog</code>写好了，但是还没有<code>commit</code>时崩溃了，这时会判断对应事务的binlog是否存在并完整：<br>（1）如果存在并完整则提交事务，这时恢复到事务提交之后的状态，因为<code>binlog</code>中有记录，所以恢复成功<br>（2）如果<code>binlog</code>不存在或者不完整，这时会恢复到事务提交之前的状态，因为<code>binlog</code>中无记录或者不完整的记录不会生效，所以恢复也成功。</li>
+<li><code>redo</code>已经有了<code>commit</code>标识，则直接提交事务，同时因为<code>binlog</code>有记录，则恢复数据也不受影响</li>
+</ol>
+<p><code>redo log</code> 用于保证 crash-safe 能力。<code>innodb_flush_log_at_trx_commit</code> 这个参数设置成 <code>1</code> 的时候，表示每次事务的 <code>redo log</code> 都直接持久化到磁盘。这个参数建议设置成 <code>1</code>，这样可以保证 MySQL 异常重启之后数据不丢失。</p>
+<p><code>sync_binlog</code> 这个参数设置成 <code>1</code> 的时候，表示每次事务的 <code>binlog</code> 都持久化到磁盘。这个参数也建议设置成 <code>1</code>，这样可以保证 MySQL 异常重启之后 <code>binlog</code> 不丢失。</p>
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>标题:</strong> MySQL实战45讲学习笔记（一）</li>
+        <li><strong>作者:</strong> urlyy</li>
+        <li><strong>创建于
+                :</strong> 2022-02-26 11:46:27</li>
+        
+            <li>
+                <strong>更新于
+                    :</strong> 2025-12-21 18:39:57
+            </li>
+        
+        <li>
+            <strong>链接:</strong> https://urlyy.github.io/2022/02/26/MySQL实战45讲学习笔记（一）/
+        </li>
+        <li>
+            <strong>
+                版权声明:
+            </strong>
+            
+
+            
+                本文章采用 <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a> 进行许可。
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+		<ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/MySQL/">#MySQL</a>&nbsp;
+			</li>
+			
+		</ul>
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="prev" rel="prev" href="/2022/02/26/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E4%B9%8B%E7%BE%8E%E7%AC%94%E8%AE%B0%E4%B9%8B%E5%A6%82%E4%BD%95%E6%9D%83%E8%A1%A1%E9%80%89%E6%8B%A9%E4%BD%BF%E7%94%A8%E5%93%AA%E7%A7%8D%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%92%8C%E7%AE%97%E6%B3%95/">
+					<span class="left arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-left"></i>
+					</span>
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">数据结构与算法之美笔记之如何权衡选择使用哪种数据结构和算法</span>
+						<span class="post-nav-item">上一篇</span>
+					</span>
+				</a>
+			</div>
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2022/02/22/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E4%B9%8B%E7%BE%8E%E7%AC%94%E8%AE%B0%E4%B9%8B%E7%B4%A2%E5%BC%95%E3%80%81%E5%B9%B6%E8%A1%8C%E7%AE%97%E6%B3%95/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">数据结构与算法之美笔记之索引、并行算法</span>
+						<span class="post-nav-item">下一篇</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        评论
+    </div>
+    
+
+        
+            
+    <div id="giscus-container"></div>
+    <script data-swup-reload-script defer>
+        async function loadGiscus() {
+            const giscusConfig = {
+                'src': 'https://giscus.app/client.js',
+                'data-repo': 'urlyy/urlyy_blog_comments',
+                'data-repo-id': 'R_kgDONo8nwQ',
+                'data-category': 'Announcements',
+                'data-category-id': 'DIC_kwDONo8nwc4Cl7pw',
+                'data-mapping': 'title',
+                'data-strict': '0',
+                'data-reactions-enabled': '1',
+                'data-emit-metadata': '1',
+                'data-theme': 'preferred_color_scheme',
+                'data-lang': 'zh-CN',
+                'data-input-position': 'top',
+                'data-loading': 'lazy',
+                'crossorigin': 'anonymous',
+                'async': true
+            }
+            const giscusScript = document.createElement('script');
+            for (const key in giscusConfig) {
+                giscusScript.setAttribute(key, giscusConfig[key]);
+            }
+            document.getElementById('giscus-container').appendChild(giscusScript);
+        }
+        if ('true') {
+            let loadGiscusTimeout = setTimeout(() => {
+                loadGiscus();
+                clearTimeout(loadGiscusTimeout);
+            }, 1000);
+        } else {
+            document.addEventListener('DOMContentLoaded', loadGiscus);
+        }
+    </script>
+
+
+        
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">目录</div>
+		<div class="page-title">MySQL实战45讲学习笔记（一）</div>
+		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2%E8%AF%AD%E5%8F%A5%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B-%EF%BC%88select-from-T-where-ID-10-%EF%BC%89"><span class="nav-text">查询语句执行过程  （select * from T where ID&#x3D;10;）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#mysql%E7%9A%84%E9%80%BB%E8%BE%91%E6%9E%B6%E6%9E%84%E5%9B%BE"><span class="nav-text">mysql的逻辑架构图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E8%BF%9E%E6%8E%A5%E5%99%A8"><span class="nav-text">1. 连接器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%9F%A5%E8%AF%A2%E7%BC%93%E5%AD%98"><span class="nav-text">2. 查询缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%88%86%E6%9E%90%E5%99%A8"><span class="nav-text">3. 分析器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E4%BC%98%E5%8C%96%E5%99%A8"><span class="nav-text">4. 优化器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E6%89%A7%E8%A1%8C%E5%99%A8"><span class="nav-text">5. 执行器</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0%E6%93%8D%E4%BD%9C%E8%BF%87%E7%A8%8B%E4%B8%AD%E7%9A%84%E6%97%A5%E5%BF%97%E6%A8%A1%E5%9D%97-%EF%BC%88update-T-set-c-c-1-where-ID-2-%EF%BC%89"><span class="nav-text">更新操作过程中的日志模块 （update T set c&#x3D;c+1 where ID&#x3D;2;）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#redo-log"><span class="nav-text">redo log</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%A4%E4%B8%AA%E6%97%A5%E5%BF%97%E6%A8%A1%E5%9D%97%E7%9A%84%E6%AF%94%E8%BE%83"><span class="nav-text">两个日志模块的比较</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C%E5%99%A8%E5%9C%A8%E7%94%A8innoDB%E5%BC%95%E6%93%8E%E6%89%A7%E8%A1%8C%E8%BF%99%E4%B8%AAupdate%E6%93%8D%E4%BD%9C%E7%9A%84%E6%B5%81%E7%A8%8B"><span class="nav-text">执行器在用innoDB引擎执行这个update操作的流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%A4%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4"><span class="nav-text">两阶段提交</span></a></li></ol></li></ol></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2021</span>
+              -
+            
+            2025&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">urlyy</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        共撰写了 78 篇文章
+                    </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">访问人数</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">总访问量</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">由 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a> 驱动</span>
+            <span class="text-sm lg:block">主题&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.5</a></span>
+        </div>
+        
+        
+            <div>
+                博客已运行 <span class="odometer" id="runtime_days" ></span> 天 <span class="odometer" id="runtime_hours"></span> 小时 <span class="odometer" id="runtime_minutes"></span> 分钟 <span class="odometer" id="runtime_seconds"></span> 秒
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="fa-regular fa-arrow-up"></i>
+		</li>
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+	<div class="search-pop-overlay">
+	<div class="popup search-popup">
+		<div class="search-header">
+			<span class="search-input-field-pre">
+				<i class="fa-solid fa-keyboard"></i>
+			</span>
+			<div class="search-input-container">
+				<input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="站内搜索您需要的内容..." spellcheck="false" type="search" class="search-input">
+			</div>
+			<span class="popup-btn-close">
+				<i class="fa-solid fa-times"></i>
+			</span>
+		</div>
+		<div id="search-result">
+			<div id="no-result">
+				<i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>
+			</div>
+		</div>
+	</div>
+</div>
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+	
+<script src="/js/build/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/build/utils.js" type="module"></script>
+
+<script src="/js/build/main.js" type="module"></script>
+
+<script src="/js/build/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/build/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/build/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/build/layouts/categoryList.js" type="module"></script>
+
+
+
+    
+<script src="/js/build/tools/localSearch.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/layouts/lazyload.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/runtime.js"></script>
+
+    
+<script src="/js/build/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+  
+<script src="/js/build/plugins/typed.js" type="module"></script>
+
+
+
+
+    
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@9.3.0/dist/mermaid.min.js"></script>
+    
+    
+<script src="/js/build/plugins/mermaid.js"></script>
+
+
+
+
+
+
+    
+<script src="/js/build/libs/anime.min.js"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/tocToggle.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/layouts/toc.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/plugins/tabs.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+<script src="/js/build/layouts/essays.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+
+	
+</body>
+
+</html>

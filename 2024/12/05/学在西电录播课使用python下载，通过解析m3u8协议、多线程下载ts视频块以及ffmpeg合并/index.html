@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="urlyy">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set data attribute for CSS variables
+                root.setAttribute("data-theme", theme);
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes once DOM is ready
+            if (document.readyState !== "loading") {
+                document.body.classList.add(theme + "-mode");
+            } else {
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add(theme + "-mode");
+                    document.body.classList.remove((theme === DARK ? LIGHT : DARK) + "-mode");
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Critical CSS to prevent flash -->
+    <style>
+        :root[data-theme="dark"] {
+            --background-color: #202124;
+            --background-color-transparent: rgba(32, 33, 36, 0.6);
+            --second-background-color: #2d2e32;
+            --third-background-color: #34353a;
+            --third-background-color-transparent: rgba(32, 33, 36, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #ffffff;
+            --second-text-color: #eeeeee;
+            --third-text-color: #bebec6;
+            --fourth-text-color: #999999;
+            --default-text-color: #bebec6;
+            --invert-text-color: #373D3F;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(255, 255, 255, 0.08);
+            --shadow-color-2: rgba(255, 255, 255, 0.05);
+        }
+        
+        :root[data-theme="light"] {
+            --background-color: #fff;
+            --background-color-transparent: rgba(255, 255, 255, 0.6);
+            --second-background-color: #f8f8f8;
+            --third-background-color: #f2f2f2;
+            --third-background-color-transparent: rgba(241, 241, 241, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #16171a;
+            --second-text-color: #2f3037;
+            --third-text-color: #5e5e5e;
+            --fourth-text-color: #eeeeee;
+            --default-text-color: #373D3F;
+            --invert-text-color: #bebec6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(0, 0, 0, 0.08);
+            --shadow-color-2: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+        
+        /* Apply body classes as soon as DOM is ready */
+        :root[data-theme="dark"] body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+    </style>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://urlyy.github.io/2024/12/05/学在西电录播课使用python下载，通过解析m3u8协议、多线程下载ts视频块以及ffmpeg合并/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta name="description" content="通过脚本下载学在西电录播课">
+<meta property="og:type" content="article">
+<meta property="og:title" content="学在西电录播课使用python下载，通过解析m3u8协议、多线程下载ts视频块以及ffmpeg合并">
+<meta property="og:url" content="http://urlyy.github.io/2024/12/05/%E5%AD%A6%E5%9C%A8%E8%A5%BF%E7%94%B5%E5%BD%95%E6%92%AD%E8%AF%BE%E4%BD%BF%E7%94%A8python%E4%B8%8B%E8%BD%BD%EF%BC%8C%E9%80%9A%E8%BF%87%E8%A7%A3%E6%9E%90m3u8%E5%8D%8F%E8%AE%AE%E3%80%81%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E8%BD%BDts%E8%A7%86%E9%A2%91%E5%9D%97%E4%BB%A5%E5%8F%8Affmpeg%E5%90%88%E5%B9%B6/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="通过脚本下载学在西电录播课">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%AD%A6%E5%9C%A8%E8%A5%BF%E7%94%B5%E5%BD%95%E6%92%AD%E8%AF%BE%E4%BD%BF%E7%94%A8python%E4%B8%8B%E8%BD%BD%EF%BC%8C%E9%80%9A%E8%BF%87%E8%A7%A3%E6%9E%90m3u8%E5%8D%8F%E8%AE%AE%E3%80%81%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E8%BD%BDts%E8%A7%86%E9%A2%91%E5%9D%97%E4%BB%A5%E5%8F%8Affmpeg%E5%90%88%E5%B9%B6/1.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%AD%A6%E5%9C%A8%E8%A5%BF%E7%94%B5%E5%BD%95%E6%92%AD%E8%AF%BE%E4%BD%BF%E7%94%A8python%E4%B8%8B%E8%BD%BD%EF%BC%8C%E9%80%9A%E8%BF%87%E8%A7%A3%E6%9E%90m3u8%E5%8D%8F%E8%AE%AE%E3%80%81%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E8%BD%BDts%E8%A7%86%E9%A2%91%E5%9D%97%E4%BB%A5%E5%8F%8Affmpeg%E5%90%88%E5%B9%B6/2.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%AD%A6%E5%9C%A8%E8%A5%BF%E7%94%B5%E5%BD%95%E6%92%AD%E8%AF%BE%E4%BD%BF%E7%94%A8python%E4%B8%8B%E8%BD%BD%EF%BC%8C%E9%80%9A%E8%BF%87%E8%A7%A3%E6%9E%90m3u8%E5%8D%8F%E8%AE%AE%E3%80%81%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E8%BD%BDts%E8%A7%86%E9%A2%91%E5%9D%97%E4%BB%A5%E5%8F%8Affmpeg%E5%90%88%E5%B9%B6/3.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%AD%A6%E5%9C%A8%E8%A5%BF%E7%94%B5%E5%BD%95%E6%92%AD%E8%AF%BE%E4%BD%BF%E7%94%A8python%E4%B8%8B%E8%BD%BD%EF%BC%8C%E9%80%9A%E8%BF%87%E8%A7%A3%E6%9E%90m3u8%E5%8D%8F%E8%AE%AE%E3%80%81%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E8%BD%BDts%E8%A7%86%E9%A2%91%E5%9D%97%E4%BB%A5%E5%8F%8Affmpeg%E5%90%88%E5%B9%B6/4.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%AD%A6%E5%9C%A8%E8%A5%BF%E7%94%B5%E5%BD%95%E6%92%AD%E8%AF%BE%E4%BD%BF%E7%94%A8python%E4%B8%8B%E8%BD%BD%EF%BC%8C%E9%80%9A%E8%BF%87%E8%A7%A3%E6%9E%90m3u8%E5%8D%8F%E8%AE%AE%E3%80%81%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E8%BD%BDts%E8%A7%86%E9%A2%91%E5%9D%97%E4%BB%A5%E5%8F%8Affmpeg%E5%90%88%E5%B9%B6/5.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%AD%A6%E5%9C%A8%E8%A5%BF%E7%94%B5%E5%BD%95%E6%92%AD%E8%AF%BE%E4%BD%BF%E7%94%A8python%E4%B8%8B%E8%BD%BD%EF%BC%8C%E9%80%9A%E8%BF%87%E8%A7%A3%E6%9E%90m3u8%E5%8D%8F%E8%AE%AE%E3%80%81%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E8%BD%BDts%E8%A7%86%E9%A2%91%E5%9D%97%E4%BB%A5%E5%8F%8Affmpeg%E5%90%88%E5%B9%B6/6.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%AD%A6%E5%9C%A8%E8%A5%BF%E7%94%B5%E5%BD%95%E6%92%AD%E8%AF%BE%E4%BD%BF%E7%94%A8python%E4%B8%8B%E8%BD%BD%EF%BC%8C%E9%80%9A%E8%BF%87%E8%A7%A3%E6%9E%90m3u8%E5%8D%8F%E8%AE%AE%E3%80%81%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E8%BD%BDts%E8%A7%86%E9%A2%91%E5%9D%97%E4%BB%A5%E5%8F%8Affmpeg%E5%90%88%E5%B9%B6/7.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%AD%A6%E5%9C%A8%E8%A5%BF%E7%94%B5%E5%BD%95%E6%92%AD%E8%AF%BE%E4%BD%BF%E7%94%A8python%E4%B8%8B%E8%BD%BD%EF%BC%8C%E9%80%9A%E8%BF%87%E8%A7%A3%E6%9E%90m3u8%E5%8D%8F%E8%AE%AE%E3%80%81%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E8%BD%BDts%E8%A7%86%E9%A2%91%E5%9D%97%E4%BB%A5%E5%8F%8Affmpeg%E5%90%88%E5%B9%B6/8.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%AD%A6%E5%9C%A8%E8%A5%BF%E7%94%B5%E5%BD%95%E6%92%AD%E8%AF%BE%E4%BD%BF%E7%94%A8python%E4%B8%8B%E8%BD%BD%EF%BC%8C%E9%80%9A%E8%BF%87%E8%A7%A3%E6%9E%90m3u8%E5%8D%8F%E8%AE%AE%E3%80%81%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E8%BD%BDts%E8%A7%86%E9%A2%91%E5%9D%97%E4%BB%A5%E5%8F%8Affmpeg%E5%90%88%E5%B9%B6/9.png">
+<meta property="article:published_time" content="2024-12-05T15:22:41.000Z">
+<meta property="article:modified_time" content="2025-12-21T10:39:57.287Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://urlyy.github.io/article_images/%E5%AD%A6%E5%9C%A8%E8%A5%BF%E7%94%B5%E5%BD%95%E6%92%AD%E8%AF%BE%E4%BD%BF%E7%94%A8python%E4%B8%8B%E8%BD%BD%EF%BC%8C%E9%80%9A%E8%BF%87%E8%A7%A3%E6%9E%90m3u8%E5%8D%8F%E8%AE%AE%E3%80%81%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E8%BD%BDts%E8%A7%86%E9%A2%91%E5%9D%97%E4%BB%A5%E5%8F%8Affmpeg%E5%90%88%E5%B9%B6/1.png">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/avatar.jpg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.jpg">
+    <meta name="theme-color" content="#5c701a">
+    <link rel="shortcut icon" href="/images/avatar.jpg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            学在西电录播课使用python下载，通过解析m3u8协议、多线程下载ts视频块以及ffmpeg合并 | urlyy的小窝
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+        <link href="" rel="stylesheet">
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"urlyy.github.io","root":"/","language":"zh-CN","path":"search.json"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":false,"auto":false,"list":[""]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":true},"copyright":true,"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#5c701a","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":true,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":false},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"side_tools":{"gear_rotation":true,"auto_expand":false},"open_graph":true,"google_analytics":{"enable":false,"id":null},"busuanzi_counter":{"enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"pjax":true},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/bg/1.jpg","dark":"/images/bg/1.jpg"},"title":"urlyy的小窝","subtitle":{"text":["Loading..."],"hitokoto":{"enable":true,"show_author":false,"api":"https://v1.hitokoto.cn?c=a&c=b&c=d&c=k"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"style":"default","links":{"github":"https://github.com/urlyy?tab=repositories","instagram":null,"zhihu":null,"twitter":null,"email":"2213732736@qq.com"},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":true,"version":"9.3.0"}},"version":"2.8.5","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Categories":{"icon":"fa-regular fa-folder","path":"/categories/"},"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Github":{"path":"https://github.com/urlyy","icon":"fa-brands fa-github"},"个人介绍":{"path":"/personal/profile.html","icon":"fa-regular fa-user"}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"cloud"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":null},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2021/9/7 16:55:00"};
+    window.lang_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 个月前","year":"%s 年前"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                urlyy的小窝
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    首页
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/categories/"
+                                        >
+                                    <i class="fa-regular fa-folder fa-fw"></i>
+                                    分类
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/archives"
+                                        >
+                                    <i class="fa-regular fa-archive fa-fw"></i>
+                                    归档
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   target="_blank" rel="noopener" href="https://github.com/urlyy"
+                                        >
+                                    <i class="fa-brands fa-github fa-fw"></i>
+                                    GITHUB
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/personal/profile.html"
+                                        >
+                                    <i class="fa-regular fa-user fa-fw"></i>
+                                    个人介绍
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                首页
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/categories/"
+                        >
+                            <span>
+                                分类
+                            </span>
+                            
+                                <i class="fa-regular fa-folder fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/archives"
+                        >
+                            <span>
+                                归档
+                            </span>
+                            
+                                <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           target="_blank" rel="noopener" href="https://github.com/urlyy"
+                        >
+                            <span>
+                                GITHUB
+                            </span>
+                            
+                                <i class="fa-brands fa-github fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/personal/profile.html"
+                        >
+                            <span>
+                                个人介绍
+                            </span>
+                            
+                                <i class="fa-regular fa-user fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">25</div>
+        <div class="label text-third-text-color text-sm">标签</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">29</div>
+        <div class="label text-third-text-color text-sm">分类</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">78</div>
+        <div class="label text-third-text-color text-sm">文章</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">学在西电录播课使用python下载，通过解析m3u8协议、多线程下载ts视频块以及ffmpeg合并</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/avatar.jpg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">urlyy</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2024-12-05 23:22:41</span>
+        <span class="mobile">2024-12-05 23:22:41</span>
+        <span class="hover-info">创建</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2025-12-21 18:39:57</span>
+            <span class="mobile">2025-12-21 18:39:57</span>
+            <span class="hover-info">更新</span>
+        </span>
+    
+
+    
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<blockquote>
+<p>本文涵盖的内容仅供个人学习使用，如果侵犯学校权利，麻烦联系我删除。</p>
+</blockquote>
+<h1 id="初衷"><a href="#初衷" class="headerlink" title="初衷"></a>初衷</h1><p><del>研究生必修选逃，</del> 期末复习怕漏过重点<del>题目</del>，但是看学在西电的录播回放课一卡一卡的，于是想在空余时间一个个下载下来，然后到时候就突击复习。 </p>
+<h1 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h1><p>因为懒得用二进制安装ffmpeg，所以用的Ubuntu22.04</p>
+<div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install ffmpeg</span><br><span class="line">ffmpeg -version</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">要有python3，安装步骤略过</span></span><br><span class="line">...</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">pip依赖</span></span><br><span class="line">pip install aiohttp</span><br><span class="line">pip install tqdm</span><br><span class="line">pip install m3u8</span><br></pre></td></tr></table></figure></div>
+<h1 id="预备知识"><a href="#预备知识" class="headerlink" title="预备知识"></a>预备知识</h1><p>关于网站部分，本文写于2024-12-05，不保证后面会不会改</p>
+<p>学在西电就是在学习通上再加了一层，加了点新东西。录播在这个地方看。(本文默认已经登录成功)<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/%E5%AD%A6%E5%9C%A8%E8%A5%BF%E7%94%B5%E5%BD%95%E6%92%AD%E8%AF%BE%E4%BD%BF%E7%94%A8python%E4%B8%8B%E8%BD%BD%EF%BC%8C%E9%80%9A%E8%BF%87%E8%A7%A3%E6%9E%90m3u8%E5%8D%8F%E8%AE%AE%E3%80%81%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E8%BD%BDts%E8%A7%86%E9%A2%91%E5%9D%97%E4%BB%A5%E5%8F%8Affmpeg%E5%90%88%E5%B9%B6/1.png"
+                     
+                ><br>下面的图就是录播播放界面，由于有学生姓名和学号的水印，我打码了。<br>左边是拍老师和黑板的录像，右边是展示ppt的录像。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/%E5%AD%A6%E5%9C%A8%E8%A5%BF%E7%94%B5%E5%BD%95%E6%92%AD%E8%AF%BE%E4%BD%BF%E7%94%A8python%E4%B8%8B%E8%BD%BD%EF%BC%8C%E9%80%9A%E8%BF%87%E8%A7%A3%E6%9E%90m3u8%E5%8D%8F%E8%AE%AE%E3%80%81%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E8%BD%BDts%E8%A7%86%E9%A2%91%E5%9D%97%E4%BB%A5%E5%8F%8Affmpeg%E5%90%88%E5%B9%B6/2.png"
+                     
+                ><br>为了捕获请求，我们先打开开发者面板的网络面板，点击下面的某堂课跳转，然后在页面刷新后获取到加载时的请求，通过关键词过滤<code>m3u8</code>，得到重要的三个请求。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/%E5%AD%A6%E5%9C%A8%E8%A5%BF%E7%94%B5%E5%BD%95%E6%92%AD%E8%AF%BE%E4%BD%BF%E7%94%A8python%E4%B8%8B%E8%BD%BD%EF%BC%8C%E9%80%9A%E8%BF%87%E8%A7%A3%E6%9E%90m3u8%E5%8D%8F%E8%AE%AE%E3%80%81%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E8%BD%BDts%E8%A7%86%E9%A2%91%E5%9D%97%E4%BB%A5%E5%8F%8Affmpeg%E5%90%88%E5%B9%B6/3.png"
+                     
+                ><br>注意这里有两个<code>playback.m3u8</code>，通过上面图中那个另外的请求<code>playVideo?info=...</code>的响应，我们可以看到<code>pptVideo</code>和<code>teacherTrack</code>这两个路径，分别对应ppt和老师黑板的m3u8文件的url。</p>
+<div class="code-container" data-rel="Json"><figure class="iseeu highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;videoPath&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;pptVideo&quot;</span><span class="punctuation">:</span> <span class="string">&quot;....m3u8&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;teacherTrack&quot;</span><span class="punctuation">:</span> <span class="string">&quot;....m3u8&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;studentFull&quot;</span><span class="punctuation">:</span> <span class="string">&quot;....m3u8&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;liveId&quot;</span><span class="punctuation">:</span> ...<span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;isshowpl&quot;</span><span class="punctuation">:</span> <span class="number">0</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure></div>
+<p>在学在西电里，视频文件是被切分为许多个几秒的视频块(ts文件，是Transport Stream不是Typescript)，通过一个m3u8协议文件保存对应视频的各个小视频块的文件名、序列号、持续时间等信息。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/%E5%AD%A6%E5%9C%A8%E8%A5%BF%E7%94%B5%E5%BD%95%E6%92%AD%E8%AF%BE%E4%BD%BF%E7%94%A8python%E4%B8%8B%E8%BD%BD%EF%BC%8C%E9%80%9A%E8%BF%87%E8%A7%A3%E6%9E%90m3u8%E5%8D%8F%E8%AE%AE%E3%80%81%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E8%BD%BDts%E8%A7%86%E9%A2%91%E5%9D%97%E4%BB%A5%E5%8F%8Affmpeg%E5%90%88%E5%B9%B6/4.png"
+                     
+                ><br>m3u8文件内容如下，还好学在西电这里没有做加密，没有<code>#EXT-X-KEY:METHOD=AES-128,URI...</code>这么一行，所以我们可以用这些ts文件名直接下载(当然前面还要有http之类的前缀)。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/%E5%AD%A6%E5%9C%A8%E8%A5%BF%E7%94%B5%E5%BD%95%E6%92%AD%E8%AF%BE%E4%BD%BF%E7%94%A8python%E4%B8%8B%E8%BD%BD%EF%BC%8C%E9%80%9A%E8%BF%87%E8%A7%A3%E6%9E%90m3u8%E5%8D%8F%E8%AE%AE%E3%80%81%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E8%BD%BDts%E8%A7%86%E9%A2%91%E5%9D%97%E4%BB%A5%E5%8F%8Affmpeg%E5%90%88%E5%B9%B6/5.png"
+                     
+                ><br>最后，使用伟大牛逼的 ffmpeg 可以将这些ts文件合并为 mp4 文件。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/%E5%AD%A6%E5%9C%A8%E8%A5%BF%E7%94%B5%E5%BD%95%E6%92%AD%E8%AF%BE%E4%BD%BF%E7%94%A8python%E4%B8%8B%E8%BD%BD%EF%BC%8C%E9%80%9A%E8%BF%87%E8%A7%A3%E6%9E%90m3u8%E5%8D%8F%E8%AE%AE%E3%80%81%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E8%BD%BDts%E8%A7%86%E9%A2%91%E5%9D%97%E4%BB%A5%E5%8F%8Affmpeg%E5%90%88%E5%B9%B6/6.png"
+                     
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/%E5%AD%A6%E5%9C%A8%E8%A5%BF%E7%94%B5%E5%BD%95%E6%92%AD%E8%AF%BE%E4%BD%BF%E7%94%A8python%E4%B8%8B%E8%BD%BD%EF%BC%8C%E9%80%9A%E8%BF%87%E8%A7%A3%E6%9E%90m3u8%E5%8D%8F%E8%AE%AE%E3%80%81%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E8%BD%BDts%E8%A7%86%E9%A2%91%E5%9D%97%E4%BB%A5%E5%8F%8Affmpeg%E5%90%88%E5%B9%B6/7.png"
+                     
+                ></p>
+<h1 id="具体代码"><a href="#具体代码" class="headerlink" title="具体代码"></a>具体代码</h1><h2 id="1-下载各ts"><a href="#1-下载各ts" class="headerlink" title="1. 下载各ts"></a>1. 下载各ts</h2><p>基于<code>m3u8</code>库解析m3u8文件，<code>aiohttp</code>做协程下载，<code>tqdm</code>做进度条方便查看，最后记得threading加锁。<br>考虑到偶尔的下载异常，加了个2次重试。<br>url按照下图获取<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/%E5%AD%A6%E5%9C%A8%E8%A5%BF%E7%94%B5%E5%BD%95%E6%92%AD%E8%AF%BE%E4%BD%BF%E7%94%A8python%E4%B8%8B%E8%BD%BD%EF%BC%8C%E9%80%9A%E8%BF%87%E8%A7%A3%E6%9E%90m3u8%E5%8D%8F%E8%AE%AE%E3%80%81%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E8%BD%BDts%E8%A7%86%E9%A2%91%E5%9D%97%E4%BB%A5%E5%8F%8Affmpeg%E5%90%88%E5%B9%B6/8.png"
+                     
+                ></p>
+<p>实测5分钟左右下完。</p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> shutil</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> m3u8</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"><span class="keyword">import</span> aiohttp</span><br><span class="line"><span class="keyword">from</span> tqdm <span class="keyword">import</span> tqdm</span><br><span class="line"></span><br><span class="line">pbar:tqdm = <span class="literal">None</span></span><br><span class="line">pbar_lock = threading.Lock()</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">download_segment</span>(<span class="params">session, ts_url, true_url, output_dir, cnt</span>):</span><br><span class="line">    <span class="keyword">global</span> pbar</span><br><span class="line">    filename = os.path.join(output_dir, true_url)</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">    	<span class="comment"># 实际在这里下载</span></span><br><span class="line">        <span class="keyword">async</span> <span class="keyword">with</span> session.get(ts_url) <span class="keyword">as</span> resp:</span><br><span class="line">            resp.raise_for_status()</span><br><span class="line">            <span class="keyword">with</span> <span class="built_in">open</span>(filename, <span class="string">&#x27;wb&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">                <span class="keyword">async</span> <span class="keyword">for</span> chunk <span class="keyword">in</span> resp.content.iter_chunked(<span class="number">1024</span>):</span><br><span class="line">                    <span class="keyword">if</span> chunk:</span><br><span class="line">                        f.write(chunk)</span><br><span class="line">            logging.info(<span class="string">f&quot;下载完成: <span class="subst">&#123;true_url&#125;</span>&quot;</span>)</span><br><span class="line">            <span class="keyword">with</span> pbar_lock:</span><br><span class="line">                pbar.update(<span class="number">1</span>)</span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        logging.error(<span class="string">f&quot;第<span class="subst">&#123;cnt&#125;</span>次下载失败: <span class="subst">&#123;true_url&#125;</span>, 错误信息: <span class="subst">&#123;e&#125;</span>&quot;</span>)</span><br><span class="line">        <span class="comment"># 3次重试机会</span></span><br><span class="line">        <span class="keyword">if</span> cnt == <span class="number">3</span>:</span><br><span class="line">            logging.error(<span class="string">f&quot;重试次数达到上限，跳过下载: <span class="subst">&#123;true_url&#125;</span>&quot;</span>)</span><br><span class="line">            <span class="comment"># 把需要手动下的单独保存</span></span><br><span class="line">            <span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">f&#x27;<span class="subst">&#123;output_dir&#125;</span>.err&#x27;</span>, <span class="string">&#x27;a&#x27;</span>, encoding=<span class="string">&#x27;utf-8&#x27;</span>) <span class="keyword">as</span> file:</span><br><span class="line">                file.write(ts_url + <span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">            <span class="comment"># 并且这个下了一半的ts文件需要删掉，防止弄混</span></span><br><span class="line">            <span class="keyword">if</span> os.path.exists(filename):</span><br><span class="line">                os.remove(filename)</span><br><span class="line">            <span class="keyword">with</span> pbar_lock:</span><br><span class="line">                pbar.update(<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">        	<span class="comment"># 重试一下，且计数器+1</span></span><br><span class="line">            <span class="keyword">await</span> download_segment(session, ts_url, true_url, output_dir, cnt+<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">download_m3u8</span>(<span class="params">m3u8_url, output_dir</span>):</span><br><span class="line">    <span class="keyword">global</span> pbar</span><br><span class="line">    <span class="comment"># 日志</span></span><br><span class="line">    logging_file = <span class="string">f&#x27;<span class="subst">&#123;output_dir&#125;</span>-download.log&#x27;</span></span><br><span class="line">    err_file = <span class="string">f&#x27;<span class="subst">&#123;output_dir&#125;</span>.err&#x27;</span></span><br><span class="line">    <span class="keyword">if</span> os.path.exists(logging_file):</span><br><span class="line">        os.remove(logging_file)</span><br><span class="line">    <span class="keyword">if</span> os.path.exists(err_file):</span><br><span class="line">        os.remove(err_file)</span><br><span class="line">    <span class="keyword">if</span> os.path.exists(output_dir):</span><br><span class="line">        shutil.rmtree(output_dir)</span><br><span class="line">    logging.basicConfig(filename=logging_file, level=logging.INFO, <span class="built_in">format</span>=<span class="string">&#x27;%(asctime)s - %(levelname)s - %(message)s&#x27;</span>)</span><br><span class="line">    <span class="comment"># 创建输出目录</span></span><br><span class="line">    os.mkdir(output_dir)</span><br><span class="line">    <span class="comment"># 下载并解析 m3u8 文件</span></span><br><span class="line">    logging.info(<span class="string">f&quot;开始解析 m3u8 文件: <span class="subst">&#123;m3u8_url&#125;</span>&quot;</span>)</span><br><span class="line">    m3u8_obj = m3u8.load(m3u8_url)</span><br><span class="line">    <span class="comment"># 提取 base URL</span></span><br><span class="line">    base_url = re.split(<span class="string">r&quot;[a-zA-Z0-9-_\.]+\.m3u8&quot;</span>, m3u8_url)[<span class="number">0</span>]</span><br><span class="line">    logging.info(<span class="string">f&quot;提取到的base URL: <span class="subst">&#123;base_url&#125;</span>&quot;</span>)</span><br><span class="line">     <span class="comment"># 创建 aiohttp session</span></span><br><span class="line">    <span class="keyword">async</span> <span class="keyword">with</span> aiohttp.ClientSession() <span class="keyword">as</span> session:</span><br><span class="line">        <span class="comment"># 异步下载所有 ts 片段</span></span><br><span class="line">        tasks = []</span><br><span class="line">        pbar = tqdm(total=<span class="built_in">len</span>(m3u8_obj.segments))</span><br><span class="line">        logging.info(<span class="string">f&quot;segment 个数: <span class="subst">&#123;<span class="built_in">len</span>(m3u8_obj.segments)&#125;</span>&quot;</span>)</span><br><span class="line">        <span class="keyword">for</span> _, segment <span class="keyword">in</span> <span class="built_in">enumerate</span>(m3u8_obj.segments):</span><br><span class="line">        	<span class="comment"># 真正ts的下载url是要拼起来的</span></span><br><span class="line">            ts_url = base_url + segment.uri</span><br><span class="line">            task = asyncio.create_task(download_segment(session, ts_url, segment.uri, output_dir, <span class="number">1</span>))</span><br><span class="line">            tasks.append(task)</span><br><span class="line">        <span class="keyword">await</span> asyncio.gather(*tasks)</span><br><span class="line">    <span class="comment"># 任务完成后关闭进度条</span></span><br><span class="line">    pbar.close()</span><br><span class="line">    logging.info(<span class="string">f&quot;下载完成&quot;</span>)</span><br><span class="line">    </span><br><span class="line">m3u8_url = <span class="string">&quot;http://.../playback.m3u8&quot;</span></span><br><span class="line">output_dir = <span class="string">&quot;4-2-1-ppt&quot;</span></span><br><span class="line">asyncio.run(download_m3u8(m3u8_url, output_dir))</span><br></pre></td></tr></table></figure></div>
+<p>执行后会生成一个download.log，不过这个文件没啥用。主要还是ts文件夹，上述例子就会产生一个名为<code>4-2-1-ppt</code>的文件夹。</p>
+<h2 id="2-合并为mp4"><a href="#2-合并为mp4" class="headerlink" title="2. 合并为mp4"></a>2. 合并为mp4</h2><p>基于命令: <code>ffmpeg -f concat -safe 0 -i ts_list.txt -c copy video.mp4</code>。注意这个<code>-i</code>，如果只有少量文件，可以<code>-i &quot;concat:1.ts|2.ts|3.ts|4.ts|.5.ts|&quot; </code>，但对于我们这种，就只能让他读取一个文件名列表文件，注意这个文件每行都是<code>file+文件路径</code>。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/%E5%AD%A6%E5%9C%A8%E8%A5%BF%E7%94%B5%E5%BD%95%E6%92%AD%E8%AF%BE%E4%BD%BF%E7%94%A8python%E4%B8%8B%E8%BD%BD%EF%BC%8C%E9%80%9A%E8%BF%87%E8%A7%A3%E6%9E%90m3u8%E5%8D%8F%E8%AE%AE%E3%80%81%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8B%E8%BD%BDts%E8%A7%86%E9%A2%91%E5%9D%97%E4%BB%A5%E5%8F%8Affmpeg%E5%90%88%E5%B9%B6/9.png"
+                     
+                ><br>我代码里首先获取了ts文件夹里的所有ts文件名，但是因为多线程所以乱序，要先排个序才能让ffmpeg按顺序拼接。</p>
+<p>实测1分钟左右合并完成。</p>
+<p>如果看不懂代码，可以逐步运行查看效果。</p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">main</span>(<span class="params">dir_name</span>):</span><br><span class="line">    filename = <span class="string">f&#x27;<span class="subst">&#123;dir_name&#125;</span>_ts_list.txt&#x27;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> os.path.exists(filename):</span><br><span class="line">	    os.remove(filename)</span><br><span class="line">    f = <span class="built_in">open</span>(filename, <span class="string">&#x27;a&#x27;</span>, encoding=<span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    names = []</span><br><span class="line">    <span class="keyword">with</span> os.scandir(dir_name) <span class="keyword">as</span> entries:</span><br><span class="line">	    <span class="keyword">for</span> entry <span class="keyword">in</span> entries:</span><br><span class="line">		    <span class="comment"># 检查是否为文件</span></span><br><span class="line">		    <span class="keyword">if</span> entry.is_file():</span><br><span class="line">			    names.append(entry.name)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 注意要先排序，按顺序写入文件名</span></span><br><span class="line">    names.sort(key=<span class="keyword">lambda</span> x: <span class="built_in">int</span>(x.split(<span class="string">&#x27;_&#x27;</span>)[<span class="number">0</span>]))</span><br><span class="line">    <span class="keyword">for</span> name <span class="keyword">in</span> names:</span><br><span class="line">	    f.write(<span class="string">f&quot;file  <span class="subst">&#123;os.path.join(dir_name,name)&#125;</span>\n&quot;</span>)</span><br><span class="line">	    </span><br><span class="line">    f.close()</span><br><span class="line"></span><br><span class="line">    mp4_name = <span class="string">f&quot;<span class="subst">&#123;dir_name&#125;</span>.mp4&quot;</span></span><br><span class="line">    <span class="keyword">if</span> os.path.exists(mp4_name):</span><br><span class="line">	    os.remove(mp4_name)</span><br><span class="line"></span><br><span class="line">    cmd = <span class="string">rf&#x27;ffmpeg -f concat -safe 0 -i ./<span class="subst">&#123;filename&#125;</span> -c copy <span class="subst">&#123;mp4_name&#125;</span>&#x27;</span></span><br><span class="line">    os.system(cmd)</span><br><span class="line"></span><br><span class="line">main(<span class="string">&quot;./4-2-1-ppt&quot;</span>)</span><br></pre></td></tr></table></figure></div>
+
+<h1 id="其他：处理少数下载失败的ts"><a href="#其他：处理少数下载失败的ts" class="headerlink" title="其他：处理少数下载失败的ts"></a>其他：处理少数下载失败的ts</h1><p>其实就是比较m3u8里的所有ts文件名和本地已下载成功的ts文件，看哪些还没写，保存到<code>&#123;output_dir&#125;-url.txt</code>下，通过点击链接手动下载并保存到ts文件夹中。</p>
+<p>注意由于下载链接已经包含鉴权信息，所以这个链接给谁都可以直接用，无需特定的会话。</p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> m3u8</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">record</span>(<span class="params">url,output_dir</span>):</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">f&#x27;<span class="subst">&#123;output_dir&#125;</span>-url.txt&#x27;</span>, <span class="string">&#x27;a&#x27;</span>, encoding=<span class="string">&#x27;utf-8&#x27;</span>) <span class="keyword">as</span> file:</span><br><span class="line">        file.write(url + <span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">find_err</span>(<span class="params">m3u8_url, output_dir</span>):</span><br><span class="line">    m3u8_obj = m3u8.load(m3u8_url)</span><br><span class="line">    <span class="comment"># 提取 base URL</span></span><br><span class="line">    base_url = re.split(<span class="string">r&quot;[a-zA-Z0-9-_\.]+\.m3u8&quot;</span>, m3u8_url)[<span class="number">0</span>]</span><br><span class="line">    <span class="comment"># 已下载的</span></span><br><span class="line">    done = <span class="built_in">set</span>()</span><br><span class="line">    <span class="keyword">with</span> os.scandir(output_dir) <span class="keyword">as</span> entries:</span><br><span class="line">        <span class="keyword">for</span> entry <span class="keyword">in</span> entries:</span><br><span class="line">            <span class="keyword">if</span> entry.is_file():</span><br><span class="line">                done.add(entry.name)</span><br><span class="line">    <span class="built_in">all</span> = <span class="built_in">set</span>()</span><br><span class="line">    <span class="keyword">for</span> _, segment <span class="keyword">in</span> <span class="built_in">enumerate</span>(m3u8_obj.segments):</span><br><span class="line">        <span class="built_in">all</span>.add(segment.uri)</span><br><span class="line">    not_done = <span class="built_in">all</span> - done</span><br><span class="line">    tmp = <span class="built_in">list</span>(not_done)</span><br><span class="line">    tmp.sort()</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> tmp:</span><br><span class="line">        record(base_url+i,output_dir)</span><br><span class="line">    </span><br><span class="line">m3u8_url = <span class="string">&quot;http://.../playback.m3u8&quot;</span></span><br><span class="line">output_dir = <span class="string">&quot;4-2-1-ppt&quot;</span></span><br><span class="line">find_err(m3u8_url, output_dir)</span><br></pre></td></tr></table></figure></div>
+
+
+<h1 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h1><ol>
+<li>其实也可以直接用ffmpeg一次完成: <code>ffmpeg -i http://.../playback.m3u8 -c copy 2-4-1.mp4</code>，只是似乎是串行依次下载ts，速度不快。</li>
+<li>我也有搜到用IDM下载或者potplayer播放，学长&#x2F;弟&#x2F;姐&#x2F;妹可以自行尝试。<ul>
+<li><a class="link"   target="_blank" rel="noopener" href="https://blog.csdn.net/qq_43226213/article/details/117661937?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522bb046bb04f13778903cf66158785a761%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=bb046bb04f13778903cf66158785a761&biz_id=0&spm=1018.2226.3001.4187" >学在西电课程回放稳定播放方法<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1VL411n72R/?spm_id_from=333.337.search-card.all.click&vd_source=43b6af819307ca6bdad60477a02d8d1c" >手把手教你用IDM下载学在西电课程回放视频<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+</li>
+<li>关于ppt视频的忽略音频流，ffmpeg可以设置参数，我没看这个</li>
+<li>关于字幕生成，免费方案是B站必剪支持15分钟内视频的字幕生成，可以在必剪里裁剪和生成，但是有点麻烦而且效果很差。其他方案请自行研究。</li>
+<li>似乎也有直接可用的m3u8播放器，请自行研究。如 <a class="link"   target="_blank" rel="noopener" href="https://github.com/nilaoda/N_m3u8DL-CLI" >nilaoda&#x2F;N_m3u8DL-CLI<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>。</li>
+</ol>
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>标题:</strong> 学在西电录播课使用python下载，通过解析m3u8协议、多线程下载ts视频块以及ffmpeg合并</li>
+        <li><strong>作者:</strong> urlyy</li>
+        <li><strong>创建于
+                :</strong> 2024-12-05 23:22:41</li>
+        
+            <li>
+                <strong>更新于
+                    :</strong> 2025-12-21 18:39:57
+            </li>
+        
+        <li>
+            <strong>链接:</strong> https://urlyy.github.io/2024/12/05/学在西电录播课使用python下载，通过解析m3u8协议、多线程下载ts视频块以及ffmpeg合并/
+        </li>
+        <li>
+            <strong>
+                版权声明:
+            </strong>
+            
+
+            
+                本文章采用 <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a> 进行许可。
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="prev" rel="prev" href="/2024/12/08/%E6%80%9D%E8%80%83/">
+					<span class="left arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-left"></i>
+					</span>
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">思考</span>
+						<span class="post-nav-item">上一篇</span>
+					</span>
+				</a>
+			</div>
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2024/12/04/%E3%80%8A%E6%BC%AB%E6%AD%A5%E4%BA%BA%E7%94%9F%E8%B7%AF%E3%80%8B/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">《漫步人生路》</span>
+						<span class="post-nav-item">下一篇</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        评论
+    </div>
+    
+
+        
+            
+    <div id="giscus-container"></div>
+    <script data-swup-reload-script defer>
+        async function loadGiscus() {
+            const giscusConfig = {
+                'src': 'https://giscus.app/client.js',
+                'data-repo': 'urlyy/urlyy_blog_comments',
+                'data-repo-id': 'R_kgDONo8nwQ',
+                'data-category': 'Announcements',
+                'data-category-id': 'DIC_kwDONo8nwc4Cl7pw',
+                'data-mapping': 'title',
+                'data-strict': '0',
+                'data-reactions-enabled': '1',
+                'data-emit-metadata': '1',
+                'data-theme': 'preferred_color_scheme',
+                'data-lang': 'zh-CN',
+                'data-input-position': 'top',
+                'data-loading': 'lazy',
+                'crossorigin': 'anonymous',
+                'async': true
+            }
+            const giscusScript = document.createElement('script');
+            for (const key in giscusConfig) {
+                giscusScript.setAttribute(key, giscusConfig[key]);
+            }
+            document.getElementById('giscus-container').appendChild(giscusScript);
+        }
+        if ('true') {
+            let loadGiscusTimeout = setTimeout(() => {
+                loadGiscus();
+                clearTimeout(loadGiscusTimeout);
+            }, 1000);
+        } else {
+            document.addEventListener('DOMContentLoaded', loadGiscus);
+        }
+    </script>
+
+
+        
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">目录</div>
+		<div class="page-title">学在西电录播课使用python下载，通过解析m3u8协议、多线程下载ts视频块以及ffmpeg合并</div>
+		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%9D%E8%A1%B7"><span class="nav-text">初衷</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83"><span class="nav-text">环境</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A2%84%E5%A4%87%E7%9F%A5%E8%AF%86"><span class="nav-text">预备知识</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E4%BB%A3%E7%A0%81"><span class="nav-text">具体代码</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%B8%8B%E8%BD%BD%E5%90%84ts"><span class="nav-text">1. 下载各ts</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%90%88%E5%B9%B6%E4%B8%BAmp4"><span class="nav-text">2. 合并为mp4</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%EF%BC%9A%E5%A4%84%E7%90%86%E5%B0%91%E6%95%B0%E4%B8%8B%E8%BD%BD%E5%A4%B1%E8%B4%A5%E7%9A%84ts"><span class="nav-text">其他：处理少数下载失败的ts</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B6%E4%BB%96"><span class="nav-text">其他</span></a></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2021</span>
+              -
+            
+            2025&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">urlyy</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        共撰写了 78 篇文章
+                    </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">访问人数</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">总访问量</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">由 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a> 驱动</span>
+            <span class="text-sm lg:block">主题&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.5</a></span>
+        </div>
+        
+        
+            <div>
+                博客已运行 <span class="odometer" id="runtime_days" ></span> 天 <span class="odometer" id="runtime_hours"></span> 小时 <span class="odometer" id="runtime_minutes"></span> 分钟 <span class="odometer" id="runtime_seconds"></span> 秒
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="fa-regular fa-arrow-up"></i>
+		</li>
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+	<div class="search-pop-overlay">
+	<div class="popup search-popup">
+		<div class="search-header">
+			<span class="search-input-field-pre">
+				<i class="fa-solid fa-keyboard"></i>
+			</span>
+			<div class="search-input-container">
+				<input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="站内搜索您需要的内容..." spellcheck="false" type="search" class="search-input">
+			</div>
+			<span class="popup-btn-close">
+				<i class="fa-solid fa-times"></i>
+			</span>
+		</div>
+		<div id="search-result">
+			<div id="no-result">
+				<i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>
+			</div>
+		</div>
+	</div>
+</div>
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+	
+<script src="/js/build/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/build/utils.js" type="module"></script>
+
+<script src="/js/build/main.js" type="module"></script>
+
+<script src="/js/build/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/build/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/build/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/build/layouts/categoryList.js" type="module"></script>
+
+
+
+    
+<script src="/js/build/tools/localSearch.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/layouts/lazyload.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/runtime.js"></script>
+
+    
+<script src="/js/build/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+  
+<script src="/js/build/plugins/typed.js" type="module"></script>
+
+
+
+
+    
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@9.3.0/dist/mermaid.min.js"></script>
+    
+    
+<script src="/js/build/plugins/mermaid.js"></script>
+
+
+
+
+
+
+    
+<script src="/js/build/libs/anime.min.js"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/tocToggle.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/layouts/toc.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/plugins/tabs.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+<script src="/js/build/layouts/essays.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+
+	
+</body>
+
+</html>

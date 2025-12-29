@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="urlyy">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set data attribute for CSS variables
+                root.setAttribute("data-theme", theme);
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes once DOM is ready
+            if (document.readyState !== "loading") {
+                document.body.classList.add(theme + "-mode");
+            } else {
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add(theme + "-mode");
+                    document.body.classList.remove((theme === DARK ? LIGHT : DARK) + "-mode");
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Critical CSS to prevent flash -->
+    <style>
+        :root[data-theme="dark"] {
+            --background-color: #202124;
+            --background-color-transparent: rgba(32, 33, 36, 0.6);
+            --second-background-color: #2d2e32;
+            --third-background-color: #34353a;
+            --third-background-color-transparent: rgba(32, 33, 36, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #ffffff;
+            --second-text-color: #eeeeee;
+            --third-text-color: #bebec6;
+            --fourth-text-color: #999999;
+            --default-text-color: #bebec6;
+            --invert-text-color: #373D3F;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(255, 255, 255, 0.08);
+            --shadow-color-2: rgba(255, 255, 255, 0.05);
+        }
+        
+        :root[data-theme="light"] {
+            --background-color: #fff;
+            --background-color-transparent: rgba(255, 255, 255, 0.6);
+            --second-background-color: #f8f8f8;
+            --third-background-color: #f2f2f2;
+            --third-background-color-transparent: rgba(241, 241, 241, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #16171a;
+            --second-text-color: #2f3037;
+            --third-text-color: #5e5e5e;
+            --fourth-text-color: #eeeeee;
+            --default-text-color: #373D3F;
+            --invert-text-color: #bebec6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(0, 0, 0, 0.08);
+            --shadow-color-2: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+        
+        /* Apply body classes as soon as DOM is ready */
+        :root[data-theme="dark"] body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+    </style>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://urlyy.github.io/2023/08/16/mit6-5840分布式系统课程笔记/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta name="description" content="1.1.介绍1.2.MapReduce2.GFS3.主备复制4.1.Raft共识算法4.2.Raft共识算法5.Go6.一致性模型与线性化7.zookeeper8.链复制技术9.分布式事务10.缓存一致性11.Spanner12.乐观并发控制13.DynamoDB14.Spark15.缓存一致性216.Zanzibar17.SUNDR18.拜占庭容错19.比特币20.智能合约21.经过验证的主备分">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MIT6.5840分布式系统课程笔记">
+<meta property="og:url" content="http://urlyy.github.io/2023/08/16/MIT6-5840%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="1.1.介绍1.2.MapReduce2.GFS3.主备复制4.1.Raft共识算法4.2.Raft共识算法5.Go6.一致性模型与线性化7.zookeeper8.链复制技术9.分布式事务10.缓存一致性11.Spanner12.乐观并发控制13.DynamoDB14.Spark15.缓存一致性216.Zanzibar17.SUNDR18.拜占庭容错19.比特币20.智能合约21.经过验证的主备分">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://urlyy.github.io/article_images/8.CR%E7%AE%97%E6%B3%95/image-20230813224532448.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/9.%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/c839fb2cd2c75179fe0f5b11d80e6788.jpeg">
+<meta property="og:image" content="http://urlyy.github.io/article_images/11.Spanner/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM0OTI0MTU2,size_16,color_FFFFFF,t_70.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/11.Spanner/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM0OTI0MTU2,size_16,color_FFFFFF,t_70-1692092825574-5.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/11.Spanner/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM0OTI0MTU2,size_16,color_FFFFFF,t_70-1692092951806-8.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/14.Spark/image-20230816170908634.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/15.%E7%BC%93%E5%AD%98%E4%B8%80%E8%87%B4%E6%80%A72/image-20230816173622623.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/18.%E6%8B%9C%E5%8D%A0%E5%BA%AD%E5%AE%B9%E9%94%99/image-20230816202158335.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/19.%E6%AF%94%E7%89%B9%E5%B8%81/f8e87e1907c3462aa2cd45fbd3e73059.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/19.%E6%AF%94%E7%89%B9%E5%B8%81/4295e3b6d8f04f58acc470dd46a78a0a.png">
+<meta property="article:published_time" content="2023-08-16T13:06:01.000Z">
+<meta property="article:modified_time" content="2025-12-21T10:39:57.267Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://urlyy.github.io/article_images/8.CR%E7%AE%97%E6%B3%95/image-20230813224532448.png">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/avatar.jpg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.jpg">
+    <meta name="theme-color" content="#5c701a">
+    <link rel="shortcut icon" href="/images/avatar.jpg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            MIT6.5840分布式系统课程笔记 | urlyy的小窝
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+        <link href="" rel="stylesheet">
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"urlyy.github.io","root":"/","language":"zh-CN","path":"search.json"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":false,"auto":false,"list":[""]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":true},"copyright":true,"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#5c701a","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":true,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":false},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"side_tools":{"gear_rotation":true,"auto_expand":false},"open_graph":true,"google_analytics":{"enable":false,"id":null},"busuanzi_counter":{"enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"pjax":true},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/bg/1.jpg","dark":"/images/bg/1.jpg"},"title":"urlyy的小窝","subtitle":{"text":["Loading..."],"hitokoto":{"enable":true,"show_author":false,"api":"https://v1.hitokoto.cn?c=a&c=b&c=d&c=k"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"style":"default","links":{"github":"https://github.com/urlyy?tab=repositories","instagram":null,"zhihu":null,"twitter":null,"email":"2213732736@qq.com"},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":true,"version":"9.3.0"}},"version":"2.8.5","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Categories":{"icon":"fa-regular fa-folder","path":"/categories/"},"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Github":{"path":"https://github.com/urlyy","icon":"fa-brands fa-github"},"个人介绍":{"path":"/personal/profile.html","icon":"fa-regular fa-user"}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"cloud"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":null},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2021/9/7 16:55:00"};
+    window.lang_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 个月前","year":"%s 年前"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                urlyy的小窝
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    首页
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/categories/"
+                                        >
+                                    <i class="fa-regular fa-folder fa-fw"></i>
+                                    分类
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/archives"
+                                        >
+                                    <i class="fa-regular fa-archive fa-fw"></i>
+                                    归档
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   target="_blank" rel="noopener" href="https://github.com/urlyy"
+                                        >
+                                    <i class="fa-brands fa-github fa-fw"></i>
+                                    GITHUB
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/personal/profile.html"
+                                        >
+                                    <i class="fa-regular fa-user fa-fw"></i>
+                                    个人介绍
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                首页
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/categories/"
+                        >
+                            <span>
+                                分类
+                            </span>
+                            
+                                <i class="fa-regular fa-folder fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/archives"
+                        >
+                            <span>
+                                归档
+                            </span>
+                            
+                                <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           target="_blank" rel="noopener" href="https://github.com/urlyy"
+                        >
+                            <span>
+                                GITHUB
+                            </span>
+                            
+                                <i class="fa-brands fa-github fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/personal/profile.html"
+                        >
+                            <span>
+                                个人介绍
+                            </span>
+                            
+                                <i class="fa-regular fa-user fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">25</div>
+        <div class="label text-third-text-color text-sm">标签</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">29</div>
+        <div class="label text-third-text-color text-sm">分类</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">78</div>
+        <div class="label text-third-text-color text-sm">文章</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">MIT6.5840分布式系统课程笔记</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/avatar.jpg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">urlyy</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2023-08-16 21:06:01</span>
+        <span class="mobile">2023-08-16 21:06:01</span>
+        <span class="hover-info">创建</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2025-12-21 18:39:57</span>
+            <span class="mobile">2025-12-21 18:39:57</span>
+            <span class="hover-info">更新</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/6-584/">6.584</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<div class="tabs" id="tab-页面内不重复的id"><ul class="nav-tabs"><li class="tab active"><a class="#页面内不重复的id-1">1.1.介绍</a></li><li class="tab"><a class="#页面内不重复的id-2">1.2.MapReduce</a></li><li class="tab"><a class="#页面内不重复的id-3">2.GFS</a></li><li class="tab"><a class="#页面内不重复的id-4">3.主备复制</a></li><li class="tab"><a class="#页面内不重复的id-5">4.1.Raft共识算法</a></li><li class="tab"><a class="#页面内不重复的id-6">4.2.Raft共识算法</a></li><li class="tab"><a class="#页面内不重复的id-7">5.Go</a></li><li class="tab"><a class="#页面内不重复的id-8">6.一致性模型与线性化</a></li><li class="tab"><a class="#页面内不重复的id-9">7.zookeeper</a></li><li class="tab"><a class="#页面内不重复的id-10">8.链复制技术</a></li><li class="tab"><a class="#页面内不重复的id-11">9.分布式事务</a></li><li class="tab"><a class="#页面内不重复的id-12">10.缓存一致性</a></li><li class="tab"><a class="#页面内不重复的id-13">11.Spanner</a></li><li class="tab"><a class="#页面内不重复的id-14">12.乐观并发控制</a></li><li class="tab"><a class="#页面内不重复的id-15">13.DynamoDB</a></li><li class="tab"><a class="#页面内不重复的id-16">14.Spark</a></li><li class="tab"><a class="#页面内不重复的id-17">15.缓存一致性2</a></li><li class="tab"><a class="#页面内不重复的id-18">16.Zanzibar</a></li><li class="tab"><a class="#页面内不重复的id-19">17.SUNDR</a></li><li class="tab"><a class="#页面内不重复的id-20">18.拜占庭容错</a></li><li class="tab"><a class="#页面内不重复的id-21">19.比特币</a></li><li class="tab"><a class="#页面内不重复的id-22">20.智能合约</a></li><li class="tab"><a class="#页面内不重复的id-23">21.经过验证的主备</a></li></ul><div class="tab-content"><div class="tab-pane active" id="页面内不重复的id-1"><h1 id="分布式系统工程"><a href="#分布式系统工程" class="headerlink" title="分布式系统工程"></a>分布式系统工程</h1><p>分布式系统是一组合作提供服务的计算机</p>
+<p>主要是基础设施服务，存储、通信、计算</p>
+<p>例如云存储、云计算、点对点共享</p>
+<h1 id="为什么要构建"><a href="#为什么要构建" class="headerlink" title="为什么要构建"></a>为什么要构建</h1><p>并行处理：提高计算速度、吞吐量、有可靠和容错机制、可扩展性强</p>
+<p>冗余：通过数据复制提高可靠性</p>
+<p>隔离：提高安全性</p>
+<h1 id="难点"><a href="#难点" class="headerlink" title="难点"></a>难点</h1><p>并发</p>
+<p>相互作用</p>
+<p>部分节点的失效</p>
+<p>性能问题</p>
+<h1 id="各实验"><a href="#各实验" class="headerlink" title="各实验"></a>各实验</h1><p>实验 1：分布式大数据框架（如MapReduce）</p>
+<p>实验 2：使用复制的容错 (Raft)</p>
+<p>实验 3：一个简单的容错数据库</p>
+<p>实验 4：通过分片扩展数据库性能</p>
+<h1 id="一个大目标"><a href="#一个大目标" class="headerlink" title="一个大目标"></a>一个大目标</h1><p>对上层应用程序隐藏分发的复杂性</p>
+<h1 id="权衡"><a href="#权衡" class="headerlink" title="权衡"></a>权衡</h1><ul>
+<li><p>容错性：尽管出现故障，服务仍然继续。数据冗余。</p>
+</li>
+<li><p>一致性</p>
+</li>
+<li><p>性能：可扩展的吞吐量。负载尽量均衡。</p>
+</li>
+</ul>
+<p>上述三点需要权衡，因为通信是慢且不可拓展。提供弱一致性以提高速度。</p>
+<h1 id="实施"><a href="#实施" class="headerlink" title="实施"></a>实施</h1><p>RPC、线程、并发控制</p></div><div class="tab-pane" id="页面内不重复的id-2"><h1 id="MapReduce"><a href="#MapReduce" class="headerlink" title="MapReduce"></a>MapReduce</h1><p>对多TB数据集进行长时间计算</p>
+<p>对开发人员友好，而不仅限于分布式专家使用</p>
+<p>程序员只需定义Map和Reduce函数</p>
+<p>其他细节被MR管理和隐藏</p>
+<p>论文：[MapReduce: Simplified Data Processing on Large Clusters](<a class="link"   target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/mapreduce.pdf" >rfeet.qrk (mit.edu)<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>)</p>
+<h1 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h1><ol>
+<li><p>输入已经被分割为多个文件</p>
+</li>
+<li><p>每个文件作为任务，通过Map()生成中间数据</p>
+</li>
+<li><p>将中间数据传递给Reduce()产生最终输出</p>
+</li>
+</ol>
+<h1 id="细节"><a href="#细节" class="headerlink" title="细节"></a>细节</h1><ol>
+<li>Map()和reduce()可以有多次交叉</li>
+<li>同一阶段的Map()和Reduce()们并行执行，它们之间没有交互。允许多个交叉的阶段(如MRMRRMMR)。</li>
+<li>由于并行计算，计算机数目与吞吐量成正比</li>
+<li>MR对于上层应用，隐藏了<ol>
+<li>将程序员编写的代码发送到服务器</li>
+<li>跟踪任务进度</li>
+<li>将中间数据乱序传递</li>
+<li>负载均衡</li>
+<li>处理失败恢复</li>
+</ol>
+</li>
+<li>限制较多，且无交互、无状态、无迭代、无实时或流处理</li>
+<li>输入和输出存储在GFS集群上，GFS将文件进行了分割，并进行了数据冗余</li>
+<li>性能限制：<ol>
+<li>早年的带宽限制</li>
+<li>流量大头在于中间输出传递给Reduce和写入GFS</li>
+</ol>
+</li>
+<li>减少使用网络的措施<ol>
+<li>在存储了任务的服务器上直接进行Map，如一个服务器同时运行Map()和GFS存储，Map就可以直接读本地文件了</li>
+<li>Map()结果写入本地，Reduce()直接读取该Map()服务器的本地文件，不走GFS</li>
+<li>增加中间文件的大小，进行少次大文件传输而非多次小文件传输</li>
+</ol>
+</li>
+<li>负载均衡方案：让较快的服务器完成更多的任务，多次分发给他</li>
+<li>函数保证：Map()和Reduce()必须是纯函数，无状态、无文件IO、无交互、无外部通信</li>
+<li>崩溃恢复的细节：<ol>
+<li>Map<ol>
+<li>worker节点不响应心跳</li>
+<li>coordinator知道该worker运行了什么Map任务，并让另一个worker做这个Map</li>
+<li>如果Reduce已经拿到所有数据，那就不用重做这个Map了</li>
+</ol>
+</li>
+<li>Reduce<ol>
+<li>已经完成的任务保存进GFS了，不用管</li>
+<li>没完成的给另一个worker执行</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>其他错误<ol>
+<li>任务被多次分发：对于多个Map任务，只告诉Reduce一个Mapper；对于多个Reduce任务，GFS保证只有一个中间文件可见</li>
+<li>一台机子很慢：将部分任务给worker完成</li>
+</ol>
+</li>
+</ol>
+<h1 id="目前"><a href="#目前" class="headerlink" title="目前"></a>目前</h1><p>对后世影响大</p>
+<p>很少被使用</p></div><div class="tab-pane" id="页面内不重复的id-3"><h1 id="GFS"><a href="#GFS" class="headerlink" title="GFS"></a>GFS</h1><p>论文：<a href="%5Bpdos.csail.mit.edu/6.824/papers/gfs.pdf%5D(https://pdos.csail.mit.edu/6.824/papers/gfs.pdf)">The Google File System</a></p>
+<p>大型、快速、统一、容错的存储系统</p>
+<p>给多个应用共享</p>
+<p>针对批量大数据</p>
+<h1 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h1><ul>
+<li><p>多个client、多个chunkserver、一个coordinator</p>
+</li>
+<li><p>文件被分割为64MB的chunk，分布在多个chunkserver上</p>
+<ul>
+<li>coordinator保存了两组映射：filename -&gt; 一组chunkhandle、chunkhandle -&gt; 一组chunkserver</li>
+</ul>
+</li>
+<li><p>client从coordinator获取目标文件的chunk信息，然后使用直接访问相关chunkserver(多个client会有并行读写，性能高)</p>
+</li>
+<li><p>chunk被冗余存储，同时写入时也会修改所有备份数据，当然只读其中一个</p>
+<ul>
+<li>冗余方案(避免了多个client不同顺序的备份写入导致的数据不一致)：对于每个chunk，确定主备server，只写入主server，然后同步到备server</li>
+<li>写入时涉及租约机制，保证只有一个主server，防止脑裂。每个chunk都有一个租约</li>
+</ul>
+</li>
+<li><p>允许client重试追加，因此会出现重复数据。可以在写入数据中添加校验和与ID来支持读操作的过滤去重</p>
+</li>
+<li><p>一致性支持</p>
+<p>三种状态</p>
+<ul>
+<li><p>defined：无并发的写入，所有客户端看到的都相同且正确</p>
+</li>
+<li><p>consistent：并发的写入，客户端看到的相同，但不一定正确。因为大写入被分解为多个小写入，并发交错写入会有问题</p>
+</li>
+<li><p>inconsistent：各个客户端看到的不相同。这种情况GFS会返回“写入错误”给client</p>
+</li>
+</ul>
+</li>
+<li><p>结点宕机处理</p>
+<ul>
+<li>client宕机：写入操作对于主节点，告知或没告知</li>
+<li>chunkserver(包括主备节点)宕机：coordinator定期发心跳，更新缓存的映射信息，可能还需要复制副本数据到新分配的备节点上<ul>
+<li>备节点宕机：主节点重试，或者主节点返回错误让client重试(其实这次大概率也写入失败)</li>
+<li>主节点宕机：等待租约到期，再分配一个新的主节点</li>
+</ul>
+</li>
+<li>coordinator宕机(备份coordinator发的心跳没有回应)：将临界状态(映射)写入磁盘。重启恢复；或将更新操作发给备份coordinator</li>
+</ul>
+</li>
+<li><p>coordinator会进行版本记录，防止访问过时chunk</p>
+</li>
+</ul>
+<h1 id="一些概括"><a href="#一些概括" class="headerlink" title="一些概括"></a>一些概括</h1><ul>
+<li><p>全局集群文件系统，一个通用基础设施</p>
+</li>
+<li><p>将路由与存储分离</p>
+</li>
+<li><p>分片、并行吞吐</p>
+</li>
+<li><p>使用大文件(chunk)减少开销</p>
+</li>
+<li><p>主备机制，保证了写入的顺序。</p>
+</li>
+<li><p>租约避免脑裂</p>
+</li>
+<li><p>coordinator可能是瓶颈，它的存储空间和算力有限（Colossus行），同时对于coordinator的故障处理较差</p>
+</li>
+<li><p>不适合大量小文件场景（BigTable行）</p>
+</li>
+<li><p>一致性松散</p>
+</li>
+</ul></div><div class="tab-pane" id="页面内不重复的id-4"><h1 id="主备复制"><a href="#主备复制" class="headerlink" title="主备复制"></a>主备复制</h1><p>论文：<a class="link"   target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/vm-ft.pdf" >The design of a practical system for fault-tolerant virtual machines (mit.edu)<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h1 id="为什么需要"><a href="#为什么需要" class="headerlink" title="为什么需要"></a>为什么需要</h1><p>通过复制实现高可用</p>
+<p>避免硬件、设备问题导致的服务不可用</p>
+<p>但是无助于操作员的操作失误和软件错误</p>
+<h1 id="怎么实现"><a href="#怎么实现" class="headerlink" title="怎么实现"></a>怎么实现</h1><ul>
+<li>主要方法：<ul>
+<li>快照复制：将快照发送到备份结点。但是快照很大，网络传输较慢。</li>
+<li>状态机复制：对于相同启动状态的两个状态机，在相同的顺序执行相同的确定性操作，能到达相同的终态。所以只需复制追加的操作。</li>
+</ul>
+</li>
+<li>主要讨论的问题：<ul>
+<li>什么是状态</li>
+<li>主节点是否要等待备份</li>
+<li>备份结点如何知晓要进行接管</li>
+<li>主副结点切换是否出现异常</li>
+<li>结点切换如何加速并保证正确</li>
+</ul>
+</li>
+<li>副本级别：<ul>
+<li>应用程序：将高级的逻辑操作发送到备份结点</li>
+<li>机器级别：转发机器事件(中断、网络数据包)(VMware实现了)</li>
+</ul>
+</li>
+</ul>
+<h1 id="VMware案例"><a href="#VMware案例" class="headerlink" title="VMware案例"></a>VMware案例</h1><ul>
+<li>状态机复制：主从结点最初以相同的内存、寄存器、软件(OS等)开始，且运行的指令在主从节点上相同</li>
+<li>但是如读取当前时间、网络数据包和磁盘读取等需要特殊处理。备份必须看到相同的时间和同样的顺序，并且要能产生同样的结果。</li>
+<li>使用网络共享磁盘模拟本地磁盘</li>
+<li>备份必须之后一个日志条目</li>
+<li>允许重试，TCP会忽略重复的序列号，同时共享磁盘也会hash到同一位置</li>
+</ul></div><div class="tab-pane" id="页面内不重复的id-5"><p>论文：</p>
+<ul>
+<li><p>[In Search of an Understandable Consensus Algorithm(Extended Version)](<a class="link"   target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf" >In Search of an Understandable Consensus Algorithm (mit.edu)<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>)</p>
+</li>
+<li><p><a href="%5B(17%E6%9D%A1%E6%B6%88%E6%81%AF">raft论文中文翻译</a> In Search of an Understandable Consensus Algorithm(Extended Version)_西西弗的小蚂蚁的博客-CSDN博客](<a class="link"   target="_blank" rel="noopener" href="https://blog.csdn.net/zj_18706809267/article/details/125044750" >https://blog.csdn.net/zj_18706809267/article/details/125044750<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>))</p>
+</li>
+</ul>
+<h1 id="分区问题"><a href="#分区问题" class="headerlink" title="分区问题"></a>分区问题</h1><p>计算机无法区分“宕机”与“网络损坏”，因为其表现形式都是无响应</p>
+<p>会导致脑裂</p>
+<p>需要一个决定切换服务器的自动化方案</p>
+<p>投票机制允许一半一下的节点宕机(尽量保持服务器数量为奇数)</p>
+<h1 id="一个底层使用了raft的kv服务"><a href="#一个底层使用了raft的kv服务" class="headerlink" title="一个底层使用了raft的kv服务"></a>一个底层使用了raft的kv服务</h1><p>一条命令的执行与集群一致：</p>
+<ol>
+<li><p>client向leader的kv层发送PUT&#x2F;GET命令</p>
+</li>
+<li><p>kv层调用Start(command)来调用raft</p>
+</li>
+<li><p>leader的raft添加命令到日志</p>
+</li>
+<li><p>leader向follower们发送AppendEntries RPC</p>
+</li>
+<li><p>follower们添加命令到日志</p>
+</li>
+<li><p>如果leader发现绝大多数人添加成功，就提交日志(执行命令)，并让follower们执行该条相同日志</p>
+</li>
+<li><p>提交后向client返回响应</p>
+</li>
+</ol>
+<h1 id="日志"><a href="#日志" class="headerlink" title="日志"></a>日志</h1><p>日志保存了状态机状态</p>
+<p>保证了命令的执行顺序</p>
+<p>方便leader查看follower是否一致</p>
+<p>在内存中保存，方便重发，同时支持“未提交”到“提交”状态的转变</p>
+<p>可以持久化以保存leader状态</p>
+<p>集群中日志可能会不同，但最终会收敛到相互一致</p>
+<p>只执行大多数节点都添加的，稳定的日志</p>
+<h1 id="Raft细节"><a href="#Raft细节" class="headerlink" title="Raft细节"></a>Raft细节</h1><ul>
+<li>单领导者：保证命令执行的顺序</li>
+<li>使用任期作为逻辑时钟，并限制唯一leader，防止脑裂</li>
+<li>各follower节点在一个随机时间内未收到leader发来的心跳，就会变为candidate开始选举<ul>
+<li>通过“大多数”、“同一个任期只能投一次票”，保证一个任期最多一个leader</li>
+<li>心跳抑制新的选举</li>
+<li>随机的选举超时时间防止多个节点同时开始选举</li>
+<li>心跳间隔必须小于选举超时时间</li>
+</ul>
+</li>
+</ul></div><div class="tab-pane" id="页面内不重复的id-6"><p>  论文：</p>
+<ul>
+<li><p>[In Search of an Understandable Consensus Algorithm(Extended Version)](<a class="link"   target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf" >In Search of an Understandable Consensus Algorithm (mit.edu)<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>)</p>
+</li>
+<li><p><a href="%5B(17%E6%9D%A1%E6%B6%88%E6%81%AF">raft论文中文翻译</a> In Search of an Understandable Consensus Algorithm(Extended Version)_西西弗的小蚂蚁的博客-CSDN博客](<a class="link"   target="_blank" rel="noopener" href="https://blog.csdn.net/zj_18706809267/article/details/125044750" >https://blog.csdn.net/zj_18706809267/article/details/125044750<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>))</p>
+</li>
+</ul>
+<h1 id="处理日志不一致"><a href="#处理日志不一致" class="headerlink" title="处理日志不一致"></a>处理日志不一致</h1><ul>
+<li><p>Raft保证当选的leader拥有所有已提交的日志，防止出现“承诺client成功，但无日志”的情况</p>
+<ul>
+<li>已提交：即使故障也不会丢失的操作；系统知道已提交</li>
+</ul>
+</li>
+<li><p>Raft让follower只能从leader上获取日志，client只与leader交流，保证执行命令的有序</p>
+</li>
+<li><p>leader发出的心跳带有leader持有日志的信息，故follower可以拿来判断自身日志是否最新，同时返回结果告诉leader自己的日志是否最新。leader维护了对每个节点的日志情况(有效长度)，并根据这个决定下一次心跳要发给对应节点的日志条目。</p>
+</li>
+<li><p>日志每个条目除了指令还有任期，相同命令、不同任期的条目最终会被覆盖掉(follower删除与leader不同的日志尾部)，以保证follower日志与leader一致()</p>
+</li>
+<li><p>只能是日志最新的结点成为leader，不能是最长的，因为最长的不一定是最新的，最新的日志可能已经被提交，若最长的成为leader，则会忽视掉最新日志。</p>
+</li>
+<li><p>加速日志的回滚(先让follower的前缀与leader一致)：follower在心跳响应中放入第一个冲突的日志信息</p>
+</li>
+</ul>
+<h1 id="持久化"><a href="#持久化" class="headerlink" title="持久化"></a>持久化</h1><ul>
+<li><p>崩溃并重启，需要持久化：</p>
+<pre><code>1. 已持有的日志：如果这个节点有最新日志，允许他重启后，集群内的新leader获得最新日志
+
+1. 当前任期：避免同意被取代的结点发来的投票请求
+
+1. votedFor：避免出现宕机前投了票、宕机后又投了票
+</code></pre>
+</li>
+<li><p>leader保存的一些集群内所有节点的日志信息不需要持久化，因为会慢慢收敛，重回正常</p>
+<ul>
+<li>运行很久的系统，慢慢收敛恢复数据太慢，可以使用快照+一点尾部日志的恢复</li>
+</ul>
+</li>
+</ul>
+<h1 id="使用快照来日志压缩"><a href="#使用快照来日志压缩" class="headerlink" title="使用快照来日志压缩"></a>使用快照来日志压缩</h1><ul>
+<li>定期将已提交的日志保存为磁盘上的快照，然后丢弃这些已持久化的日志</li>
+<li>使用了快照会导致日志索引不再从0开始，恢复数据需要改变策略<ul>
+<li>不使用心跳而是一个新的RPC来让follower读取快照</li>
+</ul>
+</li>
+</ul>
+<h1 id="读操作"><a href="#读操作" class="headerlink" title="读操作"></a>读操作</h1><ul>
+<li><p>新leader可能没有执行最新的put操作(老leader执行了)，所以不能马上响应client的PUT操作</p>
+<ul>
+<li>还是要通过收敛(GET操作加入日志、发送RPC使数据一致化)直到知晓自己的最新PUT已提交</li>
+</ul>
+</li>
+<li><p>一种方法：租约，规定一个结点是否有权响应只读请求(不一定是当前leader，也可以是老的、租约还未过期的leader)</p>
+</li>
+<li><p>不过实践中某些时候人们能忍受看到老数据(这种场景就不用出各种方案，并且性能会更高)</p>
+</li>
+</ul>
+<h1 id="重传"><a href="#重传" class="headerlink" title="重传"></a>重传</h1><ul>
+<li>保证幂等性<ul>
+<li>client为请求设置ID和顺序号</li>
+<li>同一个请求，重发时请求ID不变</li>
+<li>顺序号防止乱序执行</li>
+<li>kv服务维护ID去重表</li>
+</ul>
+</li>
+<li>崩溃恢复如果使用了快照，快照也要包含这个去重表</li>
+<li>采取某些措施减少去重表大小，如当前已连续的顺序号前的请求全部拒绝</li>
+</ul></div><div class="tab-pane" id="页面内不重复的id-7"><p>论文：</p>
+<ul>
+<li>[The Go Programming Language and Environment](<a class="link"   target="_blank" rel="noopener" href="https://cacm.acm.org/magazines/2022/5/260357-the-go-programming-language-and-environment/fulltext" >The Go Programming Language and Environment | May 2022 | Communications of the ACM<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>)</li>
+</ul>
+<h1 id="Go做的事"><a href="#Go做的事" class="headerlink" title="Go做的事"></a>Go做的事</h1><h2 id="依赖导入"><a href="#依赖导入" class="headerlink" title="依赖导入"></a>依赖导入</h2><ul>
+<li>需要显式导入包</li>
+<li>避免导入依赖相关的所有依赖(如导入A包，但A中函数Func的参数是与B包相关的内容，如果还需导入B包，那一次导入会导入大量依赖)</li>
+<li>使用大小写区分公开和私有，减少语法重量</li>
+</ul>
+<h2 id="类型"><a href="#类型" class="headerlink" title="类型"></a>类型</h2><ul>
+<li>提供引用、字符串、数组、hash表和切片(无自带的Set等数据结构)</li>
+<li>不支持隐式类型转换</li>
+</ul>
+<h1 id="并发"><a href="#并发" class="headerlink" title="并发"></a>并发</h1><ul>
+<li><p>方便程序员管理的线程：goroutine</p>
+<ul>
+<li>底层使用多路复用</li>
+<li>提供阻塞IO</li>
+</ul>
+</li>
+<li><p>提供channel以便goroutine的通信和同步</p>
+</li>
+<li><p>也提供了mutex、cond、atomic等较低层的并发控制类型</p>
+</li>
+<li><p>提供了竞态检测工具 -race</p>
+</li>
+</ul>
+<h1 id="安全"><a href="#安全" class="headerlink" title="安全"></a>安全</h1><ul>
+<li><p>解决了部分C和C++的问题，减少了因程序员失误导致的系统问题</p>
+</li>
+<li><p>提供unsafe包编写底层系统</p>
+</li>
+<li><p>自带一套加密库</p>
+</li>
+</ul>
+<h1 id="完整性"><a href="#完整性" class="headerlink" title="完整性"></a>完整性</h1><ul>
+<li><p>自带一套开发需要的核心部分(如加密包、网络包)等，但也不滥竽充数，防止出现选择障碍</p>
+</li>
+<li><p>集成了一套编译、测试等的工具包</p>
+</li>
+</ul>
+<h1 id="一致性"><a href="#一致性" class="headerlink" title="一致性"></a>一致性</h1><ul>
+<li>性能一致<ul>
+<li>不会出现“缓慢启动”的情况，程序在各生命周期的性能一致</li>
+<li>完全并发的GC，开销较小</li>
+</ul>
+</li>
+<li>在不同系统架构下效果一致</li>
+<li>不同时间点下一致，官方承诺新版本会向后兼容</li>
+</ul>
+<h1 id="辅助工具"><a href="#辅助工具" class="headerlink" title="辅助工具"></a>辅助工具</h1><p>大量的工具、插件</p>
+<h1 id="库"><a href="#库" class="headerlink" title="库"></a>库</h1><ul>
+<li>作为适合分布式计算的语言，无中央服务器，通过URL获取远程存储库中托管的包</li>
+<li>也可以发布静态文件包，以支持实现私有服务</li>
+</ul></div><div class="tab-pane" id="页面内不重复的id-8"><p>帖子：[Testing Distributed Systems for Linearizability](<a class="link"   target="_blank" rel="noopener" href="https://anishathalye.com/testing-distributed-systems-for-linearizability/" >Testing Distributed Systems for Linearizability (anishathalye.com)<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>)</p>
+<h1 id="一致性模型"><a href="#一致性模型" class="headerlink" title="一致性模型"></a>一致性模型</h1><p>产生了很多模型</p>
+<ul>
+<li><strong>线性化</strong></li>
+<li>最终一致性</li>
+<li>因果一致性</li>
+<li>分叉一致性</li>
+<li>可串行化</li>
+<li>顺序一致性</li>
+</ul>
+<p>因为需要在 性能&#x2F;便利性&#x2F;可靠性上做权衡</p>
+<h1 id="线性化模型"><a href="#线性化模型" class="headerlink" title="线性化模型"></a>线性化模型</h1><p>强一致性</p>
+<p>需要串行组件</p>
+<p>可用性差</p>
+<h1 id="最终一致性模型"><a href="#最终一致性模型" class="headerlink" title="最终一致性模型"></a>最终一致性模型</h1><p>更受欢迎</p>
+<p>性能更好、更大的容错空间</p>
+<p>可能读到旧数据，不利于系统安全(权限、支付)</p>
+<p>一致性差</p>
+<h1 id="权衡"><a href="#权衡" class="headerlink" title="权衡"></a>权衡</h1><p>可用性和一致性不能两者兼得</p></div><div class="tab-pane" id="页面内不重复的id-9"><p>论文：<a class="link"   target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/zookeeper.pdf" >zookeeper.pdf (mit.edu)<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p></div><div class="tab-pane" id="页面内不重复的id-10"><ul>
+<li>论文：<a class="link"   target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/cr-osdi04.pdf" >Chain Replication for Supporting High Throughput and Availability<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+<h1 id="链复制技术"><a href="#链复制技术" class="headerlink" title="链复制技术"></a>链复制技术</h1><ul>
+<li><p>一系列服务器组成链表(保证有序、线性化写入)<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/8.CR%E7%AE%97%E6%B3%95/image-20230813224532448.png"
+                      alt="image-20230813224532448"
+                ></p>
+</li>
+<li><p>头结点接收写请求，并按配置的顺序(有序)，依次向后发送更新请求并进行响应的更新</p>
+<ul>
+<li>当前写入时，首先将数据缓存，然后将写入请求发给下一个节点(不会像P&#x2F;R模型一样primary结点负载大)，并等待下一个节点返回ACK</li>
+<li>下一个节点返回ACK后，才将缓存中的数据持久化到本地，然后给上一个结点返回ACK</li>
+<li>在等待ACK期间，结点不进行其他操作(线性化)</li>
+<li>在写入头结点后立刻返回给client写成功响应(高吞吐)</li>
+</ul>
+</li>
+<li><p>尾结点接收读请求(该结点负载大)(同一时间获得同一数据，强一致)，将尾结点上的数据和请求结果返回给客户端</p>
+</li>
+<li><p>易知后面结点的数据一定是前面数据的前缀</p>
+</li>
+<li><p>结点宕机情况</p>
+<ul>
+<li>写操作<ul>
+<li>头结点：写操作直接失败，客户端报错</li>
+<li>中间结点和尾结点：反正已经返回客户端成功了。恢复后比较本地存储和前一个结点的数据，并恢复数据。</li>
+</ul>
+</li>
+<li>读操作：<ul>
+<li>尾结点：读操作直接失败</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>可用：</p>
+<ul>
+<li>多个结点进行数据冗余，</li>
+<li>额外的配置和监听服务器，监听集群内各节点状态，在节点宕机时分配备份节点。</li>
+</ul>
+</li>
+<li><p>容忍最多N-1个结点失败</p>
+</li>
+</ul>
+<h1 id="CRAQ"><a href="#CRAQ" class="headerlink" title="CRAQ"></a>CRAQ</h1><ul>
+<li><p>允许任何节点处理读请求，并继续保持强一致</p>
+</li>
+<li><p>双向链表</p>
+</li>
+<li><p>不能处理脑裂问题</p>
+</li>
+<li><p>TODO</p>
+</li>
+</ul></div><div class="tab-pane" id="页面内不重复的id-11"><ul>
+<li><p>事务是数据库中的老生常谈了</p>
+</li>
+<li><p>ACID</p>
+<ul>
+<li>Atomic</li>
+<li>Consistent</li>
+<li>Isolated</li>
+<li>Durable</li>
+</ul>
+</li>
+<li><p>分布式事务 &#x3D; 原子提交 + 并发控制</p>
+<ul>
+<li>并发控制<ul>
+<li>悲观锁：访问前加锁</li>
+<li>乐观锁：不加锁，用变量进行记录</li>
+<li>如果并发小，乐观锁性能好，否则悲观锁</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>两段锁协议（2PL）：用于单机事务中的一致性与隔离性</p>
+<ul>
+<li><p>写操作时加锁</p>
+</li>
+<li><p>所有的解锁操作必须在加锁操作之后(即分为两个阶段)</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/9.%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/c839fb2cd2c75179fe0f5b11d80e6788.jpeg"
+                      alt="c839fb2cd2c75179fe0f5b11d80e6788.png"
+                ></p>
+</li>
+<li><p>可能产生死锁</p>
+</li>
+<li><p>是一种</p>
+</li>
+</ul>
+</li>
+<li><p>两阶段提交(2PC)：用于分布式事务</p>
+<ul>
+<li>将事务分为准备阶段和提交阶段<ul>
+<li>准备阶段：事务管理器给每个参与者发送Prepare消息，每个参与者在本地执行事务，并写Undo、Redo日志</li>
+<li>提交阶段：如果事务管理器收到了失败或超时消息，就给每个参与者发回滚消息，否则发提交消息。参与者根据发来的消息执行操作，然后释放事务中使用的锁资源。</li>
+</ul>
+</li>
+<li>可用性差，因为加锁会阻止其他事务，同时也有无限期阻塞的可能。必须所有服务器都活着才有效</li>
+</ul>
+</li>
+</ul></div><div class="tab-pane" id="页面内不重复的id-12"><p>论文：<a class="link"   target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/thekkath-frangipani.pdf" >Frangipani: A Scalable Distributed File System<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p></div><div class="tab-pane" id="页面内不重复的id-13"><p>论文：[Spanner: Google’s Globally-Distributed Database](<a class="link"   target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/spanner.pdf" >spanner.pdf (mit.edu)<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>)</p>
+<h1 id="Spanner"><a href="#Spanner" class="headerlink" title="Spanner"></a>Spanner</h1><ul>
+<li><p>使用Paxos作为分布式一致性协议</p>
+</li>
+<li><p>非阻塞的读，且只读事务不使用锁机制</p>
+</li>
+<li><p>会随着时间推移，自动对数据进行重新分片，以平衡各节点负载</p>
+</li>
+<li><p>支持通用事务</p>
+</li>
+<li><p>在使用了时间戳的情况下，支持跨越全球的一致性的读操作</p>
+<ul>
+<li>时间戳分配给数据，更像一个多版本数据库</li>
+<li>时间戳反应了事务的执行顺序</li>
+<li>使用了具有原子时钟和GPS的TrueTime API来决定时间戳标记。</li>
+</ul>
+</li>
+<li><p>结构</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/11.Spanner/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM0OTI0MTU2,size_16,color_FFFFFF,t_70.png"
+                      alt="img"
+                ></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/11.Spanner/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM0OTI0MTU2,size_16,color_FFFFFF,t_70-1692092825574-5.png"
+                      alt="img"
+                ></p>
+</li>
+<li><p>并发控制</p>
+</li>
+</ul>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/11.Spanner/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM0OTI0MTU2,size_16,color_FFFFFF,t_70-1692092951806-8.png"
+                      alt="img"
+                ></p></div><div class="tab-pane" id="页面内不重复的id-14"><p>论文：[No compromises: distributed transactions with consistency, availability, and performance](<a class="link"   target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/farm-2015.pdf" >farm-2015.pdf (mit.edu)<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>)</p>
+<h1 id="乐观并发控制-OCC"><a href="#乐观并发控制-OCC" class="headerlink" title="乐观并发控制(OCC)"></a>乐观并发控制(OCC)</h1></div><div class="tab-pane" id="页面内不重复的id-15"><p>论文：[Amazon DynamoDB: A Scalable, Predictably  Performant, and Fully Managed NoSQL  Database Servic](<a class="link"   target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/atc22-dynamodb.pdf" >atc22-dynamodb.pdf (mit.edu)<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>)</p>
+<p>论文较新，解读较少，这里放译文：[<a class="link"   target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/560018207" >译文]Amazon DynamoDB - A Scalable, Predicably Performant, and Fully Managed NoSQL Database Service - 知乎 (zhihu.com)<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<p><a class="link"   target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/TxFvMug_Rxpjjp9wPMxQag" >DynamoDB 2022 论文解读丨东旭说 (qq.com)<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p></div><div class="tab-pane" id="页面内不重复的id-16"><p><a class="link"   target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/zaharia-spark.pdf" >Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h1 id="RDD"><a href="#RDD" class="headerlink" title="RDD"></a>RDD</h1><ul>
+<li>RDD：弹性分布式数据集，是一种分布式内存（集群上的内存存储）的抽象，即支持数据重用、容错、并行</li>
+<li>是只读、分局记录的集合</li>
+<li>只能通过稳定的物理存储或者其他RDD的数据集来创建</li>
+</ul>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/14.Spark/image-20230816170908634.png"
+                      alt="image-20230816170908634"
+                ></p>
+<ul>
+<li>用户可以控制哪些RDD被缓存、哪些被分区</li>
+</ul>
+<h1 id="Spark"><a href="#Spark" class="headerlink" title="Spark"></a>Spark</h1><ul>
+<li><p>Spark是一种RDD系统，提供了Scala接口(简洁、高效)</p>
+</li>
+<li><p>Spark中RDD都是对象，可以操作</p>
+</li>
+<li><p>Spark中RDD默认存储到RAM，RAM不够时部分写到磁盘上</p>
+</li>
+<li><p>Spark使用lineage进行容错恢复，只需重新计算丢失节点，不需要回滚全部</p>
+</li>
+<li><p>Spark可以利用数据局部性，提高性能</p>
+</li>
+<li><p>RDD适用于：     </p>
+<p>​    对数据集中的所有元素使用同一操作的批量应用。在这种情况中，RDD可通过lineage高效记住每个转换，并且无需大量数据即可恢复丢失分区。</p>
+</li>
+<li><p>RDD不适用于：<br>在共享状态下的异步细粒度的更新，比如web存储系统，或增量式web爬虫，这些更适合于用传统的日志更新，或是数据检查点。</p>
+</li>
+<li><p>MR的局限性</p>
+<ul>
+<li>需要准备好批量处理的大量数据</li>
+<li>所有数据处理的方式相同</li>
+<li>不适用于交互性的</li>
+</ul>
+</li>
+<li><p>比起MR，提高了表现力和性能，可以描述数据流图，操作内存比操作磁盘更快</p>
+</li>
+</ul></div><div class="tab-pane" id="页面内不重复的id-17"><p>论文：<a class="link"   target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/memcache-fb.pdf" >Scaling Memcache at Facebook<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h1 id="构建缓存层的最佳实践"><a href="#构建缓存层的最佳实践" class="headerlink" title="构建缓存层的最佳实践"></a>构建缓存层的最佳实践</h1><ul>
+<li><p>大部分业务都是读多写少，缓存层能保护DB</p>
+</li>
+<li><p>缓存策略</p>
+<ul>
+<li>读时，先从缓存获取数据，获取失败则将数据从DB加入缓存</li>
+<li>写时，先更新DB，再将缓存中数据删除</li>
+<li>不一定必须用分布式事务保证一致性(性能要求)</li>
+</ul>
+</li>
+<li><p>业务增加时，也需要缓存层横向扩容，通过一致性hash建立memcache集群</p>
+</li>
+<li><p>读取多个数据，且数据有依赖关系时，会产生一个DAG</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/15.%E7%BC%93%E5%AD%98%E4%B8%80%E8%87%B4%E6%80%A72/image-20230816173622623.png"
+                      alt="image-20230816173622623"
+                ></p>
+</li>
+<li><p>对于可能会从一个memcache上读多次的情况，在业务层减少读取次数，一次读出</p>
+</li>
+<li><p>因为读对错误的容忍性较高，使用UDP通信(此外还在拥塞控制上进行了处理，动态找到窗口大小)</p>
+</li>
+<li><p>通过对数据发放租约id，避免读到并使用过期数据</p>
+</li>
+<li><p>防止缓存穿透</p>
+<ul>
+<li>控制lease的发放速率，并让请求拿过期数据或重试</li>
+<li>如果容忍过期数据，可以缓存过期数据</li>
+<li>对各个缓存按访问频率分类，即热数据、冷数据这样的</li>
+<li>一个缓存节点建立多个备份结点，写效率换读效率</li>
+</ul>
+</li>
+<li><p>可以使用DB的日志，实现最终一致性</p>
+</li>
+<li><p>在不同地域建立数据中心和缓存服务</p>
+</li>
+</ul></div><div class="tab-pane" id="页面内不重复的id-18"><p>论文：<a class="link"   target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/zanzibar.pdf" >Zanzibar: Google’s Consistent, Global Authorization System<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h1 id="Zanzibar"><a href="#Zanzibar" class="headerlink" title="Zanzibar"></a>Zanzibar</h1><ul>
+<li><p>一个谷歌内部的分布式的鉴权应用</p>
+</li>
+<li><p>结合了Spanner进行全球存储</p>
+</li>
+<li><p>为谷歌的众多服务提供了鉴权服务，蒋授权逻辑提取到公共服务中，统一用户模型</p>
+</li>
+<li><p>Zanzibar是内部系统，服务的对象都是谷歌的服务，信任它们的代码</p>
+</li>
+<li><p>权限模型：</p>
+<ul>
+<li>ACL：对每个存储对象，增删查改每个操作都设置一个可供修改的条目</li>
+</ul>
+</li>
+<li><p>Zanzibar部署在全球</p>
+</li>
+<li><p>Zanzibar不是线性化设计</p>
+</li>
+<li><p>利用 Spanner 的线性化和即时快照读取</p>
+</li>
+<li><p>利用特定的安全要求来允许使用过去的快照</p>
+</li>
+<li><p>用时间戳标记缓存数据而不是试图保持最新</p>
+</li>
+<li><p>容错全部交给Spanner</p>
+</li>
+<li><p>。。。。。。。。。。。。。。。。。。。。。。。。TODO</p>
+</li>
+</ul></div><div class="tab-pane" id="页面内不重复的id-19"><p>论文：<a class="link"   target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/li-sundr.pdf" >Secure Untrusted Data Repository (SUNDR)<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p></div><div class="tab-pane" id="页面内不重复的id-20"><p>论文：<a class="link"   target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/castro-practicalbft.pdf" >Practical Byzantine Fault Tolerance<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h1 id="PBFT"><a href="#PBFT" class="headerlink" title="PBFT"></a>PBFT</h1><ul>
+<li><p>一种状态机副本复制算法，允许(N-1)&#x2F;3个节点出错</p>
+</li>
+<li><p>PBFT算法的过程如下:</p>
+<ul>
+<li>客户端向主节点发送请求操作消息, 主节点接收到请求操作消息并校验正确后, 保存该消息, 并依据该请求操作消息生成预准备消息, 广播给各备份节点.</li>
+<li>各备份节点接收到预准备消息并校验正确后, 保存该消息, 并以该预准备消息为依据, 生成准备消息广播给主节点和其他备份节点.</li>
+<li>各存储副本的节点接收到准备消息并校验正确后, 保存该消息, 并以该准备消息为依据, 生成提交消息给客户端、主节点和其他备份节点.</li>
+<li>各存储副本的节点接收到 (2n + 1)&#x2F;3 个提交消息并校验正确后, 则执行来自客户端的请求操作消息里的操作.</li>
+<li>客户端接收到 (n + 2)&#x2F;3 个提交消息, 验证正确并接受后, 便认为该消息已被副本节点集群所承认与执行. 这里的客户端接受 (n + 2)&#x2F;3 个提交消息而不是 (2n + 1)&#x2F;3 个的原因在于失效的节点数量不超过 (n − 1)&#x2F;3, 因此 (n − 1)&#x2F;3 + 1 个一致响应必定能够保证结果是正确的.</li>
+</ul>
+</li>
+</ul>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/18.%E6%8B%9C%E5%8D%A0%E5%BA%AD%E5%AE%B9%E9%94%99/image-20230816202158335.png"
+                      alt="image-20230816202158335"
+                ></p></div><div class="tab-pane" id="页面内不重复的id-21"><p>论文：<a class="link"   target="_blank" rel="noopener" href="https://pdos.csail.mit.edu/6.824/papers/bitcoin.pdf" >Bitcoin: A Peer-to-Peer Electronic Cash System<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h1 id="比特币"><a href="#比特币" class="headerlink" title="比特币"></a>比特币</h1><ul>
+<li><p>一个开放&#x2F;无权限的系统，服务器数量都未知(很难投票)</p>
+</li>
+<li><p>提出l了一种解决双花问题的<strong>P2P网络</strong>：该网络把 <strong>交易(transactions)</strong> 哈希结果记录到一个基于 <strong>PoW共识机制</strong> 不断增长的链上，用来给交易打上时间戳形成一条<strong>不可篡改</strong>的记录</p>
+</li>
+<li><p><a class="link"   target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=P2P&spm=1001.2101.3001.7020" >P2P<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>的电子货币可以在<strong>无第三方</strong>金融机构的情况下进行在线支付</p>
+</li>
+<li><p><strong>数字签名</strong>技术可以用于防止<strong>双花</strong>(double-spending)</p>
+</li>
+<li><p><strong>最长链</strong>会作为已发生事件的载体，同时其自身也代表了最强大的CPU算力池</p>
+</li>
+<li><p>只要大部分算力由节点控制而不是合作用于攻击网络，他们将始终创造比攻击者更长的链（也就是攻击该网络需要拿下 <strong>&gt;50%</strong> 的算力）</p>
+</li>
+<li><p>消息会尽可能<strong>广播</strong>。</p>
+</li>
+<li><p>节点可以<strong>随时</strong>加入和离开网络。</p>
+</li>
+<li><p>签名机制如下</p>
+</li>
+<li><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/19.%E6%AF%94%E7%89%B9%E5%B8%81/f8e87e1907c3462aa2cd45fbd3e73059.png"
+                      alt="img"
+                ></p>
+</li>
+<li><p>在没有可信第三方的情况下，交易需要被<strong>广播</strong>（transactions must be publicly announced），同时还需要一个可以让参与者对他们接受到的信息达成<strong>一致</strong>历史顺序的系统</p>
+</li>
+<li><p>每个Timestamp包含了对上一个Timestamp的hash，如此循环形成链。时间戳服务器通过对要加时间戳的项目区块进行hash并且广播hash值来工作<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/19.%E6%AF%94%E7%89%B9%E5%B8%81/4295e3b6d8f04f58acc470dd46a78a0a.png"
+                      alt="img"
+                ></p>
+</li>
+<li><p>POW：工作量证明包括检测hash结果中的某个值，例如：SHA-256算法 hash值以一些0 bit开头，就是计算结果满足前缀有多少个0才满足PoW机制，平均所需工作量是0的位数的指数倍，工作量证明难度由根据每小时区块产生的平均值确定。如果它们生成得太快，则难度会增加。</p>
+</li>
+</ul></div><div class="tab-pane" id="页面内不重复的id-22"><p>论文：<a class="link"   target="_blank" rel="noopener" href="https://ethereum.org/en/whitepaper/" >Ethereum White Paper (2014)<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h1 id="智能合约"><a href="#智能合约" class="headerlink" title="智能合约"></a>智能合约</h1><ul>
+<li>一种带有内置完整成熟的图灵完备编程语言的区块链，可用于创建“合同”，该合同可用于编码任意状态转换函数，从而允许用户创建上述任何系统，以及我们尚未想到的许多其他功能，只需通过几行代码编写逻辑即可。</li>
+</ul></div><div class="tab-pane" id="页面内不重复的id-23"><p>内容</p></div></div></div>
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>标题:</strong> MIT6.5840分布式系统课程笔记</li>
+        <li><strong>作者:</strong> urlyy</li>
+        <li><strong>创建于
+                :</strong> 2023-08-16 21:06:01</li>
+        
+            <li>
+                <strong>更新于
+                    :</strong> 2025-12-21 18:39:57
+            </li>
+        
+        <li>
+            <strong>链接:</strong> https://urlyy.github.io/2023/08/16/MIT6-5840分布式系统课程笔记/
+        </li>
+        <li>
+            <strong>
+                版权声明:
+            </strong>
+            
+
+            
+                本文章采用 <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a> 进行许可。
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="prev" rel="prev" href="/2023/08/16/%E4%B8%80%E6%96%87%E6%90%9E%E5%AE%9A%E9%AB%98%E6%80%A7%E8%83%BDAPI%E8%AE%BE%E8%AE%A1/">
+					<span class="left arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-left"></i>
+					</span>
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">一文搞定高性能API设计</span>
+						<span class="post-nav-item">上一篇</span>
+					</span>
+				</a>
+			</div>
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2023/07/25/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AF%BC%E8%AE%BA%E7%AC%94%E8%AE%B0/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">操作系统导论笔记</span>
+						<span class="post-nav-item">下一篇</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        评论
+    </div>
+    
+
+        
+            
+    <div id="giscus-container"></div>
+    <script data-swup-reload-script defer>
+        async function loadGiscus() {
+            const giscusConfig = {
+                'src': 'https://giscus.app/client.js',
+                'data-repo': 'urlyy/urlyy_blog_comments',
+                'data-repo-id': 'R_kgDONo8nwQ',
+                'data-category': 'Announcements',
+                'data-category-id': 'DIC_kwDONo8nwc4Cl7pw',
+                'data-mapping': 'title',
+                'data-strict': '0',
+                'data-reactions-enabled': '1',
+                'data-emit-metadata': '1',
+                'data-theme': 'preferred_color_scheme',
+                'data-lang': 'zh-CN',
+                'data-input-position': 'top',
+                'data-loading': 'lazy',
+                'crossorigin': 'anonymous',
+                'async': true
+            }
+            const giscusScript = document.createElement('script');
+            for (const key in giscusConfig) {
+                giscusScript.setAttribute(key, giscusConfig[key]);
+            }
+            document.getElementById('giscus-container').appendChild(giscusScript);
+        }
+        if ('true') {
+            let loadGiscusTimeout = setTimeout(() => {
+                loadGiscus();
+                clearTimeout(loadGiscusTimeout);
+            }, 1000);
+        } else {
+            document.addEventListener('DOMContentLoaded', loadGiscus);
+        }
+    </script>
+
+
+        
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">目录</div>
+		<div class="page-title">MIT6.5840分布式系统课程笔记</div>
+		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F%E5%B7%A5%E7%A8%8B"><span class="nav-text">分布式系统工程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E6%9E%84%E5%BB%BA"><span class="nav-text">为什么要构建</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9A%BE%E7%82%B9"><span class="nav-text">难点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%90%84%E5%AE%9E%E9%AA%8C"><span class="nav-text">各实验</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E4%B8%AA%E5%A4%A7%E7%9B%AE%E6%A0%87"><span class="nav-text">一个大目标</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9D%83%E8%A1%A1"><span class="nav-text">权衡</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E6%96%BD"><span class="nav-text">实施</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#MapReduce"><span class="nav-text">MapReduce</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%87%E7%A8%8B"><span class="nav-text">过程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%86%E8%8A%82"><span class="nav-text">细节</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E5%89%8D"><span class="nav-text">目前</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GFS"><span class="nav-text">GFS</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0"><span class="nav-text">具体实现</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E6%A6%82%E6%8B%AC"><span class="nav-text">一些概括</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%BB%E5%A4%87%E5%A4%8D%E5%88%B6"><span class="nav-text">主备复制</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81"><span class="nav-text">为什么需要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%8E%E4%B9%88%E5%AE%9E%E7%8E%B0"><span class="nav-text">怎么实现</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#VMware%E6%A1%88%E4%BE%8B"><span class="nav-text">VMware案例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E5%8C%BA%E9%97%AE%E9%A2%98"><span class="nav-text">分区问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E4%B8%AA%E5%BA%95%E5%B1%82%E4%BD%BF%E7%94%A8%E4%BA%86raft%E7%9A%84kv%E6%9C%8D%E5%8A%A1"><span class="nav-text">一个底层使用了raft的kv服务</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%97%A5%E5%BF%97"><span class="nav-text">日志</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Raft%E7%BB%86%E8%8A%82"><span class="nav-text">Raft细节</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E6%97%A5%E5%BF%97%E4%B8%8D%E4%B8%80%E8%87%B4"><span class="nav-text">处理日志不一致</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8C%81%E4%B9%85%E5%8C%96"><span class="nav-text">持久化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%BF%AB%E7%85%A7%E6%9D%A5%E6%97%A5%E5%BF%97%E5%8E%8B%E7%BC%A9"><span class="nav-text">使用快照来日志压缩</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AF%BB%E6%93%8D%E4%BD%9C"><span class="nav-text">读操作</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%87%8D%E4%BC%A0"><span class="nav-text">重传</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Go%E5%81%9A%E7%9A%84%E4%BA%8B"><span class="nav-text">Go做的事</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%9D%E8%B5%96%E5%AF%BC%E5%85%A5"><span class="nav-text">依赖导入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B1%BB%E5%9E%8B"><span class="nav-text">类型</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B9%B6%E5%8F%91"><span class="nav-text">并发</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E5%85%A8"><span class="nav-text">安全</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%8C%E6%95%B4%E6%80%A7"><span class="nav-text">完整性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E8%87%B4%E6%80%A7"><span class="nav-text">一致性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BE%85%E5%8A%A9%E5%B7%A5%E5%85%B7"><span class="nav-text">辅助工具</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BA%93"><span class="nav-text">库</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E8%87%B4%E6%80%A7%E6%A8%A1%E5%9E%8B"><span class="nav-text">一致性模型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BA%BF%E6%80%A7%E5%8C%96%E6%A8%A1%E5%9E%8B"><span class="nav-text">线性化模型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7%E6%A8%A1%E5%9E%8B"><span class="nav-text">最终一致性模型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9D%83%E8%A1%A1"><span class="nav-text">权衡</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%93%BE%E5%A4%8D%E5%88%B6%E6%8A%80%E6%9C%AF"><span class="nav-text">链复制技术</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CRAQ"><span class="nav-text">CRAQ</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Spanner"><span class="nav-text">Spanner</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B9%90%E8%A7%82%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6-OCC"><span class="nav-text">乐观并发控制(OCC)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RDD"><span class="nav-text">RDD</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Spark"><span class="nav-text">Spark</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9E%84%E5%BB%BA%E7%BC%93%E5%AD%98%E5%B1%82%E7%9A%84%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5"><span class="nav-text">构建缓存层的最佳实践</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Zanzibar"><span class="nav-text">Zanzibar</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PBFT"><span class="nav-text">PBFT</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%AF%94%E7%89%B9%E5%B8%81"><span class="nav-text">比特币</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6"><span class="nav-text">智能合约</span></a></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2021</span>
+              -
+            
+            2025&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">urlyy</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        共撰写了 78 篇文章
+                    </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">访问人数</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">总访问量</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">由 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a> 驱动</span>
+            <span class="text-sm lg:block">主题&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.5</a></span>
+        </div>
+        
+        
+            <div>
+                博客已运行 <span class="odometer" id="runtime_days" ></span> 天 <span class="odometer" id="runtime_hours"></span> 小时 <span class="odometer" id="runtime_minutes"></span> 分钟 <span class="odometer" id="runtime_seconds"></span> 秒
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="fa-regular fa-arrow-up"></i>
+		</li>
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+	<div class="search-pop-overlay">
+	<div class="popup search-popup">
+		<div class="search-header">
+			<span class="search-input-field-pre">
+				<i class="fa-solid fa-keyboard"></i>
+			</span>
+			<div class="search-input-container">
+				<input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="站内搜索您需要的内容..." spellcheck="false" type="search" class="search-input">
+			</div>
+			<span class="popup-btn-close">
+				<i class="fa-solid fa-times"></i>
+			</span>
+		</div>
+		<div id="search-result">
+			<div id="no-result">
+				<i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>
+			</div>
+		</div>
+	</div>
+</div>
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+	
+<script src="/js/build/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/build/utils.js" type="module"></script>
+
+<script src="/js/build/main.js" type="module"></script>
+
+<script src="/js/build/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/build/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/build/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/build/layouts/categoryList.js" type="module"></script>
+
+
+
+    
+<script src="/js/build/tools/localSearch.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/layouts/lazyload.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/runtime.js"></script>
+
+    
+<script src="/js/build/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+  
+<script src="/js/build/plugins/typed.js" type="module"></script>
+
+
+
+
+    
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@9.3.0/dist/mermaid.min.js"></script>
+    
+    
+<script src="/js/build/plugins/mermaid.js"></script>
+
+
+
+
+
+
+    
+<script src="/js/build/libs/anime.min.js"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/tocToggle.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/layouts/toc.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/plugins/tabs.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+<script src="/js/build/layouts/essays.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+
+	
+</body>
+
+</html>

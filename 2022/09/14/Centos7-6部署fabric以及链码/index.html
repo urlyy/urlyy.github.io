@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="urlyy">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set data attribute for CSS variables
+                root.setAttribute("data-theme", theme);
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes once DOM is ready
+            if (document.readyState !== "loading") {
+                document.body.classList.add(theme + "-mode");
+            } else {
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add(theme + "-mode");
+                    document.body.classList.remove((theme === DARK ? LIGHT : DARK) + "-mode");
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Critical CSS to prevent flash -->
+    <style>
+        :root[data-theme="dark"] {
+            --background-color: #202124;
+            --background-color-transparent: rgba(32, 33, 36, 0.6);
+            --second-background-color: #2d2e32;
+            --third-background-color: #34353a;
+            --third-background-color-transparent: rgba(32, 33, 36, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #ffffff;
+            --second-text-color: #eeeeee;
+            --third-text-color: #bebec6;
+            --fourth-text-color: #999999;
+            --default-text-color: #bebec6;
+            --invert-text-color: #373D3F;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(255, 255, 255, 0.08);
+            --shadow-color-2: rgba(255, 255, 255, 0.05);
+        }
+        
+        :root[data-theme="light"] {
+            --background-color: #fff;
+            --background-color-transparent: rgba(255, 255, 255, 0.6);
+            --second-background-color: #f8f8f8;
+            --third-background-color: #f2f2f2;
+            --third-background-color-transparent: rgba(241, 241, 241, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #16171a;
+            --second-text-color: #2f3037;
+            --third-text-color: #5e5e5e;
+            --fourth-text-color: #eeeeee;
+            --default-text-color: #373D3F;
+            --invert-text-color: #bebec6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(0, 0, 0, 0.08);
+            --shadow-color-2: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+        
+        /* Apply body classes as soon as DOM is ready */
+        :root[data-theme="dark"] body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+    </style>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://urlyy.github.io/2022/09/14/centos7-6部署fabric以及链码/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta name="description" content="Fabric部署记录">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Centos7.6部署fabric以及链码">
+<meta property="og:url" content="http://urlyy.github.io/2022/09/14/Centos7-6%E9%83%A8%E7%BD%B2fabric%E4%BB%A5%E5%8F%8A%E9%93%BE%E7%A0%81/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Fabric部署记录">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://urlyy.github.io/article_images/Centos7-6%E9%83%A8%E7%BD%B2fabric%E4%BB%A5%E5%8F%8A%E9%93%BE%E7%A0%81/5f2fdc3d524045cf814fa1790b45bdad.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/Centos7-6%E9%83%A8%E7%BD%B2fabric%E4%BB%A5%E5%8F%8A%E9%93%BE%E7%A0%81/1d6b2fa8a33c45e483b7ea071d0bc8d7.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/Centos7-6%E9%83%A8%E7%BD%B2fabric%E4%BB%A5%E5%8F%8A%E9%93%BE%E7%A0%81/3745b6f99ac142b3a7123e248facc1fd.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/Centos7-6%E9%83%A8%E7%BD%B2fabric%E4%BB%A5%E5%8F%8A%E9%93%BE%E7%A0%81/b8197a5709ea4a17a06be5fb9dfb51cc.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/Centos7-6%E9%83%A8%E7%BD%B2fabric%E4%BB%A5%E5%8F%8A%E9%93%BE%E7%A0%81/54679c3cff1143db852a4fe8a80a4baf.png">
+<meta property="article:published_time" content="2022-09-14T04:56:58.000Z">
+<meta property="article:modified_time" content="2025-12-21T10:39:57.266Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://urlyy.github.io/article_images/Centos7-6%E9%83%A8%E7%BD%B2fabric%E4%BB%A5%E5%8F%8A%E9%93%BE%E7%A0%81/5f2fdc3d524045cf814fa1790b45bdad.png">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/avatar.jpg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.jpg">
+    <meta name="theme-color" content="#5c701a">
+    <link rel="shortcut icon" href="/images/avatar.jpg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            Centos7.6部署fabric以及链码 | urlyy的小窝
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+        <link href="" rel="stylesheet">
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"urlyy.github.io","root":"/","language":"zh-CN","path":"search.json"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":false,"auto":false,"list":[""]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":true},"copyright":true,"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#5c701a","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":true,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":false},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"side_tools":{"gear_rotation":true,"auto_expand":false},"open_graph":true,"google_analytics":{"enable":false,"id":null},"busuanzi_counter":{"enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"pjax":true},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/bg/1.jpg","dark":"/images/bg/1.jpg"},"title":"urlyy的小窝","subtitle":{"text":["Loading..."],"hitokoto":{"enable":true,"show_author":false,"api":"https://v1.hitokoto.cn?c=a&c=b&c=d&c=k"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"style":"default","links":{"github":"https://github.com/urlyy?tab=repositories","instagram":null,"zhihu":null,"twitter":null,"email":"2213732736@qq.com"},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":true,"version":"9.3.0"}},"version":"2.8.5","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Categories":{"icon":"fa-regular fa-folder","path":"/categories/"},"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Github":{"path":"https://github.com/urlyy","icon":"fa-brands fa-github"},"个人介绍":{"path":"/personal/profile.html","icon":"fa-regular fa-user"}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"cloud"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":null},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2021/9/7 16:55:00"};
+    window.lang_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 个月前","year":"%s 年前"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                urlyy的小窝
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    首页
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/categories/"
+                                        >
+                                    <i class="fa-regular fa-folder fa-fw"></i>
+                                    分类
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/archives"
+                                        >
+                                    <i class="fa-regular fa-archive fa-fw"></i>
+                                    归档
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   target="_blank" rel="noopener" href="https://github.com/urlyy"
+                                        >
+                                    <i class="fa-brands fa-github fa-fw"></i>
+                                    GITHUB
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/personal/profile.html"
+                                        >
+                                    <i class="fa-regular fa-user fa-fw"></i>
+                                    个人介绍
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                首页
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/categories/"
+                        >
+                            <span>
+                                分类
+                            </span>
+                            
+                                <i class="fa-regular fa-folder fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/archives"
+                        >
+                            <span>
+                                归档
+                            </span>
+                            
+                                <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           target="_blank" rel="noopener" href="https://github.com/urlyy"
+                        >
+                            <span>
+                                GITHUB
+                            </span>
+                            
+                                <i class="fa-brands fa-github fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/personal/profile.html"
+                        >
+                            <span>
+                                个人介绍
+                            </span>
+                            
+                                <i class="fa-regular fa-user fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">25</div>
+        <div class="label text-third-text-color text-sm">标签</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">29</div>
+        <div class="label text-third-text-color text-sm">分类</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">78</div>
+        <div class="label text-third-text-color text-sm">文章</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">Centos7.6部署fabric以及链码</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/avatar.jpg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">urlyy</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2022-09-14 12:56:58</span>
+        <span class="mobile">2022-09-14 12:56:58</span>
+        <span class="hover-info">创建</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2025-12-21 18:39:57</span>
+            <span class="mobile">2025-12-21 18:39:57</span>
+            <span class="hover-info">更新</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/">区块链</a>&nbsp;
+                        </li>
+                    
+                    
+                
+                    
+                        
+                            <li>></li>
+                        
+                        <li>
+                            <a href="/categories/%E5%8C%BA%E5%9D%97%E9%93%BE/%E8%BF%90%E7%BB%B4/">运维</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<p>参考<br><a class="link"   target="_blank" rel="noopener" href="https://blog.csdn.net/klay077/category_10447229.html" >Fabric学习<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a><br><a class="link"   target="_blank" rel="noopener" href="https://blog.csdn.net/xjmtxwd24/category_11645920.html" >Fabric2.2 全面学习<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h1 id="如果是最小化安装"><a href="#如果是最小化安装" class="headerlink" title="如果是最小化安装"></a>如果是最小化安装</h1><div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">遇到找不到命令时，自行用yum安装</span><br><span class="line">如</span><br><span class="line">yum install vim</span><br><span class="line">yum install wget</span><br></pre></td></tr></table></figure></div>
+
+<h1 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h1><div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">yum -y install git 		</span><br><span class="line">git --version</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">yum -y install curl 		</span><br><span class="line">curl --version</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">sudo yum install -y yum-utils</span><br><span class="line">sudo yum-config-manager \</span><br><span class="line">    --add-repo \</span><br><span class="line">    https://download.docker.com/linux/centos/docker-ce.repo</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">sudo yum install docker-ce docker-ce-cli containerd.io</span><br><span class="line">sudo systemctl start docker</span><br><span class="line">sudo systemctl enable docker</span><br><span class="line">sudo mkdir -p /etc/docker</span><br><span class="line">sudo tee /etc/docker/daemon.json &lt;&lt;-&#x27;EOF&#x27;</span><br><span class="line">&#123;</span><br><span class="line">  &quot;registry-mirrors&quot;: [&quot;https://ppztf0yr.mirror.aliyuncs.com&quot;]</span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br><span class="line">sudo systemctl daemon-reload</span><br><span class="line">sudo systemctl restart docker</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">curl -L https://get.daocloud.io/docker/compose/releases/download/1.26.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose</span><br><span class="line">chmod +x /usr/local/bin/docker-compose</span><br><span class="line">docker-compose version</span><br><span class="line"></span><br><span class="line">cd /usr/local</span><br><span class="line">wget https://studygolang.com/dl/golang/go1.14.7.linux-amd64.tar.gz</span><br><span class="line">tar -zxvf go1.14.7.linux-amd64.tar.gz</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">vim /etc/profile  </span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">添加如下</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="built_in">export</span> GOROOT=/usr/local/go</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="built_in">export</span> GOPATH=<span class="variable">$HOME</span>/go</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="built_in">export</span> PATH=<span class="variable">$PATH</span>:<span class="variable">$GOROOT</span>/bin:<span class="variable">$GOPATH</span>/bin</span></span><br><span class="line">source /etc/profile</span><br><span class="line"></span><br><span class="line">go version</span><br><span class="line">go env -w GO111MODULE=on</span><br><span class="line">go env -w GOPROXY=https://mirrors.aliyun.com/goproxy/</span><br></pre></td></tr></table></figure></div>
+
+
+<h1 id="安装fabric-samples"><a href="#安装fabric-samples" class="headerlink" title="安装fabric-samples"></a>安装fabric-samples</h1><div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cd /usr/local</span><br><span class="line">mkdir hyperledger </span><br><span class="line">cd hyperledger</span><br><span class="line">touch bootstrap.sh</span><br></pre></td></tr></table></figure></div>
+<p>我这里给出<code>bootstrap.sh</code>文件内容，</p>
+<div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">!/bin/bash</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"></span></span><br><span class="line"><span class="language-bash"><span class="comment"># Copyright IBM Corp. All Rights Reserved.</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"></span></span><br><span class="line"><span class="language-bash"><span class="comment"># SPDX-License-Identifier: Apache-2.0</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"></span></span><br><span class="line"><span class="language-bash"></span><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="keyword">if</span> version not passed <span class="keyword">in</span>, default to latest released version</span></span><br><span class="line">VERSION=2.2.0</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="keyword">if</span> ca version not passed <span class="keyword">in</span>, default to latest released version</span></span><br><span class="line">CA_VERSION=1.4.8</span><br><span class="line">ARCH=$(echo &quot;$(uname -s|tr &#x27;[:upper:]&#x27; &#x27;[:lower:]&#x27;|sed &#x27;s/mingw64_nt.*/windows/&#x27;)-$(uname -m |sed &#x27;s/x86_64/amd64/g&#x27;)&quot; |sed &#x27;s/darwin-arm64/darwin-amd64/g&#x27;)</span><br><span class="line">MARCH=$(uname -m)</span><br><span class="line">: $&#123;CONTAINER_CLI:=&quot;docker&quot;&#125;</span><br><span class="line"></span><br><span class="line">printHelp() &#123;</span><br><span class="line">    echo &quot;Usage: bootstrap.sh [version [ca_version]] [options]&quot;</span><br><span class="line">    echo</span><br><span class="line">    echo &quot;options:&quot;</span><br><span class="line">    echo &quot;-h : this help&quot;</span><br><span class="line">    echo &quot;-d : bypass docker image download&quot;</span><br><span class="line">    echo &quot;-s : bypass fabric-samples repo clone&quot;</span><br><span class="line">    echo &quot;-b : bypass download of platform-specific binaries&quot;</span><br><span class="line">    echo</span><br><span class="line">    echo &quot;e.g. bootstrap.sh 2.4.6 1.5.5 -s&quot;</span><br><span class="line">    echo &quot;will download docker images and binaries for Fabric v2.4.6 and Fabric CA v1.5.5&quot;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">dockerPull() pulls docker images from fabric and chaincode repositories</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">note, <span class="keyword">if</span> a docker image doesn<span class="string">&#x27;t exist for a requested release, it will simply</span></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="string">be skipped, since this script doesn&#x27;</span>t terminate upon errors.</span></span><br><span class="line"></span><br><span class="line">dockerPull() &#123;</span><br><span class="line">    #three_digit_image_tag is passed in, e.g. &quot;1.4.7&quot;</span><br><span class="line">    three_digit_image_tag=$1</span><br><span class="line">    shift</span><br><span class="line">    #two_digit_image_tag is derived, e.g. &quot;1.4&quot;, especially useful as a local tag for two digit references to most recent baseos, ccenv, javaenv, nodeenv patch releases</span><br><span class="line">    two_digit_image_tag=$(echo &quot;$three_digit_image_tag&quot; | cut -d&#x27;.&#x27; -f1,2)</span><br><span class="line">    while [[ $# -gt 0 ]]</span><br><span class="line">    do</span><br><span class="line">        image_name=&quot;$1&quot;</span><br><span class="line">        echo &quot;====&gt; hyperledger/fabric-$image_name:$three_digit_image_tag&quot;</span><br><span class="line">        $&#123;CONTAINER_CLI&#125; pull &quot;hyperledger/fabric-$image_name:$three_digit_image_tag&quot;</span><br><span class="line">        $&#123;CONTAINER_CLI&#125; tag &quot;hyperledger/fabric-$image_name:$three_digit_image_tag&quot; &quot;hyperledger/fabric-$image_name&quot;</span><br><span class="line">        $&#123;CONTAINER_CLI&#125; tag &quot;hyperledger/fabric-$image_name:$three_digit_image_tag&quot; &quot;hyperledger/fabric-$image_name:$two_digit_image_tag&quot;</span><br><span class="line">        shift</span><br><span class="line">    done</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">cloneSamplesRepo() &#123;</span><br><span class="line">    # clone (if needed) hyperledger/fabric-samples and checkout corresponding</span><br><span class="line">    # version to the binaries and docker images to be downloaded</span><br><span class="line">    if [ -d test-network ]; then</span><br><span class="line">        # if we are in the fabric-samples repo, checkout corresponding version</span><br><span class="line">        echo &quot;==&gt; Already in fabric-samples repo&quot;</span><br><span class="line">    elif [ -d fabric-samples ]; then</span><br><span class="line">        # if fabric-samples repo already cloned and in current directory,</span><br><span class="line">        # cd fabric-samples</span><br><span class="line">        echo &quot;===&gt; Changing directory to fabric-samples&quot;</span><br><span class="line">        cd fabric-samples</span><br><span class="line">    else</span><br><span class="line">        echo &quot;===&gt; Cloning hyperledger/fabric-samples repo&quot;</span><br><span class="line">        git clone -b main https://github.com/hyperledger/fabric-samples.git &amp;&amp; cd fabric-samples</span><br><span class="line">    fi</span><br><span class="line"></span><br><span class="line">    if GIT_DIR=.git git rev-parse v$&#123;VERSION&#125; &gt;/dev/null 2&gt;&amp;1; then</span><br><span class="line">        echo &quot;===&gt; Checking out v$&#123;VERSION&#125; of hyperledger/fabric-samples&quot;</span><br><span class="line">        git checkout -q v$&#123;VERSION&#125;</span><br><span class="line">    else</span><br><span class="line">        echo &quot;fabric-samples v$&#123;VERSION&#125; does not exist, defaulting to main. fabric-samples main branch is intended to work with recent versions of fabric.&quot;</span><br><span class="line">        git checkout -q main</span><br><span class="line">    fi</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">This will download the .tar.gz</span></span><br><span class="line">download() &#123;</span><br><span class="line">    local BINARY_FILE=$1</span><br><span class="line">    local URL=$2</span><br><span class="line">    echo &quot;===&gt; Downloading: &quot; &quot;$&#123;URL&#125;&quot;</span><br><span class="line">    curl -L --retry 5 --retry-delay 3 &quot;$&#123;URL&#125;&quot; | tar xz || rc=$?</span><br><span class="line">    if [ -n &quot;$rc&quot; ]; then</span><br><span class="line">        echo &quot;==&gt; There was an error downloading the binary file.&quot;</span><br><span class="line">        return 22</span><br><span class="line">    else</span><br><span class="line">        echo &quot;==&gt; Done.&quot;</span><br><span class="line">    fi</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">pullBinaries() &#123;</span><br><span class="line">    echo &quot;===&gt; Downloading version $&#123;FABRIC_TAG&#125; platform specific fabric binaries&quot;</span><br><span class="line">    download &quot;$&#123;BINARY_FILE&#125;&quot; &quot;https://github.com/hyperledger/fabric/releases/download/v$&#123;VERSION&#125;/$&#123;BINARY_FILE&#125;&quot;</span><br><span class="line">    if [ $? -eq 22 ]; then</span><br><span class="line">        echo</span><br><span class="line">        echo &quot;------&gt; $&#123;FABRIC_TAG&#125; platform specific fabric binary is not available to download &lt;----&quot;</span><br><span class="line">        echo</span><br><span class="line">        exit</span><br><span class="line">    fi</span><br><span class="line"></span><br><span class="line">    echo &quot;===&gt; Downloading version $&#123;CA_TAG&#125; platform specific fabric-ca-client binary&quot;</span><br><span class="line">    download &quot;$&#123;CA_BINARY_FILE&#125;&quot; &quot;https://github.com/hyperledger/fabric-ca/releases/download/v$&#123;CA_VERSION&#125;/$&#123;CA_BINARY_FILE&#125;&quot;</span><br><span class="line">    if [ $? -eq 22 ]; then</span><br><span class="line">        echo</span><br><span class="line">        echo &quot;------&gt; $&#123;CA_TAG&#125; fabric-ca-client binary is not available to download  (Available from 1.1.0-rc1) &lt;----&quot;</span><br><span class="line">        echo</span><br><span class="line">        exit</span><br><span class="line">    fi</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">pullDockerImages() &#123;</span><br><span class="line">    command -v $&#123;CONTAINER_CLI&#125; &gt;&amp; /dev/null</span><br><span class="line">    NODOCKER=$?</span><br><span class="line">    if [ &quot;$&#123;NODOCKER&#125;&quot; == 0 ]; then</span><br><span class="line">        FABRIC_IMAGES=(peer orderer ccenv tools)</span><br><span class="line">        case &quot;$VERSION&quot; in</span><br><span class="line">        2.*)</span><br><span class="line">            FABRIC_IMAGES+=(baseos)</span><br><span class="line">            shift</span><br><span class="line">            ;;</span><br><span class="line">        esac</span><br><span class="line">        echo &quot;FABRIC_IMAGES:&quot; &quot;$&#123;FABRIC_IMAGES[@]&#125;&quot;</span><br><span class="line">        echo &quot;===&gt; Pulling fabric Images&quot;</span><br><span class="line">        dockerPull &quot;$&#123;FABRIC_TAG&#125;&quot; &quot;$&#123;FABRIC_IMAGES[@]&#125;&quot;</span><br><span class="line">        echo &quot;===&gt; Pulling fabric ca Image&quot;</span><br><span class="line">        CA_IMAGE=(ca)</span><br><span class="line">        dockerPull &quot;$&#123;CA_TAG&#125;&quot; &quot;$&#123;CA_IMAGE[@]&#125;&quot;</span><br><span class="line">        echo &quot;===&gt; List out hyperledger docker images&quot;</span><br><span class="line">        $&#123;CONTAINER_CLI&#125; images | grep hyperledger</span><br><span class="line">    else</span><br><span class="line">        echo &quot;=========================================================&quot;</span><br><span class="line">        echo &quot;$&#123;CONTAINER_CLI&#125; not installed, bypassing download of Fabric images&quot;</span><br><span class="line">        echo &quot;=========================================================&quot;</span><br><span class="line">    fi</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">DOCKER=true</span><br><span class="line">SAMPLES=true</span><br><span class="line">BINARIES=true</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Parse commandline args pull out</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">version and/or ca-version strings first</span></span><br><span class="line">if [ -n &quot;$1&quot; ] &amp;&amp; [ &quot;$&#123;1:0:1&#125;&quot; != &quot;-&quot; ]; then</span><br><span class="line">    VERSION=$1;shift</span><br><span class="line">    if [ -n &quot;$1&quot; ]  &amp;&amp; [ &quot;$&#123;1:0:1&#125;&quot; != &quot;-&quot; ]; then</span><br><span class="line">        CA_VERSION=$1;shift</span><br><span class="line">        if [ -n  &quot;$1&quot; ] &amp;&amp; [ &quot;$&#123;1:0:1&#125;&quot; != &quot;-&quot; ]; then</span><br><span class="line">            THIRDPARTY_IMAGE_VERSION=$1;shift</span><br><span class="line">        fi</span><br><span class="line">    fi</span><br><span class="line">fi</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">prior to 1.2.0 architecture was determined by <span class="built_in">uname</span> -m</span></span><br><span class="line">if [[ $VERSION =~ ^1\.[0-1]\.* ]]; then</span><br><span class="line">    export FABRIC_TAG=$&#123;MARCH&#125;-$&#123;VERSION&#125;</span><br><span class="line">    export CA_TAG=$&#123;MARCH&#125;-$&#123;CA_VERSION&#125;</span><br><span class="line">    export THIRDPARTY_TAG=$&#123;MARCH&#125;-$&#123;THIRDPARTY_IMAGE_VERSION&#125;</span><br><span class="line">else</span><br><span class="line">    # starting with 1.2.0, multi-arch images will be default</span><br><span class="line">    : &quot;$&#123;CA_TAG:=&quot;$CA_VERSION&quot;&#125;&quot;</span><br><span class="line">    : &quot;$&#123;FABRIC_TAG:=&quot;$VERSION&quot;&#125;&quot;</span><br><span class="line">    : &quot;$&#123;THIRDPARTY_TAG:=&quot;$THIRDPARTY_IMAGE_VERSION&quot;&#125;&quot;</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">BINARY_FILE=hyperledger-fabric-$&#123;ARCH&#125;-$&#123;VERSION&#125;.tar.gz</span><br><span class="line">CA_BINARY_FILE=hyperledger-fabric-ca-$&#123;ARCH&#125;-$&#123;CA_VERSION&#125;.tar.gz</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="keyword">then</span> parse opts</span></span><br><span class="line">while getopts &quot;h?dsb&quot; opt; do</span><br><span class="line">    case &quot;$opt&quot; in</span><br><span class="line">        h|\?)</span><br><span class="line">            printHelp</span><br><span class="line">            exit 0</span><br><span class="line">            ;;</span><br><span class="line">        d)  DOCKER=false</span><br><span class="line">            ;;</span><br><span class="line">        s)  SAMPLES=false</span><br><span class="line">            ;;</span><br><span class="line">        b)  BINARIES=false</span><br><span class="line">            ;;</span><br><span class="line">    esac</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line">if [ &quot;$SAMPLES&quot; == &quot;true&quot; ]; then</span><br><span class="line">    echo</span><br><span class="line">    echo &quot;Clone hyperledger/fabric-samples repo&quot;</span><br><span class="line">    echo</span><br><span class="line">    cloneSamplesRepo</span><br><span class="line">fi</span><br><span class="line">if [ &quot;$BINARIES&quot; == &quot;true&quot; ]; then</span><br><span class="line">    echo</span><br><span class="line">    echo &quot;Pull Hyperledger Fabric binaries&quot;</span><br><span class="line">    echo</span><br><span class="line">    pullBinaries</span><br><span class="line">fi</span><br><span class="line">if [ &quot;$DOCKER&quot; == &quot;true&quot; ]; then</span><br><span class="line">    echo</span><br><span class="line">    echo &quot;Pull Hyperledger Fabric docker images&quot;</span><br><span class="line">    echo</span><br><span class="line">    pullDockerImages</span><br><span class="line">fi</span><br></pre></td></tr></table></figure></div>
+<p>运行下载程序<br>注意最后这三个<code>if...fi</code>，分别是克隆fabric-samples文件夹、获得bin和config文件夹、拉取镜像的作用<br>其中<code>pullBinaries</code>耗时最长，最易出错，最易搞心态，建议单独执行(或者往下面看)<br>即可以先将137行的<code>BINARIES=true</code>改为<code>BINARIES=false</code>，执行<code>bootstrap.sh</code>，再重新设<code>BINARIES=true</code>，并将其他两个设为<code>false</code>，再执行<code>bootstrap.sh</code>，并将第二次获得到的bin和config目录移入fabric-samples文件夹内<br>如果出现</p>
+<blockquote>
+<p>可以出现<code> /bin/bash^M: 坏的解释器: 没有那个文件或目录</code>，解决方案如下：<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/Centos7-6%E9%83%A8%E7%BD%B2fabric%E4%BB%A5%E5%8F%8A%E9%93%BE%E7%A0%81/5f2fdc3d524045cf814fa1790b45bdad.png"
+                      alt="在这里插入图片描述"
+                ></p>
+</blockquote>
+<blockquote>
+<p>如果克隆<code>fabric-samples</code>失败，即设<code>SAMPLES=true</code>并运行后无<code>fabric-samples</code>文件夹出现，则自己手动安装(因为这个也挺花时间的)</p>
+</blockquote>
+<div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git clone -b main https://github.com/hyperledger/fabric-samples.git</span><br><span class="line">cd fabric-samples</span><br><span class="line">git checkout -q v2.2.0</span><br><span class="line">git checkout -b branch</span><br></pre></td></tr></table></figure></div>
+<blockquote>
+<p>如果下载二进制文件的时间很长很长，可以考虑在windows上通过Github直接下好再上传到服务器上，因为<code>shell</code>里下载的方法就是<code>git</code>。将这两个文件在&#x2F;usr&#x2F;local&#x2F;hyperledger&#x2F;下载并解压</p>
+</blockquote>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">第一个下载的</span><br><span class="line">wget https://github.com/hyperledger/fabric/releases/download/v2.2.0/hyperledger-fabric-linux-amd64-2.2.0.tar.gz</span><br><span class="line">第二个下载的</span><br><span class="line">wget https://github.com/hyperledger/fabric-ca/releases/download/v1.4.8/hyperledger-fabric-ca-linux-amd64-1.4.8.tar.gz</span><br><span class="line">tar -zxvf hyperledger-fabric-linux-amd64-2.2.0.tar.gz</span><br><span class="line">tar -zxvf hyperledger-fabric-ca-linux-amd64-1.4.8.tar.gz</span><br></pre></td></tr></table></figure></div>
+
+
+<p>我们继续放命令</p>
+<div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">chmod +X bootstrap.sh</span><br><span class="line">./bootstrap.sh</span><br><span class="line">mv config/ fabric-samples/</span><br><span class="line">mv bin/ fabric-samples/</span><br><span class="line">vim /etc/profile</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">添加如下</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="built_in">export</span> PATH=<span class="variable">$PATH</span>:/usr/local/hyperledger/fabric-samples/bin</span></span><br><span class="line">source /etc/profile </span><br><span class="line">fabric-ca-client version</span><br></pre></td></tr></table></figure></div>
+
+<h1 id="使用测试网络"><a href="#使用测试网络" class="headerlink" title="使用测试网络"></a>使用测试网络</h1><div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd /usr/local/hyperledger/fabric-samples/test-network</span><br><span class="line">./network.sh up createChannel</span><br></pre></td></tr></table></figure></div>
+<p>注意上面有可能报错，无报错的 <a href="#jump-1" title="跳转">跳转</a></p>
+<div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ERROR: The Compose file &#x27;./docker/docker-compose-test-net.yaml&#x27; is invalid because:</span><br><span class="line">networks.test value Additional properties are not allowed (&#x27;name&#x27; was unexpected)</span><br><span class="line">ERROR: The Compose file &#x27;./addOrg3/docker/docker-compose-couch-org3.yaml&#x27; is invalid because:</span><br><span class="line">networks.test value Additional properties are not allowed (&#x27;name&#x27; was unexpected)</span><br></pre></td></tr></table></figure></div>
+<p>此时需要将<br><code>/usr/local/hyperledger/fabric-samples/test-network/docker/docker-compose-test-net.yaml</code></p>
+<p>的13、14、15行改为<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/Centos7-6%E9%83%A8%E7%BD%B2fabric%E4%BB%A5%E5%8F%8A%E9%93%BE%E7%A0%81/1d6b2fa8a33c45e483b7ea071d0bc8d7.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<p>并将59、96行的<code>fabric_test</code>改为<code>docker_test</code><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/Centos7-6%E9%83%A8%E7%BD%B2fabric%E4%BB%A5%E5%8F%8A%E9%93%BE%E7%A0%81/3745b6f99ac142b3a7123e248facc1fd.png"
+                      alt="在这里插入图片描述"
+                ><br>再将文件夹<code>/usr/local/hyperledger/fabric-samples/test-network/</code>下的</p>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker/docker-compose-couch.yaml</span><br><span class="line">docker/docker-compose-ca.yaml</span><br><span class="line">addOrg3/docker/docker-compose-org3.yaml</span><br><span class="line">addOrg3/docker/docker-compose-couch-org3.yaml</span><br><span class="line">addOrg3/docker/docker-compose-ca-org3.yaml</span><br></pre></td></tr></table></figure></div>
+<p>的第一个networks也改成<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/Centos7-6%E9%83%A8%E7%BD%B2fabric%E4%BB%A5%E5%8F%8A%E9%93%BE%E7%A0%81/b8197a5709ea4a17a06be5fb9dfb51cc.png"
+                      alt="在这里插入图片描述"
+                ><br>然后再</p>
+<div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./network.sh down</span><br><span class="line">./network.sh up createChannel</span><br></pre></td></tr></table></figure></div>
+<p>就行了</p>
+<p>正常后我们继续，当前路径为<code>/usr/local/hyperledger/fabric-samples/test-network</code></p>
+<div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">部署链码</span></span><br><span class="line">./network.sh deployCC -ccn basic -ccp ../asset-transfer-basic/chaincode-go -ccl go</span><br></pre></td></tr></table></figure></div>
+<p>可能会有下面的报错，此时要去这个链码包下删除mod并重新tidy<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/Centos7-6%E9%83%A8%E7%BD%B2fabric%E4%BB%A5%E5%8F%8A%E9%93%BE%E7%A0%81/54679c3cff1143db852a4fe8a80a4baf.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">cd ../asset-transfer-basic/chaincode-go</span><br><span class="line">rm -f go.sum</span><br><span class="line">go env -w GOSUMDB=off</span><br><span class="line">go mod tidy</span><br><span class="line">go env -w GOSUMDB=GOSUMDB=&quot;sum.golang.org&quot;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">重新开启</span></span><br><span class="line">./network.sh down</span><br><span class="line">./network.sh up createChannel</span><br><span class="line">./network.sh deployCC -ccn basic -ccp ../asset-transfer-basic/chaincode-go -ccl go</span><br></pre></td></tr></table></figure></div>
+
+
+<div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/profile</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">添加如下</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">export</span> PATH=/usr/local/hyperledger/fabric-samples/bin:<span class="variable">$PATH</span></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">export</span> FABRIC_CFG_PATH=/usr/local/hyperledger/fabric-samples/config/</span></span><br><span class="line">source /etc/profile</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">export CORE_PEER_TLS_ENABLED=true</span><br><span class="line">export CORE_PEER_LOCALMSPID=&quot;Org1MSP&quot;</span><br><span class="line">export CORE_PEER_TLS_ROOTCERT_FILE=$&#123;PWD&#125;/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt</span><br><span class="line">export CORE_PEER_MSPCONFIGPATH=$&#123;PWD&#125;/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp</span><br><span class="line">export CORE_PEER_ADDRESS=localhost:7051</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">调用初始化函数</span></span><br><span class="line">peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $&#123;PWD&#125;/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem -C mychannel -n basic --peerAddresses localhost:7051 --tlsRootCertFiles $&#123;PWD&#125;/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt --peerAddresses localhost:9051 --tlsRootCertFiles $&#123;PWD&#125;/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt -c &#x27;&#123;&quot;function&quot;:&quot;InitLedger&quot;,&quot;Args&quot;:[]&#125;&#x27;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">输出</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">-&gt; INFO 001 Chaincode invoke successful. result: status:200</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">调用查询</span></span><br><span class="line">peer chaincode query -C mychannel -n basic -c &#x27;&#123;&quot;Args&quot;:[&quot;GetAllAssets&quot;]&#125;&#x27;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">输出</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">[</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"> &#123;<span class="string">&quot;ID&quot;</span>: <span class="string">&quot;asset1&quot;</span>, <span class="string">&quot;color&quot;</span>: <span class="string">&quot;blue&quot;</span>, <span class="string">&quot;size&quot;</span>: 5, <span class="string">&quot;owner&quot;</span>: <span class="string">&quot;Tomoko&quot;</span>, <span class="string">&quot;appraisedValue&quot;</span>: 300&#125;,</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"> &#123;<span class="string">&quot;ID&quot;</span>: <span class="string">&quot;asset2&quot;</span>, <span class="string">&quot;color&quot;</span>: <span class="string">&quot;red&quot;</span>, <span class="string">&quot;size&quot;</span>: 5, <span class="string">&quot;owner&quot;</span>: <span class="string">&quot;Brad&quot;</span>, <span class="string">&quot;appraisedValue&quot;</span>: 400&#125;,</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"> &#123;<span class="string">&quot;ID&quot;</span>: <span class="string">&quot;asset3&quot;</span>, <span class="string">&quot;color&quot;</span>: <span class="string">&quot;green&quot;</span>, <span class="string">&quot;size&quot;</span>: 10, <span class="string">&quot;owner&quot;</span>: <span class="string">&quot;Jin Soo&quot;</span>, <span class="string">&quot;appraisedValue&quot;</span>: 500&#125;,</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"> &#123;<span class="string">&quot;ID&quot;</span>: <span class="string">&quot;asset4&quot;</span>, <span class="string">&quot;color&quot;</span>: <span class="string">&quot;yellow&quot;</span>, <span class="string">&quot;size&quot;</span>: 10, <span class="string">&quot;owner&quot;</span>: <span class="string">&quot;Max&quot;</span>, <span class="string">&quot;appraisedValue&quot;</span>: 600&#125;,</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"> &#123;<span class="string">&quot;ID&quot;</span>: <span class="string">&quot;asset5&quot;</span>, <span class="string">&quot;color&quot;</span>: <span class="string">&quot;black&quot;</span>, <span class="string">&quot;size&quot;</span>: 15, <span class="string">&quot;owner&quot;</span>: <span class="string">&quot;Adriana&quot;</span>, <span class="string">&quot;appraisedValue&quot;</span>: 700&#125;,</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"> &#123;<span class="string">&quot;ID&quot;</span>: <span class="string">&quot;asset6&quot;</span>, <span class="string">&quot;color&quot;</span>: <span class="string">&quot;white&quot;</span>, <span class="string">&quot;size&quot;</span>: 15, <span class="string">&quot;owner&quot;</span>: <span class="string">&quot;Michel&quot;</span>, <span class="string">&quot;appraisedValue&quot;</span>: 800&#125;</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">]</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">测试网络搭建成功</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">关闭网络</span></span><br><span class="line">./network.sh down </span><br></pre></td></tr></table></figure></div>
+
+<h1 id="编写自己的链码"><a href="#编写自己的链码" class="headerlink" title="编写自己的链码"></a>编写自己的链码</h1><div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cd /usr/local/hyperledger/fabric-samples/asset-transfer-basic</span><br><span class="line">mkdir atcc &amp;&amp; cd atcc</span><br><span class="line">go mod init atcc</span><br><span class="line">touch atcc.go</span><br></pre></td></tr></table></figure></div>
+<p>链码内容如下</p>
+<div class="code-container" data-rel="Go"><figure class="iseeu highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;encoding/json&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/hyperledger/fabric-contract-api-go/contractapi&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// SmartContract provides functions for managing an Asset</span></span><br><span class="line"><span class="keyword">type</span> SmartContract <span class="keyword">struct</span> &#123;</span><br><span class="line">	contractapi.Contract</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Asset describes basic details of what makes up a simple asset</span></span><br><span class="line"><span class="keyword">type</span> Asset <span class="keyword">struct</span> &#123;</span><br><span class="line">	ID             <span class="type">string</span> <span class="string">`json:&quot;ID&quot;`</span></span><br><span class="line">	Owner          <span class="type">string</span> <span class="string">`json:&quot;owner&quot;`</span></span><br><span class="line">	Value          <span class="type">int</span>    <span class="string">`json:&quot;Value&quot;`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// InitLedger adds a base set of assets to the ledger</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *SmartContract)</span></span> InitLedger(ctx contractapi.TransactionContextInterface) <span class="type">error</span> &#123;</span><br><span class="line">	assets := []Asset&#123;</span><br><span class="line">		&#123;ID: <span class="string">&quot;asset1&quot;</span>, Owner: <span class="string">&quot;ZhangSan&quot;</span>, Value: <span class="number">300</span>&#125;,</span><br><span class="line">		&#123;ID: <span class="string">&quot;asset2&quot;</span>, Owner: <span class="string">&quot;LiSi&quot;</span>, Value: <span class="number">400</span>&#125;,</span><br><span class="line">		&#123;ID: <span class="string">&quot;asset3&quot;</span>, Owner: <span class="string">&quot;Klay&quot;</span>, Value: <span class="number">500</span>&#125;,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> _, asset := <span class="keyword">range</span> assets &#123;</span><br><span class="line">		assetJSON, err := json.Marshal(asset)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		err = ctx.GetStub().PutState(asset.ID, assetJSON)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;failed to put to world state. %v&quot;</span>, err)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// CreateAsset issues a new asset to the world state with given details.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *SmartContract)</span></span> CreateAsset(ctx contractapi.TransactionContextInterface, id <span class="type">string</span>, owner <span class="type">string</span>, Value <span class="type">int</span>) <span class="type">error</span> &#123;</span><br><span class="line">	exists, err := s.AssetExists(ctx, id)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> exists &#123;</span><br><span class="line">		<span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;the asset %s already exists&quot;</span>, id)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	asset := Asset&#123;</span><br><span class="line">		ID:             id,</span><br><span class="line">		Owner:          owner,</span><br><span class="line">		Value:          Value,</span><br><span class="line">	&#125;</span><br><span class="line">	assetJSON, err := json.Marshal(asset)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> ctx.GetStub().PutState(id, assetJSON)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ReadAsset returns the asset stored in the world state with given id.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *SmartContract)</span></span> ReadAsset(ctx contractapi.TransactionContextInterface, id <span class="type">string</span>) (*Asset, <span class="type">error</span>) &#123;</span><br><span class="line">	assetJSON, err := ctx.GetStub().GetState(id)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, fmt.Errorf(<span class="string">&quot;failed to read from world state: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> assetJSON == <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, fmt.Errorf(<span class="string">&quot;the asset %s does not exist&quot;</span>, id)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> asset Asset</span><br><span class="line">	err = json.Unmarshal(assetJSON, &amp;asset)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> &amp;asset, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// UpdateAsset updates an existing asset in the world state with provided parameters.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *SmartContract)</span></span> UpdateAsset(ctx contractapi.TransactionContextInterface, id <span class="type">string</span>, owner <span class="type">string</span>, Value <span class="type">int</span>) <span class="type">error</span> &#123;</span><br><span class="line">	exists, err := s.AssetExists(ctx, id)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> !exists &#123;</span><br><span class="line">		<span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;the asset %s does not exist&quot;</span>, id)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// overwriting original asset with new asset</span></span><br><span class="line">	asset := Asset&#123;</span><br><span class="line">		ID:             id,</span><br><span class="line">		Owner:          owner,</span><br><span class="line">		Value:          Value,</span><br><span class="line">	&#125;</span><br><span class="line">	assetJSON, err := json.Marshal(asset)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> ctx.GetStub().PutState(id, assetJSON)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// DeleteAsset deletes an given asset from the world state.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *SmartContract)</span></span> DeleteAsset(ctx contractapi.TransactionContextInterface, id <span class="type">string</span>) <span class="type">error</span> &#123;</span><br><span class="line">	exists, err := s.AssetExists(ctx, id)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> !exists &#123;</span><br><span class="line">		<span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;the asset %s does not exist&quot;</span>, id)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> ctx.GetStub().DelState(id)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// AssetExists returns true when asset with given ID exists in world state</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *SmartContract)</span></span> AssetExists(ctx contractapi.TransactionContextInterface, id <span class="type">string</span>) (<span class="type">bool</span>, <span class="type">error</span>) &#123;</span><br><span class="line">	assetJSON, err := ctx.GetStub().GetState(id)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">false</span>, fmt.Errorf(<span class="string">&quot;failed to read from world state: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> assetJSON != <span class="literal">nil</span>, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// TransferAsset updates the owner field of asset with given id in world state.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *SmartContract)</span></span> TransferAsset(ctx contractapi.TransactionContextInterface, id <span class="type">string</span>, newOwner <span class="type">string</span>) <span class="type">error</span> &#123;</span><br><span class="line">	asset, err := s.ReadAsset(ctx, id)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	asset.Owner = newOwner</span><br><span class="line">	assetJSON, err := json.Marshal(asset)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> ctx.GetStub().PutState(id, assetJSON)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// GetAllAssets returns all assets found in world state</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *SmartContract)</span></span> GetAllAssets(ctx contractapi.TransactionContextInterface) ([]*Asset, <span class="type">error</span>) &#123;</span><br><span class="line">	<span class="comment">// range query with empty string for startKey and endKey does an</span></span><br><span class="line">	<span class="comment">// open-ended query of all assets in the chaincode namespace.</span></span><br><span class="line">	resultsIterator, err := ctx.GetStub().GetStateByRange(<span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> resultsIterator.Close()</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> assets []*Asset</span><br><span class="line">	<span class="keyword">for</span> resultsIterator.HasNext() &#123;</span><br><span class="line">		queryResponse, err := resultsIterator.Next()</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">var</span> asset Asset</span><br><span class="line">		err = json.Unmarshal(queryResponse.Value, &amp;asset)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">		&#125;</span><br><span class="line">		assets = <span class="built_in">append</span>(assets, &amp;asset)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> assets, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	assetChaincode, err := contractapi.NewChaincode(&amp;SmartContract&#123;&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Panicf(<span class="string">&quot;Error creating asset-transfer-basic chaincode: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err := assetChaincode.Start(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Panicf(<span class="string">&quot;Error starting asset-transfer-basic chaincode: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>处理项目依赖</p>
+<div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">go mod tidy</span><br><span class="line">go mod vendor</span><br></pre></td></tr></table></figure></div>
+
+
+<h1 id="使用测试网络进行链码部署"><a href="#使用测试网络进行链码部署" class="headerlink" title="使用测试网络进行链码部署"></a>使用测试网络进行链码部署</h1><p>当前位置：<code>/usr/local/hyperledger/fabric-samples/test-network</code></p>
+<div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">./network.sh down</span><br><span class="line">./network.sh up createChannel</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">注意下面那个尖括号的玩意要替换为自定义的链码文件夹名，设为环境变量只是为了方便操作，比如我这里就要换为<span class="built_in">export</span> CHAINCODE_NAME=atcc</span></span><br><span class="line">export CHAINCODE_NAME=&lt;chaincode-name&gt;</span><br><span class="line"></span><br><span class="line">peer lifecycle chaincode package 打包后的压缩包名.tar.gz --path ../asset-transfer-basic/$CHAINCODE_NAME/ --lang golang --label atcc_1.0 </span><br><span class="line"></span><br><span class="line">peer lifecycle chaincode package $CHAINCODE_NAME.tar.gz \</span><br><span class="line">--path ../asset-transfer-basic/$CHAINCODE_NAME/ \ #注意替换链码文件路径</span><br><span class="line">--lang golang \</span><br><span class="line">--label &lt;chaincode-name&gt;_1.0 #注意替换&lt;chaincode-name&gt;内容</span><br></pre></td></tr></table></figure></div>
+
+
+
+<div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br></pre></td><td class="code"><pre><span class="line">./network.sh down</span><br><span class="line">./network.sh up createChannel</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">export CHAINCODE_NAME=flower_fabric</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">peer lifecycle chaincode package $CHAINCODE_NAME.tar.gz --path $CHAINCODE_NAME/ --lang golang --label flower_fabric_1.0 </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">export CORE_PEER_TLS_ENABLED=true</span><br><span class="line">export CORE_PEER_LOCALMSPID=&quot;Org1MSP&quot;</span><br><span class="line">export CORE_PEER_TLS_ROOTCERT_FILE=$&#123;PWD&#125;/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt</span><br><span class="line">export CORE_PEER_MSPCONFIGPATH=$&#123;PWD&#125;/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp</span><br><span class="line">export CORE_PEER_ADDRESS=localhost:7051</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">peer lifecycle chaincode install $CHAINCODE_NAME.tar.gz</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">export CORE_PEER_LOCALMSPID=&quot;Org2MSP&quot;</span><br><span class="line">export CORE_PEER_TLS_ROOTCERT_FILE=$&#123;PWD&#125;/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt</span><br><span class="line">export CORE_PEER_TLS_ROOTCERT_FILE=$&#123;PWD&#125;/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt</span><br><span class="line">export CORE_PEER_MSPCONFIGPATH=$&#123;PWD&#125;/organizations/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp</span><br><span class="line">export CORE_PEER_ADDRESS=localhost:9051</span><br><span class="line"></span><br><span class="line">peer lifecycle chaincode install $CHAINCODE_NAME.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查询包ID</span></span><br><span class="line">peer lifecycle chaincode queryinstalled</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">export CC_PACKAGE_ID=&lt;Package ID&gt; #注意替换这里的链码包ID</span><br><span class="line">export CC_PACKAGE_ID=atcc_1.0:5657426d49d01aadeaabfd8ea13fa7f431931702f534120335ead5acd107e8cd</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">peer lifecycle chaincode approveformyorg \</span><br><span class="line">-o localhost:7050 \</span><br><span class="line">--ordererTLSHostnameOverride orderer.example.com \</span><br><span class="line">--channelID mychannel \</span><br><span class="line">--name $CHAINCODE_NAME \</span><br><span class="line">--version 1.0 \</span><br><span class="line">--package-id $CC_PACKAGE_ID \</span><br><span class="line">--sequence 1 \</span><br><span class="line">--tls \</span><br><span class="line">--cafile $&#123;PWD&#125;/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">export CORE_PEER_LOCALMSPID=&quot;Org1MSP&quot;</span><br><span class="line">export CORE_PEER_MSPCONFIGPATH=$&#123;PWD&#125;/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp</span><br><span class="line">export CORE_PEER_TLS_ROOTCERT_FILE=$&#123;PWD&#125;/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt</span><br><span class="line">export CORE_PEER_ADDRESS=localhost:7051</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">peer lifecycle chaincode approveformyorg \</span><br><span class="line">-o localhost:7050 \</span><br><span class="line">--ordererTLSHostnameOverride orderer.example.com \</span><br><span class="line">--channelID mychannel \</span><br><span class="line">--name $CHAINCODE_NAME \</span><br><span class="line">--version 1.0 \</span><br><span class="line">--package-id $CC_PACKAGE_ID \</span><br><span class="line">--sequence 1 \</span><br><span class="line">--tls \</span><br><span class="line">--cafile $&#123;PWD&#125;/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem</span><br><span class="line"></span><br><span class="line">peer lifecycle chaincode checkcommitreadiness \</span><br><span class="line">--channelID mychannel \</span><br><span class="line">--name $CHAINCODE_NAME \</span><br><span class="line">--version 1.0 \</span><br><span class="line">--sequence 1 \</span><br><span class="line">--tls \</span><br><span class="line">--cafile $&#123;PWD&#125;/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem \</span><br><span class="line">--output json</span><br><span class="line"></span><br><span class="line">peer lifecycle chaincode commit \</span><br><span class="line">-o localhost:7050 \</span><br><span class="line">--ordererTLSHostnameOverride orderer.example.com \</span><br><span class="line">--channelID mychannel \</span><br><span class="line">--name $CHAINCODE_NAME \</span><br><span class="line">--version 1.0 \</span><br><span class="line">--sequence 1 \</span><br><span class="line">--tls \</span><br><span class="line">--cafile $&#123;PWD&#125;/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem \</span><br><span class="line">--peerAddresses localhost:7051 \</span><br><span class="line">--tlsRootCertFiles $&#123;PWD&#125;/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \</span><br><span class="line">--peerAddresses localhost:9051 \</span><br><span class="line">--tlsRootCertFiles $&#123;PWD&#125;/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt</span><br><span class="line"></span><br><span class="line">peer lifecycle chaincode querycommitted \</span><br><span class="line">--channelID mychannel \</span><br><span class="line">--name $CHAINCODE_NAME \</span><br><span class="line">--cafile $&#123;PWD&#125;/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">echo &quot;链码安装完毕，下面为测试代码&quot;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">peer chaincode invoke \</span><br><span class="line">-o localhost:7050 \</span><br><span class="line">--ordererTLSHostnameOverride orderer.example.com \</span><br><span class="line">--tls \</span><br><span class="line">--cafile $&#123;PWD&#125;/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem \</span><br><span class="line">-C mychannel \</span><br><span class="line">-n $CHAINCODE_NAME \</span><br><span class="line">--peerAddresses localhost:7051 \</span><br><span class="line">--tlsRootCertFiles $&#123;PWD&#125;/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \</span><br><span class="line">--peerAddresses localhost:9051 \</span><br><span class="line">--tlsRootCertFiles $&#123;PWD&#125;/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \</span><br><span class="line">-c &#x27;&#123;&quot;function&quot;:&quot;initLedger&quot;,&quot;Args&quot;:[]&#125;&#x27;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">peer chaincode query \</span><br><span class="line">-C mychannel \</span><br><span class="line">-n $CHAINCODE_NAME \</span><br><span class="line">-c &#x27;&#123;&quot;Args&quot;:[&quot;getAllAssets&quot;]&#125;&#x27;</span><br></pre></td></tr></table></figure></div>
+<h1 id="记录一下我自己的链码的测试代码"><a href="#记录一下我自己的链码的测试代码" class="headerlink" title="记录一下我自己的链码的测试代码"></a>记录一下我自己的链码的测试代码</h1><div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line">peer chaincode invoke \</span><br><span class="line">-o localhost:7050 \</span><br><span class="line">--ordererTLSHostnameOverride orderer.example.com \</span><br><span class="line">--tls \</span><br><span class="line">--cafile $&#123;PWD&#125;/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem \</span><br><span class="line">-C mychannel \</span><br><span class="line">-n $CHAINCODE_NAME \</span><br><span class="line">--peerAddresses localhost:7051 \</span><br><span class="line">--tlsRootCertFiles $&#123;PWD&#125;/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \</span><br><span class="line">--peerAddresses localhost:9051 \</span><br><span class="line">--tlsRootCertFiles $&#123;PWD&#125;/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \</span><br><span class="line">-c &#x27;&#123;&quot;function&quot;:&quot;CreateWallet&quot;,&quot;Args&quot;:[&quot;1&quot;]&#125;&#x27;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">peer chaincode query \</span><br><span class="line">-C mychannel \</span><br><span class="line">-n $CHAINCODE_NAME \</span><br><span class="line">-c &#x27;&#123;&quot;Args&quot;:[&quot;getAllWallets&quot;]&#125;&#x27;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">peer chaincode invoke \</span><br><span class="line">-o localhost:7050 \</span><br><span class="line">--ordererTLSHostnameOverride orderer.example.com \</span><br><span class="line">--tls \</span><br><span class="line">--cafile $&#123;PWD&#125;/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem \</span><br><span class="line">-C mychannel \</span><br><span class="line">-n $CHAINCODE_NAME \</span><br><span class="line">--peerAddresses localhost:7051 \</span><br><span class="line">--tlsRootCertFiles $&#123;PWD&#125;/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \</span><br><span class="line">--peerAddresses localhost:9051 \</span><br><span class="line">--tlsRootCertFiles $&#123;PWD&#125;/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \</span><br><span class="line">-c &#x27;&#123;&quot;function&quot;:&quot;UpdateWalletIntegral&quot;,&quot;Args&quot;:[&quot;1&quot;,&quot;20&quot;,&quot;a&quot;]&#125;&#x27;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">peer chaincode query \</span><br><span class="line">-C mychannel \</span><br><span class="line">-n $CHAINCODE_NAME \</span><br><span class="line">-c &#x27;&#123;&quot;Args&quot;:[&quot;getAllWallets&quot;]&#125;&#x27;</span><br><span class="line"></span><br><span class="line">peer chaincode query \</span><br><span class="line">-C mychannel \</span><br><span class="line">-n $CHAINCODE_NAME \</span><br><span class="line">-c &#x27;&#123;&quot;Args&quot;:[&quot;ReadWallet&quot;,&quot;1&quot;]&#125;&#x27;</span><br><span class="line"></span><br><span class="line">peer chaincode query \</span><br><span class="line">-C mychannel \</span><br><span class="line">-n $CHAINCODE_NAME \</span><br><span class="line">-c &#x27;&#123;&quot;Args&quot;:[&quot;ReadHistory&quot;,&quot;1&quot;]&#125;&#x27;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">peer chaincode invoke \</span><br><span class="line">-o localhost:7050 \</span><br><span class="line">--ordererTLSHostnameOverride orderer.example.com \</span><br><span class="line">--tls \</span><br><span class="line">--cafile $&#123;PWD&#125;/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem \</span><br><span class="line">-C mychannel \</span><br><span class="line">-n $CHAINCODE_NAME \</span><br><span class="line">--peerAddresses localhost:7051 \</span><br><span class="line">--tlsRootCertFiles $&#123;PWD&#125;/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \</span><br><span class="line">--peerAddresses localhost:9051 \</span><br><span class="line">--tlsRootCertFiles $&#123;PWD&#125;/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \</span><br><span class="line">-c &#x27;&#123;&quot;function&quot;:&quot;initLedger&quot;,&quot;Args&quot;:[]&#125;&#x27;</span><br></pre></td></tr></table></figure></div>
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>标题:</strong> Centos7.6部署fabric以及链码</li>
+        <li><strong>作者:</strong> urlyy</li>
+        <li><strong>创建于
+                :</strong> 2022-09-14 12:56:58</li>
+        
+            <li>
+                <strong>更新于
+                    :</strong> 2025-12-21 18:39:57
+            </li>
+        
+        <li>
+            <strong>链接:</strong> https://urlyy.github.io/2022/09/14/Centos7-6部署fabric以及链码/
+        </li>
+        <li>
+            <strong>
+                版权声明:
+            </strong>
+            
+
+            
+                本文章采用 <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a> 进行许可。
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="prev" rel="prev" href="/2022/11/15/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/">
+					<span class="left arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-left"></i>
+					</span>
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">分布式相关知识入门学习(待续)</span>
+						<span class="post-nav-item">上一篇</span>
+					</span>
+				</a>
+			</div>
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2022/08/14/scrapy%E4%B8%AA%E4%BA%BA%E5%BE%AA%E5%BA%8F%E6%B8%90%E8%BF%9B/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">scrapy个人循序渐进</span>
+						<span class="post-nav-item">下一篇</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        评论
+    </div>
+    
+
+        
+            
+    <div id="giscus-container"></div>
+    <script data-swup-reload-script defer>
+        async function loadGiscus() {
+            const giscusConfig = {
+                'src': 'https://giscus.app/client.js',
+                'data-repo': 'urlyy/urlyy_blog_comments',
+                'data-repo-id': 'R_kgDONo8nwQ',
+                'data-category': 'Announcements',
+                'data-category-id': 'DIC_kwDONo8nwc4Cl7pw',
+                'data-mapping': 'title',
+                'data-strict': '0',
+                'data-reactions-enabled': '1',
+                'data-emit-metadata': '1',
+                'data-theme': 'preferred_color_scheme',
+                'data-lang': 'zh-CN',
+                'data-input-position': 'top',
+                'data-loading': 'lazy',
+                'crossorigin': 'anonymous',
+                'async': true
+            }
+            const giscusScript = document.createElement('script');
+            for (const key in giscusConfig) {
+                giscusScript.setAttribute(key, giscusConfig[key]);
+            }
+            document.getElementById('giscus-container').appendChild(giscusScript);
+        }
+        if ('true') {
+            let loadGiscusTimeout = setTimeout(() => {
+                loadGiscus();
+                clearTimeout(loadGiscusTimeout);
+            }, 1000);
+        } else {
+            document.addEventListener('DOMContentLoaded', loadGiscus);
+        }
+    </script>
+
+
+        
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">目录</div>
+		<div class="page-title">Centos7.6部署fabric以及链码</div>
+		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A6%82%E6%9E%9C%E6%98%AF%E6%9C%80%E5%B0%8F%E5%8C%96%E5%AE%89%E8%A3%85"><span class="nav-text">如果是最小化安装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83"><span class="nav-text">环境</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%85fabric-samples"><span class="nav-text">安装fabric-samples</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%B5%8B%E8%AF%95%E7%BD%91%E7%BB%9C"><span class="nav-text">使用测试网络</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BC%96%E5%86%99%E8%87%AA%E5%B7%B1%E7%9A%84%E9%93%BE%E7%A0%81"><span class="nav-text">编写自己的链码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%B5%8B%E8%AF%95%E7%BD%91%E7%BB%9C%E8%BF%9B%E8%A1%8C%E9%93%BE%E7%A0%81%E9%83%A8%E7%BD%B2"><span class="nav-text">使用测试网络进行链码部署</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%8B%E6%88%91%E8%87%AA%E5%B7%B1%E7%9A%84%E9%93%BE%E7%A0%81%E7%9A%84%E6%B5%8B%E8%AF%95%E4%BB%A3%E7%A0%81"><span class="nav-text">记录一下我自己的链码的测试代码</span></a></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2021</span>
+              -
+            
+            2025&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">urlyy</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        共撰写了 78 篇文章
+                    </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">访问人数</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">总访问量</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">由 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a> 驱动</span>
+            <span class="text-sm lg:block">主题&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.5</a></span>
+        </div>
+        
+        
+            <div>
+                博客已运行 <span class="odometer" id="runtime_days" ></span> 天 <span class="odometer" id="runtime_hours"></span> 小时 <span class="odometer" id="runtime_minutes"></span> 分钟 <span class="odometer" id="runtime_seconds"></span> 秒
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="fa-regular fa-arrow-up"></i>
+		</li>
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+	<div class="search-pop-overlay">
+	<div class="popup search-popup">
+		<div class="search-header">
+			<span class="search-input-field-pre">
+				<i class="fa-solid fa-keyboard"></i>
+			</span>
+			<div class="search-input-container">
+				<input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="站内搜索您需要的内容..." spellcheck="false" type="search" class="search-input">
+			</div>
+			<span class="popup-btn-close">
+				<i class="fa-solid fa-times"></i>
+			</span>
+		</div>
+		<div id="search-result">
+			<div id="no-result">
+				<i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>
+			</div>
+		</div>
+	</div>
+</div>
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+	
+<script src="/js/build/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/build/utils.js" type="module"></script>
+
+<script src="/js/build/main.js" type="module"></script>
+
+<script src="/js/build/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/build/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/build/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/build/layouts/categoryList.js" type="module"></script>
+
+
+
+    
+<script src="/js/build/tools/localSearch.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/layouts/lazyload.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/runtime.js"></script>
+
+    
+<script src="/js/build/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+  
+<script src="/js/build/plugins/typed.js" type="module"></script>
+
+
+
+
+    
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@9.3.0/dist/mermaid.min.js"></script>
+    
+    
+<script src="/js/build/plugins/mermaid.js"></script>
+
+
+
+
+
+
+    
+<script src="/js/build/libs/anime.min.js"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/tocToggle.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/layouts/toc.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/plugins/tabs.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+<script src="/js/build/layouts/essays.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+
+	
+</body>
+
+</html>

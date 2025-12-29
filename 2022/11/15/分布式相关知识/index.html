@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="urlyy">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set data attribute for CSS variables
+                root.setAttribute("data-theme", theme);
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes once DOM is ready
+            if (document.readyState !== "loading") {
+                document.body.classList.add(theme + "-mode");
+            } else {
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add(theme + "-mode");
+                    document.body.classList.remove((theme === DARK ? LIGHT : DARK) + "-mode");
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Critical CSS to prevent flash -->
+    <style>
+        :root[data-theme="dark"] {
+            --background-color: #202124;
+            --background-color-transparent: rgba(32, 33, 36, 0.6);
+            --second-background-color: #2d2e32;
+            --third-background-color: #34353a;
+            --third-background-color-transparent: rgba(32, 33, 36, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #ffffff;
+            --second-text-color: #eeeeee;
+            --third-text-color: #bebec6;
+            --fourth-text-color: #999999;
+            --default-text-color: #bebec6;
+            --invert-text-color: #373D3F;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(255, 255, 255, 0.08);
+            --shadow-color-2: rgba(255, 255, 255, 0.05);
+        }
+        
+        :root[data-theme="light"] {
+            --background-color: #fff;
+            --background-color-transparent: rgba(255, 255, 255, 0.6);
+            --second-background-color: #f8f8f8;
+            --third-background-color: #f2f2f2;
+            --third-background-color-transparent: rgba(241, 241, 241, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #16171a;
+            --second-text-color: #2f3037;
+            --third-text-color: #5e5e5e;
+            --fourth-text-color: #eeeeee;
+            --default-text-color: #373D3F;
+            --invert-text-color: #bebec6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(0, 0, 0, 0.08);
+            --shadow-color-2: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+        
+        /* Apply body classes as soon as DOM is ready */
+        :root[data-theme="dark"] body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+    </style>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://urlyy.github.io/2022/11/15/分布式相关知识/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta name="description" content="本文是我在结合MIT6.824课程和网上诸多博客、课程的内容进行的总结参考博客太多，就不写引用了  几个概念 集群(部署方式)：在多台不同的服务器中部署相同应用或服务模块，构成一个集群，通过负载均衡器对外提供服务。负载均衡可以分摊运行压力  分布式(部署方式)：拆分一个大系统，将拆分出的多个子系统部署在不同服务器，各系统可通过网络通信进行协作  常见的拆分方式：  水平拆分：将项目按层次拆分，如">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式相关知识入门学习(待续)">
+<meta property="og:url" content="http://urlyy.github.io/2022/11/15/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="本文是我在结合MIT6.824课程和网上诸多博客、课程的内容进行的总结参考博客太多，就不写引用了  几个概念 集群(部署方式)：在多台不同的服务器中部署相同应用或服务模块，构成一个集群，通过负载均衡器对外提供服务。负载均衡可以分摊运行压力  分布式(部署方式)：拆分一个大系统，将拆分出的多个子系统部署在不同服务器，各系统可通过网络通信进行协作  常见的拆分方式：  水平拆分：将项目按层次拆分，如">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/6c801bac88b54b9b8d0c1d9fe5aa2a28.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/9ea310e5df47451d90eeca8412baecfe.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/412224b90a214c36b92ee90fe6ab987b.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/2d6f78df74bc4d73a9e27053a88e4de2.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/afa49b8b622043e4a2d920f2f32aeaaa.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/66e558a8a4164876b41ba7a51be4bfa4.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/c20ec348800f4112ae655ec04b7fd699.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/3669adf32352427dbca689a4a1808a3f.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/e3563393c4934f48b7eea19871fba94d.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/287aaee5a95e45539d9fb06dbf4da7b1.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/c4e2e0f07422475492e7d8397850d081.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/1f6cd1c3f65149679d4a6cfe538d9a52.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/46e1f0b7a4f94879baf7232ff2136c2b.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/025335f322394ed48a09b6ec73149b6f.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/8c64686da6a3494a9dc4a6a31539dd46.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/2d9b1c24cdcc4721a6cbb9096d08cc71.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/2bc313b97dab44129346decc69b5b00e.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/27fd42110ffd48939e8f72b618a981a7.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/db4c79fb28f0459ea82ea3ff27da466b.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/4fc47647519d43688c7d322d95618adc.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/e71ded4cd1da418ebf12cd34ba52e6b9.png">
+<meta property="article:published_time" content="2022-11-15T14:46:41.000Z">
+<meta property="article:modified_time" content="2025-12-21T10:39:57.286Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://urlyy.github.io/article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/6c801bac88b54b9b8d0c1d9fe5aa2a28.png">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/avatar.jpg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.jpg">
+    <meta name="theme-color" content="#5c701a">
+    <link rel="shortcut icon" href="/images/avatar.jpg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            分布式相关知识入门学习(待续) | urlyy的小窝
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+        <link href="" rel="stylesheet">
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"urlyy.github.io","root":"/","language":"zh-CN","path":"search.json"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":false,"auto":false,"list":[""]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":true},"copyright":true,"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#5c701a","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":true,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":false},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"side_tools":{"gear_rotation":true,"auto_expand":false},"open_graph":true,"google_analytics":{"enable":false,"id":null},"busuanzi_counter":{"enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"pjax":true},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/bg/1.jpg","dark":"/images/bg/1.jpg"},"title":"urlyy的小窝","subtitle":{"text":["Loading..."],"hitokoto":{"enable":true,"show_author":false,"api":"https://v1.hitokoto.cn?c=a&c=b&c=d&c=k"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"style":"default","links":{"github":"https://github.com/urlyy?tab=repositories","instagram":null,"zhihu":null,"twitter":null,"email":"2213732736@qq.com"},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":true,"version":"9.3.0"}},"version":"2.8.5","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Categories":{"icon":"fa-regular fa-folder","path":"/categories/"},"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Github":{"path":"https://github.com/urlyy","icon":"fa-brands fa-github"},"个人介绍":{"path":"/personal/profile.html","icon":"fa-regular fa-user"}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"cloud"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":null},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2021/9/7 16:55:00"};
+    window.lang_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 个月前","year":"%s 年前"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                urlyy的小窝
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    首页
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/categories/"
+                                        >
+                                    <i class="fa-regular fa-folder fa-fw"></i>
+                                    分类
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/archives"
+                                        >
+                                    <i class="fa-regular fa-archive fa-fw"></i>
+                                    归档
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   target="_blank" rel="noopener" href="https://github.com/urlyy"
+                                        >
+                                    <i class="fa-brands fa-github fa-fw"></i>
+                                    GITHUB
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/personal/profile.html"
+                                        >
+                                    <i class="fa-regular fa-user fa-fw"></i>
+                                    个人介绍
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                首页
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/categories/"
+                        >
+                            <span>
+                                分类
+                            </span>
+                            
+                                <i class="fa-regular fa-folder fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/archives"
+                        >
+                            <span>
+                                归档
+                            </span>
+                            
+                                <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           target="_blank" rel="noopener" href="https://github.com/urlyy"
+                        >
+                            <span>
+                                GITHUB
+                            </span>
+                            
+                                <i class="fa-brands fa-github fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/personal/profile.html"
+                        >
+                            <span>
+                                个人介绍
+                            </span>
+                            
+                                <i class="fa-regular fa-user fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">25</div>
+        <div class="label text-third-text-color text-sm">标签</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">29</div>
+        <div class="label text-third-text-color text-sm">分类</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">78</div>
+        <div class="label text-third-text-color text-sm">文章</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">分布式相关知识入门学习(待续)</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/avatar.jpg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">urlyy</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2022-11-15 22:46:41</span>
+        <span class="mobile">2022-11-15 22:46:41</span>
+        <span class="hover-info">创建</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2025-12-21 18:39:57</span>
+            <span class="mobile">2025-12-21 18:39:57</span>
+            <span class="hover-info">更新</span>
+        </span>
+    
+
+    
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<blockquote>
+<p>本文是我在结合MIT6.824课程和网上诸多博客、课程的内容进行的总结<br>参考博客太多，就不写引用了</p>
+</blockquote>
+<h1 id="几个概念"><a href="#几个概念" class="headerlink" title="几个概念"></a>几个概念</h1><ul>
+<li><p>集群(部署方式)：在多台<strong>不同</strong>的服务器中部署<strong>相同</strong>应用或服务模块，构成一个集群，通过<strong>负载均衡器</strong>对外提供服务。负载均衡可以分摊运行压力<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/6c801bac88b54b9b8d0c1d9fe5aa2a28.png"
+                      alt="在这里插入图片描述"
+                ></p>
+</li>
+<li><p>分布式(部署方式)：<strong>拆分</strong>一个大系统，将拆分出的多个子系统部署在<strong>不同</strong>服务器，各系统可通过网络通信进行协作<br>  常见的拆分方式：</p>
+<ul>
+<li>水平拆分：将项目按层次拆分，如拆分为数据层、业务层、界面层等</li>
+<li>垂直拆分：将项目按业务模块拆分，比如电商系统拆分为订单模块、用户模块、秒杀模块并分开部署</li>
+</ul>
+<p>  关于微服务与集群的结合：</p>
+<ul>
+<li>分布式的每一个划分出来的业务模块都可以做集群，而因为分布式的特点，偏底层服务模块的垮掉会影响上层服务模块，所以为了保证系统的可用性会结合分布式与集群，先分布式再微服务(注意分布式中每一个结点都可以建立集群，但集群不一定是分布式)</li>
+</ul>
+</li>
+<li><p>SOA(面向服务的架构)(架构设计方式)<br>  相对于面向对象、层次结构这些设计方式，SOA将系统看做由多个服务组成，服务相互依赖、调用、协作最终提供功能</p>
+<ul>
+<li>ESB<br>  说到SOA就不能忽略ESB(企业服务总线)，他就像一个翻译官、信使等角色，将多个可能异构的服务串起来，形成一个大的系统，也是企业中集成各系统的一个常用手段。<br>  <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/9ea310e5df47451d90eeca8412baecfe.png"
+                      alt="在这里插入图片描述"
+                ></li>
+</ul>
+</li>
+<li><p>微服务(架构设计方式)：<br>是SOA的进阶，因为微服务在将系统按服务划分的同时，它的“微”表现在尽可能微小化服务，小到一个服务只对应一个单一的功能，只做一件事，做到了模块的不可再拆分，类似于“原子性”。所以微服务算是分布式的垂直拆分的进一步拆分。但是微服务不一定要将应用分散在多个服务器上，只是更加强调单一职责和独立性。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/412224b90a214c36b92ee90fe6ab987b.png"
+                      alt="在这里插入图片描述"
+                ></p>
+</li>
+<li><p>主从架构<br>这种架构把服务器分为了主机与从机，通过角色的分配进行了任务的分配，基于该架构有读写分离、双机互备之类的影响系统可靠性、可用性、性能的方案<br>但是在实现主从机数据的同步以及主从切换上较为复杂，维护成本也相对较高</p>
+</li>
+</ul>
+<h1 id="负载均衡"><a href="#负载均衡" class="headerlink" title="负载均衡"></a>负载均衡</h1><p>字面意思，把请求根据选定的算法，让下游接收到的请求是均匀分布的<br>可以按照软硬件、实现技术等来分类<br>软件中常见的就是Nginx和Haproxy吧</p>
+<ul>
+<li><p>负载均衡算法：</p>
+<ul>
+<li>静态(固定概率)：轮询(基于取模，按编号大小依次分配)、加权、随机、加权随机、源地址hash、目标地址hash、一致性hash等</li>
+<li>动态(根据服务器实时情况)：最小连接数、加权最小连接数、最小时延等</li>
+</ul>
+</li>
+<li><p>在分布式系统中的负载均衡解决方案大概有以下几种：<br>  首先项目层次为：</p>
+<ul>
+<li>客户端层：比如用户浏览器、APP 端</li>
+<li>反向代理层：技术选型 Nignx 等</li>
+<li>Web 层：前后端分离场景下， Web 端可以用 NodeJS 、Vue 、React</li>
+<li>业务服务层：用 Java 、Go，一般互联网公司，技术方案选型就是 SC 或者 Spring Boot + Dubbo 服务化</li>
+<li>数据存储层：DB 选型 MySQL ，Cache 选型 Redis ，搜索引擎选型 ES 等</li>
+</ul>
+<p>  那么就有</p>
+<ul>
+<li><p>客户端层 -&gt; 反向代理层 的负载均衡。通过 DNS 轮询</p>
+</li>
+<li><p>反向代理层 -&gt; Web 层 的负载均衡。通过 Nginx 的负载均衡模块</p>
+</li>
+<li><p>Web 层 -&gt; 业务服务层 的负载均衡。通过服务治理框架的负载均衡模块，比如Dubbo</p>
+</li>
+<li><p>业务服务层 -&gt; 数据存储层 负载均衡。通过数据的水平分布，数据均匀了，理论上请求也会均匀。比如分库分表、通过买家ID分片等</p>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="一致性hash"><a href="#一致性hash" class="headerlink" title="一致性hash"></a>一致性hash</h1><p>hash算法在负载均衡中用的很多，因为它很简单，而且能保证同一个data能访问到同一个服务器<br>但是它不利于弹性伸缩<br>比如有三台服务器部署了redis，原先是使用<code>hash(data)%3</code>找到对应的服务器，但是突然网站被引流了，为了应付新增压力要增加服务器，那么负载均衡算法就变成了<code>hash(data)%4</code>，原先的数据会无法获取(比如<code>4%3==2</code>,<code>4%4==0</code>)，甚至有可能导致缓存穿透，同时为了恢复正常业务就要想办法进行数据迁移，这个迁移要利用新的负载均衡公式，计算原先的服务器现在被分配到到哪个位置，然后再进行迁移，这是一个很麻烦的事情。<br>所以大牛想出一个法子，建立一个环，令环周长(也是取模数)为2 ^ 32，我就设mod_num&#x3D;2 ^ 32吧。首先各服务器在环上的位置是通过取ip或者其他东西的hahs值再%mod_num。对于数据的存取，在获得<code>key=hash(data)%mod_num</code>后，根据key在圆环上的位置，顺时针遇到第一个服务器，把这个服务器作为这个数据绑定的存取服务器。<br>如果在下图的A-&gt;C这个圆弧插入一台服务器D，对于除了C-&gt;D的其他范围都没影响，而C-&gt;D这段的读数据请求会落到D服务器而不是原先的A服务器，但也算起到很大效果了<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/2d6f78df74bc4d73a9e27053a88e4de2.png"
+                      alt="在这里插入图片描述"
+                ><br>但是对于这种情况我们需要继续采取措施，因为可能会出现下图的情况，即服务器的位置很接近，此时大部分请求都会落在A服务器上，负载均衡效果不佳<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/afa49b8b622043e4a2d920f2f32aeaaa.png"
+                      alt="在这里插入图片描述"
+                ><br>对于这种情况大牛引入了虚拟节点<br>即在环上，对于每个服务器建立了多个索引，除了落在A位置表示A服务器外，落在A1、A2……都能表示访问A服务器，这样就能解决服务器分布不均的问题<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/66e558a8a4164876b41ba7a51be4bfa4.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h1 id="分布式系统特性"><a href="#分布式系统特性" class="headerlink" title="分布式系统特性"></a>分布式系统特性</h1><ul>
+<li>分布性。分布式把系统拆分了，各个部分部署在不同的服务器上，而各个部分可以通过网络通信进行协作，所以这些服务器在空间上也是可以随意分布的。</li>
+<li>对等性<br>分布式系统中的各个计算机没有主从之分，组成分布式系统的所有节点都是对等的。</li>
+<li>并发性<br>同一个分布式系统的多个结点可能会并发地操作一些共享的资源，如数据库、分布式缓存等</li>
+<li>自治性<br>分布式系统中的各个结点都包含自己的处理机和内存，各自具有独立处理数据的功能。</li>
+<li>资源共享<br>一旦授权，可以访问环境中的任何资源。</li>
+</ul>
+<h1 id="分布式系统优缺点"><a href="#分布式系统优缺点" class="headerlink" title="分布式系统优缺点"></a>分布式系统优缺点</h1><ul>
+<li><p>优点：</p>
+<ul>
+<li>提升服务可用性 &#x2F; 稳定性</li>
+<li>提升系统并发能力</li>
+<li>提升系统容错能力</li>
+<li>低延迟</li>
+</ul>
+</li>
+<li><p>缺点：</p>
+<ul>
+<li>依赖网络，会因为网络问题导致系统数据丢失或不一致性；</li>
+<li>系统复杂化，系统监控维护，版本迭代发布变得相对复杂，成本高；</li>
+<li>一致性，可用性，分区容错性无法同时满足。</li>
+</ul>
+</li>
+</ul>
+<h1 id="幂等性"><a href="#幂等性" class="headerlink" title="幂等性"></a>幂等性</h1><p>幂等性是系统的接口对外一种承诺，保证一次和多次请求某一个资源应该具有同样的副作用。比如同一个用户因为网有点卡，一直看不到“支付成功”的提示，焦急中点了很多次“确认付款”按钮，系统应该保证只扣一次钱。<br>声明为幂等的接口会认为外部调用失败是常态, 并且失败之后必然会有重试。<br>常见实现方案：<br>1、对每个请求生成唯一ID，对同一ID的多个请求只执行最先到达的<br>2、对每个数据生成唯一ID，针对于插入有唯一标识属性的实体对象的场景，且可以利用唯一索引实现查重，比如利用订单号。<br>3、利用数据的状态字段，比如订单的状态已经在“已支付”了，就要拒绝执行“支付”的请求。<br>4、乐观锁，针对更新场景，比如设置一个version版本字段，初始时version为0，执行update后version改为1，接下来第二次update就会失败</p>
+<div class="code-container" data-rel="Sql"><figure class="iseeu highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 使用了乐观锁的<span class="keyword">sql</span></span><br><span class="line"># 注意没有使用status进行过滤，没有利用状态字段</span><br><span class="line"><span class="keyword">UPDATE</span> <span class="keyword">ORDER</span> </span><br><span class="line"><span class="keyword">SET</span> status<span class="operator">=</span>#&#123;status&#125;,version<span class="operator">=</span>version<span class="operator">+</span><span class="number">1</span> </span><br><span class="line"><span class="keyword">WHERE</span> id<span class="operator">=</span>#&#123;id&#125; <span class="keyword">AND</span> version<span class="operator">=</span>#&#123;version&#125;</span><br></pre></td></tr></table></figure></div>
+<hr>
+<p>正式开始分布式具体理论和技术</p>
+<h1 id="CAP理论"><a href="#CAP理论" class="headerlink" title="CAP理论"></a>CAP理论</h1><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/c20ec348800f4112ae655ec04b7fd699.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<ul>
+<li>C 一致性(Consisitency)：客户端的每次读操作，不管访问哪个结点，要么读到的都是同一份最新的数据，要么读取失败。(强调数据一致性)</li>
+<li>A  可用性(Availability)：系统收到请求后一定能给出响应。(强调服务可用性)</li>
+<li>P  分区容错性(Partition Tolerance)：当节点间通信出现任意数量的消息丢失或高延迟的时候，系统可以继续提供服务。(下图)</li>
+<li><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/3669adf32352427dbca689a4a1808a3f.png"
+                      alt="在这里插入图片描述"
+                ></li>
+</ul>
+<h2 id="CAP三选二"><a href="#CAP三选二" class="headerlink" title="CAP三选二"></a>CAP三选二</h2><p>CAP虽然都是好的特点，但实际上我们只能三选二，而且必须保证分区容错性<br>1、首先对于“必须保证分区容错性”。“分区”就是指能相互通信的一些节点服务器所组成的一个逻辑网络。因为多节点间的通信交互就是分布式的特点，而节点间的分区故障是不能保证绝不发生的，所以只要是分布式系统就必须保证分区容错性,否则会出现整个系统不能用的情况。<br>2、如果实现了一致性，如果节点间数据同步出现异常，基于一致性的定义，用户此时操作数据会返回操作失败，系统不满足可用性<br>3、如果实现了可用性，那么即使节点间数据同步出现异常，基于可用性的定义，还是得返回自己这个节点还未更新的旧数据给用户，系统不满足一致性。</p>
+<h3 id="但是"><a href="#但是" class="headerlink" title="但是"></a>但是</h3><p>理论上，在不存在因网络问题导致一个大分区变成多个小分区的情况下，能保证CAP同时满足。<br>但是这个网络、服务器都是不可靠的，所以一般还是说CP或者AP，当数据一致性很影响系统或业务运行时，优先选择CP。</p>
+<h3 id="总之"><a href="#总之" class="headerlink" title="总之"></a>总之</h3><p>CAP理论可以作为项目设计的指南针，我们可以从CAP三个维度出发，对项目需求进行分析，进而做出合理的选型，这对项目的设计、开发、维护、重构都是很有帮助的。</p>
+<h1 id="一致性模型"><a href="#一致性模型" class="headerlink" title="一致性模型"></a>一致性模型</h1><p>这是较完整的一致性模型图<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/e3563393c4934f48b7eea19871fba94d.png"
+                      alt="在这里插入图片描述"
+                ><br>但是我们一般还是谈及下面这些<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/287aaee5a95e45539d9fb06dbf4da7b1.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<ul>
+<li><p>强一致性(线性一致性)：从更新操作完成后的瞬间开始，任何后续读操作都能获得最新的值。也可以理解为在任意时刻，所有节点中的数据是一样的。开销很大而且很难实现。</p>
+</li>
+<li><p>最终一致性<br>在经过一段时间的同步后，所有结点中的数据才达到一致。尽管不同的进程读同一数据可能会读到不同的结果，但是最终所有的更新会被按时间顺序同步到所有节点。</p>
+</li>
+<li><p>因果一致性<br>要求有因果关系的操作顺序得到保证，非因果关系的操作顺序则无所谓。</p>
+</li>
+<li><p>会话一致性<br>在操作顺序得到保证的前提下，保证用户在同一个会话里读取数据时保证数据是最新的，如分布式系统Session一致性解决方案。</p>
+</li>
+<li><p>单调读一致性<br>用户读取某个数据值后，其后续操作不会读取到该数据更早版本的值。需要确保用户只能从有最新数据的节点读取数据。</p>
+</li>
+<li><p>单调写一致性<br>用户先写一次(w1),再写一次(w2)，在所有节点看来，都是先执行w1再执行w2</p>
+</li>
+<li><p>读你的写一致性(read your writes)<br>  保证用户总能马上看到自己提交的更新，但是不保证其他用户能马上看到这个更新。一个简单的方法就是对自己的数据只在主库读写，对别人的数据只在从库读写；其余的还有时间戳等方法。<br>  借鉴了这篇博客，感觉内容挺好</p>
+<blockquote>
+<p><a class="link"   target="_blank" rel="noopener" href="https://blog.csdn.net/qq_29328443/article/details/118423602" >分布式系统中的一致性模型<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+</blockquote>
+</li>
+</ul>
+<h1 id="分布式事务ACID-酸😂"><a href="#分布式事务ACID-酸😂" class="headerlink" title="分布式事务ACID(酸😂)"></a>分布式事务ACID(酸😂)</h1><p>ACID实现的是强一致性，根据CAP理论会损失可用性</p>
+<h2 id="两阶段提交协议-2PC-实现强一致性"><a href="#两阶段提交协议-2PC-实现强一致性" class="headerlink" title="两阶段提交协议(2PC)实现强一致性"></a>两阶段提交协议(2PC)实现强一致性</h2><p>结点分为两个角色，协调者和参与者<br>协调者作为中介，统筹控制相关参与者的数据一致化，并且协调者具有<strong>超时机制</strong>，而参与者<strong>没有</strong><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/c4e2e0f07422475492e7d8397850d081.png"
+                      alt="在这里插入图片描述"
+                ><br>我自己画了个流程图，内容基本覆盖了2PC的过程，但是对于协调器出故障的情况只在二阶段给出了，而且异常结束也没给解决方案。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/1f6cd1c3f65149679d4a6cfe538d9a52.png"
+                      alt="在这里插入图片描述"
+                ><br>下图是别人博客里的一张好图，我就拿来用了</p>
+<blockquote>
+<p><a class="link"   target="_blank" rel="noopener" href="https://blog.csdn.net/kusedexingfu/article/details/103484198?spm=1001.2101.3001.6650.1&utm_medium=distribute.pc_relevant.none-task-blog-2~default~CTRLIST~Rate-1-103484198-blog-106734626.pc_relevant_3mothn_strategy_recovery&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2~default~CTRLIST~Rate-1-103484198-blog-106734626.pc_relevant_3mothn_strategy_recovery&utm_relevant_index=2" >分布式事务:XA,2PC,3PC,TCC<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+</blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/46e1f0b7a4f94879baf7232ff2136c2b.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<p>第一阶段简单而言，就是协调者把事务内容分发，让各个参与者开始并锁住资源、执行事务(只剩下提交没完成)<br>第二阶段就是对第一阶段各参与者执行事务的情况进行处理，如果没全部执行成功就全部回滚事务(原子性)，否则就全部提交事务。假如第二阶段失败，可采取的手段有：重试操作、记录日志后台定时任务补偿操作或通知人工补偿操作。</p>
+<p><strong>缺点</strong>：<br>    - 同步阻塞：在事务执行过程中，如果参与者占用了公共资源，会导致其他节点访问该公共资源的操作处于阻塞状态，降低了系统性能。<br>    - 单点问题：若协调器出现问题会导致事务无法进行或事务一直处于阻塞。<br>    - 数据不一致：当第二阶段是Commit请求时，如果因为局部网络异常或协调者中途崩溃导致只有部分参与者收到Commit请求，会导致收到了请求的和没收到请求的节点出现数据不一致的情况。<br>    - 太过保守：任何一个结点的失败都会导致整个事务的失败。<br>    - 无法解决的问题：如果协调者在发出Commit消息后宕机，而受到这条消息的参与者也宕机了，那么即使通过选举产生了新的协调者，这条事务的状态也是不确定的，没人知道事务是否已经被提交。</p>
+<h2 id="三阶段提交协议-3PC-实现强一致性"><a href="#三阶段提交协议-3PC-实现强一致性" class="headerlink" title="三阶段提交协议(3PC)实现强一致性"></a>三阶段提交协议(3PC)实现强一致性</h2><p>在2PC的基础上，给参与者也加上了超时机制，并将2PC的第一阶段分为两个阶段。第一阶段CanCommit只需要参与者查看自身情况，不需要开始事务占用资源；参与者在第三阶段接收超时则自行提交事务，因为前面两阶段已经走完，认为各个参与者都是会提交事务的，只是自己没收到DoCommit消息而已。<br><strong>优点</strong>：通过给参与者超时机制，减少事务阻塞时间。<br><strong>缺点</strong>：超时机制也导致可能出现数据不一致问题；阶段增加导致需要使用更多消息进行写上，增加系统负载和响应延迟；同时在实现上比2PC要复杂，所以在实际应用上不是很广泛。</p>
+<p>(下面这张图画的简略了，有空我再重新补一下)<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/025335f322394ed48a09b6ec73149b6f.png"
+                      alt="在这里插入图片描述"
+                ><br>下面这张也是刚刚那个博客里的图<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/8c64686da6a3494a9dc4a6a31539dd46.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h2 id="TCC-Try-Confirm-Cancel-实现强一致性"><a href="#TCC-Try-Confirm-Cancel-实现强一致性" class="headerlink" title="TCC(Try-Confirm-Cancel)实现强一致性"></a>TCC(Try-Confirm-Cancel)实现强一致性</h2><p> 实际上，2PC和3PC都是针对数据库实现的，实现的是跨库事务的一致性。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/2d9b1c24cdcc4721a6cbb9096d08cc71.png"
+                      alt="在这里插入图片描述"
+                ><br>然而，我们除了跨库操作要保持一致性之外，有些业务还要保证跨服务的一致性。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/2bc313b97dab44129346decc69b5b00e.png"
+                      alt="在这里插入图片描述"
+                ><br>TCC分为Try、Confirm、Cancel三种操作，共两个阶段<br>Try对业务系统做检测，并冻结资源<br>Confirm对事务做提交，默认Try成功则Confirm一定成功<br>Cancel是当Try出错时，回滚业务，释放预留资源</p>
+<p>在阶段2，调用方发生宕机，或者某个服务超时了，此时需要不断重试！不管是Confirm失败了，还是Cancel失败了，都不断重试。这就要求Confirm和Cancel都必须是幂等操作。注意，这里的重试是由TCC的框架来执行的，而不是让业务方自己去做。</p>
+<p>TCC一般和2PC进行比较，因为他俩的过程其实差不多，但是TCC是业务层面上的分布式事务，而2PC是资源上的分布式事务。TCC的锁其实不算锁，更多的是封锁了对该字段的读或写操作(不可能一个人下订单导致其他人不能下订单吧)，保证的是最终一致性，且锁的粒度更小，更灵活，减轻了数据库的压力，系统性能更好，但是实现起来较复杂，对代码的入侵性也很强，需要开发冻结、确认、撤销三套API进行操作，建议使用开源框架。而且在需要分布式事务能力时吗，优先考虑现成的事务型数据库(比如实现了XA的MySQL)，当现有的事务型数据库不能满足业务需求时，在考虑基于TCC实现分布式事务。</p>
+<h1 id="BASE理论-碱😂"><a href="#BASE理论-碱😂" class="headerlink" title="BASE理论(碱😂)"></a>BASE理论(碱😂)</h1><p>Basically Available (基本可用)、Soft state (软状态)、Eventually consistent (最终一致性 )，核心是基本可用和最终一致性。软状态只是说明系统允许数据有一个过渡状态，即各节点间会有短暂的数据不一致现象。<br>Base理论是AP的扩展，是对互联网大规模分布式系统的实践总结，强调可用性。因为这类系统对可用性的需求更大，一些数据也不需要那么强的一致性。</p>
+<h2 id="基本可用"><a href="#基本可用" class="headerlink" title="基本可用"></a>基本可用</h2><p>基本可用可以理解为系统出现故障时允许损失部分功能的可用，保证核心功能的可用，是一种妥协。常见方案有流量削峰(如果能控制数据，就可以做到比如错开几场秒杀活动的时间；如果不能控制数据，就将数据保存到队列)、延迟响应(请求都缓存进队列，减缓请求到业务层的速度，这也导致了响应时间的拉长)、体验降级(展示时使用缩略图等)、过载保护(存放请求的队列满了就拒绝请求进入)等等</p>
+<h2 id="最终一致"><a href="#最终一致" class="headerlink" title="最终一致"></a>最终一致</h2><p>最终一致就是数据不会马上同步到所有节点，需要经过一段延迟才会达到数据一致的状态。举个例子，像今年情人节在QQ上零点发说说时，只能看到自己的说说，看不到别人的，但是上午就能看到其他人的说说了，这种措施影响不大，反正最后别人能看到你零点发了秀恩爱消息并且给你点赞就行了，但是提高了系统的可用性。<br>几乎所有的互联网系统采用的都是最终一致性。但是在数据敏感的业务上还是需要考虑事务和强一致性，比如支付系统和金融系统。</p>
+<h3 id="实现最终一致性的常用方式"><a href="#实现最终一致性的常用方式" class="headerlink" title="实现最终一致性的常用方式"></a>实现最终一致性的常用方式</h3><ul>
+<li>读时修复：写数据时不关注是否成功，只是在客户端想读数据时，先在多个节点间获取多个该数据，再根据一定的规则决定要返回的值，可以再以这个值修复刚才不是这个值的节点。(性能不好)</li>
+<li>写时修复：多个节点进行写入时，哪个节点写失败了，就在那个节点上把原本要写的数据缓存起来，系统不断通过重试进行修复。(不需要比较数据一致性，因为存在重试机制，默认其他节点都写入成功了，所以性能损耗比较低)</li>
+<li>异步修复：定时对账检测副本数据的一致性，不一致则修复。(性能不好)</li>
+</ul>
+<h4 id="一些实现最终一致性的具体方式-不全"><a href="#一些实现最终一致性的具体方式-不全" class="headerlink" title="一些实现最终一致性的具体方式(不全)"></a>一些实现最终一致性的具体方式(不全)</h4><h5 id="基于消息实现最终一致性"><a href="#基于消息实现最终一致性" class="headerlink" title="基于消息实现最终一致性"></a>基于消息实现最终一致性</h5><p> 事务消息方案：RocketMQ<br> 本地消息方案：首先消息队列如Kafka等，是用来实现跨服务通信的。<br> 然后消息发送方(服务A，设为余额服务)的数据库需新增一张消息表，消息接收方(服务B，设为库存服务)的数据库需新增一张判重表(保证幂等性，因为是允许超时重试发消息这个操作的，会导致重复消息)。<br>此时支付开始，余额服务把修改余额记录和插入新消息记录放在同一个事务里，保证原子性；接着后台异步任务将消息表的新记录发给MQ；服务B作为消费者拉取得到消息，用这个消息里先在判重表内查重，重复则不执行，否则插入该消息并修改对应库存记录(注意判重、插入、修改也是在同一事务内的)，执行完返回ACK给MQ，如果超时没发回ACK，MQ会再次推送，防止服务B宕机重启导致消息丢失的问题。</p>
+<h5 id="基于补偿实现最终一致性"><a href="#基于补偿实现最终一致性" class="headerlink" title="基于补偿实现最终一致性"></a>基于补偿实现最终一致性</h5><p> saga模式(TODO)</p>
+<h1 id="分布式协议和算法"><a href="#分布式协议和算法" class="headerlink" title="分布式协议和算法"></a>分布式协议和算法</h1><h2 id="拜占庭将军问题"><a href="#拜占庭将军问题" class="headerlink" title="拜占庭将军问题"></a>拜占庭将军问题</h2><p>TODO</p>
+<h2 id="Paxos"><a href="#Paxos" class="headerlink" title="Paxos"></a>Paxos</h2><p>TODO</p>
+<h2 id="Raft-只说明不增删节点的情况，因为还没学那么深"><a href="#Raft-只说明不增删节点的情况，因为还没学那么深" class="headerlink" title="Raft(只说明不增删节点的情况，因为还没学那么深)"></a>Raft(只说明不增删节点的情况，因为还没学那么深)</h2><p>参考了的文章</p>
+<blockquote>
+<p><a class="link"   target="_blank" rel="noopener" href="https://blog.csdn.net/qq_45993646/article/details/122663476?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-1-122663476-blog-124001507.pc_relevant_3mothn_strategy_recovery&spm=1001.2101.3001.4242.2&utm_relevant_index=3" >raft算法详解<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a><br>极客时间 分布式协议与算法实战<br><a class="link"   target="_blank" rel="noopener" href="https://mit-public-courses-cn-translatio.gitbook.io/mit6-824/lecture-06-raft1" >MIT6.824 国人翻译课件<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a><br><a class="link"   target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/27207160" >Raft协议详解<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a><br><a class="link"   target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/452349070" >Raft梳理<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+</blockquote>
+<blockquote>
+<p>推荐两个网站<br><a class="link"   target="_blank" rel="noopener" href="http://thesecretlivesofdata.com/raft/" >Raft动画讲解<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a><br><a class="link"   target="_blank" rel="noopener" href="https://raft.github.io/raftscope/index.html" >可交互的Raft<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+</blockquote>
+<p>Raft是工程上使用较为广泛的强一致性、去中心化、高可用的分布式协议。遵从此协议的分布式集群会对某个事情达成一致的看法，即使是在部分节点故障、网络延时、网络分割的情况下。</p>
+<h3 id="角色定义"><a href="#角色定义" class="headerlink" title="角色定义"></a>角色定义</h3><p>Raft算法中定义了三种角色，即</p>
+<ul>
+<li>leader(领导者):负责与客户端的通信，接收到客户端的命令后将其转发给follower，管理日志复制，不断发送心跳给follower。</li>
+<li>follower(追随者)：执行leader传来的命令</li>
+<li>candidate(候选者)：是一个中间状态，当follower长时间没收到 leader的消息就会成为candidate，开始一次选举，抢夺成为leader的资格，抢夺成功的candidate成为leader，抢夺失败的重新变成follower</li>
+</ul>
+<h3 id="选举"><a href="#选举" class="headerlink" title="选举"></a>选举</h3><p>Raft作为一个“一切以领导者为准”的算法，领导者的选举是一件大事。同一时间领导者只能存在一个是必须实现的机制。下面我由浅到深的举例子，尽量说清楚要做出哪些努力。</p>
+<h4 id="初始情况"><a href="#初始情况" class="headerlink" title="初始情况"></a>初始情况</h4><p>此时服务器集群刚刚启动，所有结点都是follower，任期号全是0。我们先要推选出一名leader。首先提出一个机制：当超时时间结束时，follower会变为candidate，并将自己的任期+1，并开始使用自己的选票数属性，先给自己投一票，然后发请求给其他节点，邀请他们为自己投一票；受到邀请的节点重置自己的超时时间，然后因为发来的任期是1，比自己的任期0要大，所以更新自己的任期为1，并给A投出一票(返回一个投票消息给A)。</p>
+<p>如下图，节点A最先超时，那么节点A在150ms后变为candidate，任期编号+1后变为1，邀请其他节点为自己投票。此时还未超时的节点B和C收到了来自A的投票邀请，更新自己的任期为1，重置自己的超时时间，给A投出一票，同时。在选举超时时间为0之前(选举也是有超时时间的)，因为选票数&gt;节点数的一半(每个节点都会记录总节点数的)，所以节点A会成为领导者。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/27fd42110ffd48939e8f72b618a981a7.png"
+                      alt="在这里插入图片描述"
+                ><br>先别急着看leader上任后的操作，先想想如果节点A和节点B的超时时间相同，它们同时超时并发起选举，会发生什么事？<br>我再告诉你选举中的一个机制：candidate邀请其他节点投票时，会把自己+1后的那个任期编号发过去，其他节点收到这个任期编号时，如果这个任期比自己的任期要大，说明自己应该推举他，同时更新自己的任期编号为这个投票邀请的任期；如果其他节点在投票邀请发来之前变成了candidate，他的任期+1了，那等到投票邀请发来，发现和自己任期一样，那肯定不给竞争对手投票，所以不投；如果某个follower已经给某个candidate投票了，那么它任期也更新了，其他的相同任期的投票邀请过来就直接拒绝掉了，不会重复投票。**(总结就是如果发来的消息的任期比自己的大，就更新自己的任期；而且其实如果发来的消息的任期比自己任期要小的话，会直接拒绝这个消息)** 很明显这个机制对于上面那张图的节点个数情况，如果我还假设A、B同时超时，即两个candidate、一个follower的情况，是能防止出现票数相同的情况的，因为如果A和B同时超时，C也只能投给A或B，不能都投。<br>所以我再给个例子，如下图。对于这种偶数个节点，是完全可能出现选票相同的情况的。对于这种情况，Raft是会进行重新选举的。但应该有更明智的方案去减少这种情况的发生，而不是每次都进行重新选举这种降低可用性的兜底策略。<br>所以对于每个节点的超时时间，在Raft中是<strong>随机</strong>生成的，这种方法很大程度上减少了多个candidate同时超时的情况。那么先超时的就能当上follower了。即使运气不好随机到多个结点同时超时，那我就重新选举嘛。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/db4c79fb28f0459ea82ea3ff27da466b.png"
+                      alt="在这里插入图片描述"
+                ><br>好了，选举还未超时，节点A发现自己票数比总节点数的一半还大，于是自封为“leader”，但还得告知其他节点，不然他们又要开始选举了。所以节点A周期性发送心跳，告诉结点B和C“节点A是领导者，任期是1”。节点B和C收到心跳，重置自己的超时时间，继续作为follower。领导者开始接收客户端发来的命令，并在心跳消息中将新的日志(后面再讲)连带发给follower。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/4fc47647519d43688c7d322d95618adc.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h4 id="异常情况-暂不考虑日志-follower宕机"><a href="#异常情况-暂不考虑日志-follower宕机" class="headerlink" title="异常情况(暂不考虑日志) - follower宕机"></a>异常情况(暂不考虑日志) - follower宕机</h4><p>follower作为一个被动的角色，他的宕机不会对集群的运作有太大的影响。<br>但是当他重启恢复后，他要跟上集群的步伐啊，别人都任期是5了，他还在2，那真是”不知有汉，无论魏晋”了。所以不论发来的是leader的心跳还是candidate的投票邀请，他都会用请求里附带的任期更新自己的任期。(其实和前面讲的更新任期的策略是一致的)</p>
+<h4 id="异常情况-暂不考虑日志-leader或candidate宕机"><a href="#异常情况-暂不考虑日志-leader或candidate宕机" class="headerlink" title="异常情况(暂不考虑日志) - leader或candidate宕机"></a>异常情况(暂不考虑日志) - leader或candidate宕机</h4><p>leader挂了，其他节点重新选举新leader呗；candidate挂了不用重新选举。不过当它恢复过来后，收到发来的消息后发现自己任期居然比其他人还低，那它就乖乖变成follower了，并用发来的消息更新自己的任期。</p>
+<h4 id="异常情况-暂不考虑日志-follower-candidate一直收不到leader的-心跳"><a href="#异常情况-暂不考虑日志-follower-candidate一直收不到leader的-心跳" class="headerlink" title="异常情况(暂不考虑日志) - follower&#x2F;candidate一直收不到leader的 心跳"></a>异常情况(暂不考虑日志) - follower&#x2F;candidate一直收不到leader的 心跳</h4><p>该follower因为网络故障等问题一直接收不到心跳，这种情况follower先转化为candidate，然后，如果不进行特殊处理，它会一直增加自己的任期，当网络恢复后，这个candidate可能比leader的任期还大，直接把一个正常的leader逼回follower，这会影响集群的稳定性。所以在工程实现上会在candidate请求其他节点投票之前，增加一个<strong>preVote预投票阶段</strong>，在这个阶段，candidate不增加自身term，只广播投票请求，只有拿到多数投票才进入正式请求投票阶段</p>
+<h3 id="日志"><a href="#日志" class="headerlink" title="日志"></a>日志</h3><h4 id="日志复制操作的时序"><a href="#日志复制操作的时序" class="headerlink" title="日志复制操作的时序"></a>日志复制操作的时序</h4><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/e71ded4cd1da418ebf12cd34ba52e6b9.png"
+                      alt="在这里插入图片描述"
+                ><br>我这里给个场景，假设设这个Raft的上层是一个KV数据库，此时外部应用程序访问数据库应用程序  要PUT<br>1、leader接收该PUT操作<br>2、leader发送一个添加日志(AppendEntries)的RPC给其他follower，然后写入一个状态为uncommited的PUT操作的日志，等待follower们的响应<br>3、follower收到日志后，也在本地写入一个uncommited的该日志，返回给leader响应。<br>4、leader收到过半节点的正确响应后，会执行这个请求，即提交给应用程序，让数据库真正执行PUT操作，并且将得到的结果返回给客户端，同时把这个日志改为commited。然后因为follower还要知道leader已经commit了，自己才能commit，所以leader还要再下次心跳中附加一个信息，通知follower们从这个日志里取出操作让他们的上层数据库执行，把他们的这条日志状态改为commit。</p>
+<h4 id="日志的作用"><a href="#日志的作用" class="headerlink" title="日志的作用"></a>日志的作用</h4><p>从日志复制操作可以发现，首先日志是不断append的，所以日志表示了leader选择的顺序。<br>同时，因为节点收到日志和实际执行操作是有时间差的，日志相当于这个操作的临时载体。<br>而且，如果leader发送给follower的操作因为网络原因在中途丢失，leader可以重传这个日志。<br>还有，它可以帮助重启的服务器恢复状态，即作为持久化的手段。</p>
+<h3 id="实现日志一致"><a href="#实现日志一致" class="headerlink" title="实现日志一致"></a>实现日志一致</h3><p>TODO</p>
+<h3 id="其他的异常情况"><a href="#其他的异常情况" class="headerlink" title="其他的异常情况"></a>其他的异常情况</h3><h4 id="leader性能远超follower-选自MIT6-824"><a href="#leader性能远超follower-选自MIT6-824" class="headerlink" title="leader性能远超follower(选自MIT6.824)"></a>leader性能远超follower(选自MIT6.824)</h4><p>follower在执行leader传来的操作前会确认并将操作堆积在日志中，如果一直这么下去，follower的执行将无限落后于日志的堆积，最后耗尽内存。Raft没有处理这种情况。<br>所以在实际系统中需要额外增加一种消息，即由follower发给leader，告知它follower们执行到哪一步了，并以此控制leader的速度不至于太快。</p>
+<h3 id="脑裂"><a href="#脑裂" class="headerlink" title="脑裂"></a>脑裂</h3><p>为什么我在那个大标题“Raft”上要加个”只说明不删减节点”，因为网上流传的知识，大部分都不涉及这部分知识，6.824课程对这块也只是提到“Raft的作者提出了方法来处理这种场景，但是比较复杂。”<br>而且都说了是分布式协议这种理论知识了，实践什么的看后续的改进吧。<br>（有点问题，先别看）<br><del>那么说脑裂这个事。什么是脑裂？<br>举例子，一个集群ABC，客户端发“SET a&#x3D;1234”的请求给A，A就同步给集群其他人，之后客户端们不管读集群里谁的数据，都能获得”a&#x3D;1234”。<br>但是如果A和BC断开通信了，那么A一个分区，BC一个分区，客户端先对A说”SET a&#x3D;1234”，A无法将该写请求同步到BC上；这时又来一个客户端对B说”SET a&#x3D;5678”，这个写请求也只能同步到C上，到不了A那。那么这个集群里就出现了数据不一致现象了。<br>对于此，如果Raft不采用动态扩容的话，因为“投票必须过半”这个机制，我们可以事先只部署奇数个节点，那么总有一方节点数少于一半，一方节点数多于一半。如果原先的leader处于多于一半的那方，客户端继续与这个leader通信，而少于一半的那方不与leader通信，相当于不与客户端通信，对外界而言此时的集群只有leader这边的分区，数据一致性继续保持；如果原先的leader不在多于一半的那方，那么</del> </p>
+<h3 id="一些杂的话"><a href="#一些杂的话" class="headerlink" title="一些杂的话"></a>一些杂的话</h3><p>有些知识点找学长问了下，确实为了保持内容贴合Raft的理论知识，我加了很多限制条件，但实际分布式项目中哪来这么多限制条件，总要在理论上进行改造、扩展甚至违背理论，就比如反范式这种。所以理论可以了解，但是不能奉为教条。</p>
+<h2 id="Gossip"><a href="#Gossip" class="headerlink" title="Gossip"></a>Gossip</h2><p>TODO</p>
+<h2 id="Zab"><a href="#Zab" class="headerlink" title="Zab"></a>Zab</h2><p>TODO</p>
+<h1 id="分布式缓存"><a href="#分布式缓存" class="headerlink" title="分布式缓存"></a>分布式缓存</h1><p>TODO</p>
+<h1 id="分布式数据库"><a href="#分布式数据库" class="headerlink" title="分布式数据库"></a>分布式数据库</h1><p>TODO</p>
+<h1 id="分布式计算"><a href="#分布式计算" class="headerlink" title="分布式计算"></a>分布式计算</h1><p>TODO</p>
+<h1 id="分布式文件系统"><a href="#分布式文件系统" class="headerlink" title="分布式文件系统"></a>分布式文件系统</h1><p>TODO</p>
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>标题:</strong> 分布式相关知识入门学习(待续)</li>
+        <li><strong>作者:</strong> urlyy</li>
+        <li><strong>创建于
+                :</strong> 2022-11-15 22:46:41</li>
+        
+            <li>
+                <strong>更新于
+                    :</strong> 2025-12-21 18:39:57
+            </li>
+        
+        <li>
+            <strong>链接:</strong> https://urlyy.github.io/2022/11/15/分布式相关知识/
+        </li>
+        <li>
+            <strong>
+                版权声明:
+            </strong>
+            
+
+            
+                本文章采用 <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a> 进行许可。
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="prev" rel="prev" href="/2022/11/29/Airtest%E6%89%8B%E6%9C%BAAPP%E8%87%AA%E5%8A%A8%E5%8C%96-%E6%93%8D%E4%BD%9C%E5%BE%AE%E4%BF%A1%EF%BC%88%E5%B0%8F%E7%B1%B311%EF%BC%89/">
+					<span class="left arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-left"></i>
+					</span>
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">Airtest手机APP自动化--操作微信（小米11）</span>
+						<span class="post-nav-item">上一篇</span>
+					</span>
+				</a>
+			</div>
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2022/09/14/Centos7-6%E9%83%A8%E7%BD%B2fabric%E4%BB%A5%E5%8F%8A%E9%93%BE%E7%A0%81/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">Centos7.6部署fabric以及链码</span>
+						<span class="post-nav-item">下一篇</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        评论
+    </div>
+    
+
+        
+            
+    <div id="giscus-container"></div>
+    <script data-swup-reload-script defer>
+        async function loadGiscus() {
+            const giscusConfig = {
+                'src': 'https://giscus.app/client.js',
+                'data-repo': 'urlyy/urlyy_blog_comments',
+                'data-repo-id': 'R_kgDONo8nwQ',
+                'data-category': 'Announcements',
+                'data-category-id': 'DIC_kwDONo8nwc4Cl7pw',
+                'data-mapping': 'title',
+                'data-strict': '0',
+                'data-reactions-enabled': '1',
+                'data-emit-metadata': '1',
+                'data-theme': 'preferred_color_scheme',
+                'data-lang': 'zh-CN',
+                'data-input-position': 'top',
+                'data-loading': 'lazy',
+                'crossorigin': 'anonymous',
+                'async': true
+            }
+            const giscusScript = document.createElement('script');
+            for (const key in giscusConfig) {
+                giscusScript.setAttribute(key, giscusConfig[key]);
+            }
+            document.getElementById('giscus-container').appendChild(giscusScript);
+        }
+        if ('true') {
+            let loadGiscusTimeout = setTimeout(() => {
+                loadGiscus();
+                clearTimeout(loadGiscusTimeout);
+            }, 1000);
+        } else {
+            document.addEventListener('DOMContentLoaded', loadGiscus);
+        }
+    </script>
+
+
+        
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">目录</div>
+		<div class="page-title">分布式相关知识入门学习(待续)</div>
+		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%87%A0%E4%B8%AA%E6%A6%82%E5%BF%B5"><span class="nav-text">几个概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1"><span class="nav-text">负载均衡</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E8%87%B4%E6%80%A7hash"><span class="nav-text">一致性hash</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F%E7%89%B9%E6%80%A7"><span class="nav-text">分布式系统特性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="nav-text">分布式系统优缺点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B9%82%E7%AD%89%E6%80%A7"><span class="nav-text">幂等性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CAP%E7%90%86%E8%AE%BA"><span class="nav-text">CAP理论</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#CAP%E4%B8%89%E9%80%89%E4%BA%8C"><span class="nav-text">CAP三选二</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%86%E6%98%AF"><span class="nav-text">但是</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E4%B9%8B"><span class="nav-text">总之</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E8%87%B4%E6%80%A7%E6%A8%A1%E5%9E%8B"><span class="nav-text">一致性模型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1ACID-%E9%85%B8%F0%9F%98%82"><span class="nav-text">分布式事务ACID(酸😂)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%A4%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4%E5%8D%8F%E8%AE%AE-2PC-%E5%AE%9E%E7%8E%B0%E5%BC%BA%E4%B8%80%E8%87%B4%E6%80%A7"><span class="nav-text">两阶段提交协议(2PC)实现强一致性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4%E5%8D%8F%E8%AE%AE-3PC-%E5%AE%9E%E7%8E%B0%E5%BC%BA%E4%B8%80%E8%87%B4%E6%80%A7"><span class="nav-text">三阶段提交协议(3PC)实现强一致性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TCC-Try-Confirm-Cancel-%E5%AE%9E%E7%8E%B0%E5%BC%BA%E4%B8%80%E8%87%B4%E6%80%A7"><span class="nav-text">TCC(Try-Confirm-Cancel)实现强一致性</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BASE%E7%90%86%E8%AE%BA-%E7%A2%B1%F0%9F%98%82"><span class="nav-text">BASE理论(碱😂)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E5%8F%AF%E7%94%A8"><span class="nav-text">基本可用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4"><span class="nav-text">最终一致</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7%E7%9A%84%E5%B8%B8%E7%94%A8%E6%96%B9%E5%BC%8F"><span class="nav-text">实现最终一致性的常用方式</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E5%8D%8F%E8%AE%AE%E5%92%8C%E7%AE%97%E6%B3%95"><span class="nav-text">分布式协议和算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%9C%E5%8D%A0%E5%BA%AD%E5%B0%86%E5%86%9B%E9%97%AE%E9%A2%98"><span class="nav-text">拜占庭将军问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Paxos"><span class="nav-text">Paxos</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Raft-%E5%8F%AA%E8%AF%B4%E6%98%8E%E4%B8%8D%E5%A2%9E%E5%88%A0%E8%8A%82%E7%82%B9%E7%9A%84%E6%83%85%E5%86%B5%EF%BC%8C%E5%9B%A0%E4%B8%BA%E8%BF%98%E6%B2%A1%E5%AD%A6%E9%82%A3%E4%B9%88%E6%B7%B1"><span class="nav-text">Raft(只说明不增删节点的情况，因为还没学那么深)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%92%E8%89%B2%E5%AE%9A%E4%B9%89"><span class="nav-text">角色定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%89%E4%B8%BE"><span class="nav-text">选举</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%A5%E5%BF%97"><span class="nav-text">日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E6%97%A5%E5%BF%97%E4%B8%80%E8%87%B4"><span class="nav-text">实现日志一致</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E7%9A%84%E5%BC%82%E5%B8%B8%E6%83%85%E5%86%B5"><span class="nav-text">其他的异常情况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%84%91%E8%A3%82"><span class="nav-text">脑裂</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E6%9D%82%E7%9A%84%E8%AF%9D"><span class="nav-text">一些杂的话</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Gossip"><span class="nav-text">Gossip</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Zab"><span class="nav-text">Zab</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98"><span class="nav-text">分布式缓存</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-text">分布式数据库</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%A1%E7%AE%97"><span class="nav-text">分布式计算</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F"><span class="nav-text">分布式文件系统</span></a></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2021</span>
+              -
+            
+            2025&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">urlyy</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        共撰写了 78 篇文章
+                    </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">访问人数</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">总访问量</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">由 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a> 驱动</span>
+            <span class="text-sm lg:block">主题&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.5</a></span>
+        </div>
+        
+        
+            <div>
+                博客已运行 <span class="odometer" id="runtime_days" ></span> 天 <span class="odometer" id="runtime_hours"></span> 小时 <span class="odometer" id="runtime_minutes"></span> 分钟 <span class="odometer" id="runtime_seconds"></span> 秒
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="fa-regular fa-arrow-up"></i>
+		</li>
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+	<div class="search-pop-overlay">
+	<div class="popup search-popup">
+		<div class="search-header">
+			<span class="search-input-field-pre">
+				<i class="fa-solid fa-keyboard"></i>
+			</span>
+			<div class="search-input-container">
+				<input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="站内搜索您需要的内容..." spellcheck="false" type="search" class="search-input">
+			</div>
+			<span class="popup-btn-close">
+				<i class="fa-solid fa-times"></i>
+			</span>
+		</div>
+		<div id="search-result">
+			<div id="no-result">
+				<i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>
+			</div>
+		</div>
+	</div>
+</div>
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+	
+<script src="/js/build/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/build/utils.js" type="module"></script>
+
+<script src="/js/build/main.js" type="module"></script>
+
+<script src="/js/build/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/build/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/build/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/build/layouts/categoryList.js" type="module"></script>
+
+
+
+    
+<script src="/js/build/tools/localSearch.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/layouts/lazyload.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/runtime.js"></script>
+
+    
+<script src="/js/build/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+  
+<script src="/js/build/plugins/typed.js" type="module"></script>
+
+
+
+
+    
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@9.3.0/dist/mermaid.min.js"></script>
+    
+    
+<script src="/js/build/plugins/mermaid.js"></script>
+
+
+
+
+
+
+    
+<script src="/js/build/libs/anime.min.js"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/tocToggle.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/layouts/toc.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/plugins/tabs.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+<script src="/js/build/layouts/essays.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+
+	
+</body>
+
+</html>

@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="urlyy">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set data attribute for CSS variables
+                root.setAttribute("data-theme", theme);
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes once DOM is ready
+            if (document.readyState !== "loading") {
+                document.body.classList.add(theme + "-mode");
+            } else {
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add(theme + "-mode");
+                    document.body.classList.remove((theme === DARK ? LIGHT : DARK) + "-mode");
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Critical CSS to prevent flash -->
+    <style>
+        :root[data-theme="dark"] {
+            --background-color: #202124;
+            --background-color-transparent: rgba(32, 33, 36, 0.6);
+            --second-background-color: #2d2e32;
+            --third-background-color: #34353a;
+            --third-background-color-transparent: rgba(32, 33, 36, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #ffffff;
+            --second-text-color: #eeeeee;
+            --third-text-color: #bebec6;
+            --fourth-text-color: #999999;
+            --default-text-color: #bebec6;
+            --invert-text-color: #373D3F;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(255, 255, 255, 0.08);
+            --shadow-color-2: rgba(255, 255, 255, 0.05);
+        }
+        
+        :root[data-theme="light"] {
+            --background-color: #fff;
+            --background-color-transparent: rgba(255, 255, 255, 0.6);
+            --second-background-color: #f8f8f8;
+            --third-background-color: #f2f2f2;
+            --third-background-color-transparent: rgba(241, 241, 241, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #16171a;
+            --second-text-color: #2f3037;
+            --third-text-color: #5e5e5e;
+            --fourth-text-color: #eeeeee;
+            --default-text-color: #373D3F;
+            --invert-text-color: #bebec6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(0, 0, 0, 0.08);
+            --shadow-color-2: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+        
+        /* Apply body classes as soon as DOM is ready */
+        :root[data-theme="dark"] body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+    </style>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://urlyy.github.io/2024/07/03/datawhale大模型应用开发夏令营学习笔记一/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta name="description" content="参考自  基于LangChain+LLM的本地知识库问答：从企业单文档问答到批量文档问答 datawhale的llm-universe   随便谈谈由于科大讯飞的星火杯已经为我们提供了 星火大模型 的API，我也不好进行模型调参，现在能做的就是开展prompt工程，结合RAG，给到模型优质的输入信息，帮助它正确回答我提出的疑问和要求。我首先学的就是这两个。 我一开始的想法是做本地知识库，那么模型">
+<meta property="og:type" content="article">
+<meta property="og:title" content="datawhale大模型应用开发夏令营学习笔记一">
+<meta property="og:url" content="http://urlyy.github.io/2024/07/03/datawhale%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E5%A4%8F%E4%BB%A4%E8%90%A5%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%80/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="参考自  基于LangChain+LLM的本地知识库问答：从企业单文档问答到批量文档问答 datawhale的llm-universe   随便谈谈由于科大讯飞的星火杯已经为我们提供了 星火大模型 的API，我也不好进行模型调参，现在能做的就是开展prompt工程，结合RAG，给到模型优质的输入信息，帮助它正确回答我提出的疑问和要求。我首先学的就是这两个。 我一开始的想法是做本地知识库，那么模型">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://urlyy.github.io/article_images/datawhale%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E5%A4%8F%E4%BB%A4%E8%90%A5%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%80/dbf54ef45698422f82b4bd445c9ad2f9.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/datawhale%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E5%A4%8F%E4%BB%A4%E8%90%A5%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%80/3d79bdb36c6848a6bd5311960cf97b35.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/datawhale%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E5%A4%8F%E4%BB%A4%E8%90%A5%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%80/e02cfb7cfa184e829beb45783ebd847f.png">
+<meta property="article:published_time" content="2024-07-03T08:02:48.000Z">
+<meta property="article:modified_time" content="2025-12-21T10:39:57.269Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="LLM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://urlyy.github.io/article_images/datawhale%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E5%A4%8F%E4%BB%A4%E8%90%A5%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%80/dbf54ef45698422f82b4bd445c9ad2f9.png">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/avatar.jpg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.jpg">
+    <meta name="theme-color" content="#5c701a">
+    <link rel="shortcut icon" href="/images/avatar.jpg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            datawhale大模型应用开发夏令营学习笔记一 | urlyy的小窝
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+        <link href="" rel="stylesheet">
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"urlyy.github.io","root":"/","language":"zh-CN","path":"search.json"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":false,"auto":false,"list":[""]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":true},"copyright":true,"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#5c701a","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":true,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":false},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"side_tools":{"gear_rotation":true,"auto_expand":false},"open_graph":true,"google_analytics":{"enable":false,"id":null},"busuanzi_counter":{"enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"pjax":true},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/bg/1.jpg","dark":"/images/bg/1.jpg"},"title":"urlyy的小窝","subtitle":{"text":["Loading..."],"hitokoto":{"enable":true,"show_author":false,"api":"https://v1.hitokoto.cn?c=a&c=b&c=d&c=k"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"style":"default","links":{"github":"https://github.com/urlyy?tab=repositories","instagram":null,"zhihu":null,"twitter":null,"email":"2213732736@qq.com"},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":true,"version":"9.3.0"}},"version":"2.8.5","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Categories":{"icon":"fa-regular fa-folder","path":"/categories/"},"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Github":{"path":"https://github.com/urlyy","icon":"fa-brands fa-github"},"个人介绍":{"path":"/personal/profile.html","icon":"fa-regular fa-user"}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"cloud"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":null},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2021/9/7 16:55:00"};
+    window.lang_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 个月前","year":"%s 年前"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                urlyy的小窝
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    首页
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/categories/"
+                                        >
+                                    <i class="fa-regular fa-folder fa-fw"></i>
+                                    分类
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/archives"
+                                        >
+                                    <i class="fa-regular fa-archive fa-fw"></i>
+                                    归档
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   target="_blank" rel="noopener" href="https://github.com/urlyy"
+                                        >
+                                    <i class="fa-brands fa-github fa-fw"></i>
+                                    GITHUB
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/personal/profile.html"
+                                        >
+                                    <i class="fa-regular fa-user fa-fw"></i>
+                                    个人介绍
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                首页
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/categories/"
+                        >
+                            <span>
+                                分类
+                            </span>
+                            
+                                <i class="fa-regular fa-folder fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/archives"
+                        >
+                            <span>
+                                归档
+                            </span>
+                            
+                                <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           target="_blank" rel="noopener" href="https://github.com/urlyy"
+                        >
+                            <span>
+                                GITHUB
+                            </span>
+                            
+                                <i class="fa-brands fa-github fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/personal/profile.html"
+                        >
+                            <span>
+                                个人介绍
+                            </span>
+                            
+                                <i class="fa-regular fa-user fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">25</div>
+        <div class="label text-third-text-color text-sm">标签</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">29</div>
+        <div class="label text-third-text-color text-sm">分类</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">78</div>
+        <div class="label text-third-text-color text-sm">文章</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">datawhale大模型应用开发夏令营学习笔记一</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/avatar.jpg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">urlyy</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2024-07-03 16:02:48</span>
+        <span class="mobile">2024-07-03 16:02:48</span>
+        <span class="hover-info">创建</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2025-12-21 18:39:57</span>
+            <span class="mobile">2025-12-21 18:39:57</span>
+            <span class="hover-info">更新</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/">人工智能</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa-regular fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/LLM/">LLM</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<blockquote>
+<p>参考自</p>
+<ul>
+<li><a class="link"   target="_blank" rel="noopener" href="https://blog.csdn.net/v_JULY_v/article/details/131552592?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522171988967216800211591386%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=171988967216800211591386&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~top_positive~default-2-131552592-null-null.142%5Ev100%5Epc_search_result_base3&utm_term=langchain&spm=1018.2226.3001.4187" >基于LangChain+LLM的本地知识库问答：从企业单文档问答到批量文档问答<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   target="_blank" rel="noopener" href="https://github.com/datawhalechina/llm-universe/tree/main" >datawhale的llm-universe<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+</blockquote>
+<h1 id="随便谈谈"><a href="#随便谈谈" class="headerlink" title="随便谈谈"></a>随便谈谈</h1><p>由于科大讯飞的星火杯已经为我们提供了 <a class="link"   target="_blank" rel="noopener" href="https://www.xfyun.cn/doc/spark/Web.html#%E5%BF%AB%E9%80%9F%E8%B0%83%E7%94%A8%E9%9B%86%E6%88%90%E6%98%9F%E7%81%AB%E8%AE%A4%E7%9F%A5%E5%A4%A7%E6%A8%A1%E5%9E%8B%EF%BC%88python%E7%A4%BA%E4%BE%8B%EF%BC%89" >星火大模型<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> 的API，我也不好进行模型调参，现在能做的就是开展<code>prompt工程</code>，结合<code>RAG</code>，给到模型优质的输入信息，帮助它正确回答我提出的疑问和要求。我首先学的就是这两个。</p>
+<p>我一开始的想法是做本地知识库，那么模型是怎么知道这些知识呢？我们知道一个人的知识储备，可以来自他的积累，也可以来自他现在手里正翻着的书(或者当场百度:))。大模型也一样。我们可以在训练大模型时让他学习庞大的知识，也可以在提问一些小众知识时附加可参考的内容(比如在询问一个rust的第三方库怎么用时，顺带把这个库的文档文本一起给他，让他参考这些文档进行回答)</p>
+<ul>
+<li>参数知识：在训练期间学习到的知识，隐式存储在神经网络的权重中。</li>
+<li>非参数知识：存储在外部知识源中，例如向量数据库。</li>
+</ul>
+<p>当然，直接传整篇文档的方式比较粗暴，可以事先将全篇文档放入向量数据库或知识图谱（统称为知识库）。那么一次问答的过程为：首先用户提问<code>请回答我的xx问题</code>，然后大模型根据用户的提问去知识库中匹配并获取相关的参考资料，然后再将用户输入改为<code>根据 xxxxx 这些参考资料，请回答我的xx问题</code>并传入大模型。</p>
+<h1 id="一步步基于langchain实现讯飞大模型的调用和RAG"><a href="#一步步基于langchain实现讯飞大模型的调用和RAG" class="headerlink" title="一步步基于langchain实现讯飞大模型的调用和RAG"></a>一步步基于langchain实现讯飞大模型的调用和RAG</h1><p>主要参考自datawhale的教程<a class="link"   target="_blank" rel="noopener" href="https://github.com/datawhalechina/llm-universe/tree/main/notebook" >https://github.com/datawhalechina/llm-universe/tree/main/notebook<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>，确实比较详细<br>我实操的大概过程为：</p>
+<ol>
+<li>调用星火大模型</li>
+<li>读取Markdown或pdf作为本地知识，并解析出其中的文本，并进行数据清洗</li>
+<li>对解析出的文本进行文本切分。因为单个文档的长度往往会超过模型支持的上下文，导致检索得到的知识太长超出模型的处理能力</li>
+<li>调用星火的文本向量化接口</li>
+<li>使用Chroma存储向量并检索，即建立本地知识库</li>
+<li>使用template，并使用langchain的<code>LCEL</code>语法实现一条链式处理，该链将获取输入变量，将这些变量传递给提示模板以创建提示，将提示传递给语言模型，然后通过（可选）输出解析器传递输出。</li>
+<li>将”知识库检索”这一过程加入处理链中，实现大模型链接本地知识库</li>
+<li>基于Memory模块让大模型能使用到历史对话，实现带上下文的对话</li>
+<li>streamlit的教学我没看，目前考虑使用Gradio</li>
+</ol>
+<p>以上过程均基于langchain的api。<br>我这里只放一些重点内容，对详细过程感兴趣的同学可以跟着教程继续学习，我就不粘贴一遍教程里的代码了</p>
+<h2 id="RAG和微调的对比"><a href="#RAG和微调的对比" class="headerlink" title="RAG和微调的对比"></a>RAG和微调的对比</h2><table>
+<thead>
+<tr>
+<th>特征比较</th>
+<th>RAG</th>
+<th>微调</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>知识更新</td>
+<td>直接更新检索知识库，无需重新训练。信息更新成本低，适合动态变化的数据。</td>
+<td>通常需要重新训练来保持知识和数据的更新。更新成本高，适合静态数据。</td>
+</tr>
+<tr>
+<td>外部知识</td>
+<td>擅长利用外部资源，特别适合处理文档或其他结构化&#x2F;非结构化数据库。</td>
+<td>将外部知识学习到 LLM 内部。</td>
+</tr>
+<tr>
+<td>数据处理</td>
+<td>对数据的处理和操作要求极低。</td>
+<td>依赖于构建高质量的数据集，有限的数据集可能无法显著提高性能。</td>
+</tr>
+<tr>
+<td>模型定制</td>
+<td>侧重于信息检索和融合外部知识，但可能无法充分定制模型行为或写作风格。</td>
+<td>可以根据特定风格或术语调整 LLM 行为、写作风格或特定领域知识。</td>
+</tr>
+<tr>
+<td>可解释性</td>
+<td>可以追溯到具体的数据来源，有较好的可解释性和可追踪性。</td>
+<td>黑盒子，可解释性相对较低。</td>
+</tr>
+<tr>
+<td>计算资源</td>
+<td>需要额外的资源来支持检索机制和数据库的维护。</td>
+<td>依赖高质量的训练数据集和微调目标，对计算资源的要求较高。</td>
+</tr>
+<tr>
+<td>推理延迟</td>
+<td>增加了检索步骤的耗时</td>
+<td>单纯 LLM 生成的耗时</td>
+</tr>
+<tr>
+<td>降低幻觉</td>
+<td>通过检索到的真实信息生成回答，降低了产生幻觉的概率。</td>
+<td>模型学习特定领域的数据有助于减少幻觉，但面对未见过的输入时仍可能出现幻觉。</td>
+</tr>
+<tr>
+<td>伦理隐私</td>
+<td>检索和使用外部数据可能引发伦理和隐私方面的问题。</td>
+<td>训练数据中的敏感信息需要妥善处理，以防泄露。</td>
+</tr>
+</tbody></table>
+<h2 id="LangChain"><a href="#LangChain" class="headerlink" title="LangChain"></a>LangChain</h2><p>封装了很多模型的调用方式以及工具比如chain、memory等<br><a class="link"   target="_blank" rel="noopener" href="https://python.langchain.com/v0.2/docs/integrations/llms/" >https://python.langchain.com/v0.2/docs/integrations/llms/<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h2 id="Prompt"><a href="#Prompt" class="headerlink" title="Prompt"></a>Prompt</h2><p>在 ChatGPT 推出并获得大量应用之后，Prompt 开始被推广为给大模型的所有输入。即，我们每一次访问大模型的输入为一个 Prompt，而大模型给我们的返回结果则被称为 Completion。</p>
+<h2 id="Temperature"><a href="#Temperature" class="headerlink" title="Temperature"></a>Temperature</h2><p>LLM 生成是具有随机性的，我们一般可以通过控制 <code>temperature</code> 参数来控制 LLM 生成结果的随机性与创造性。</p>
+<p>Temperature 一般取值在 0~1 之间，当取值较低接近 0 时，预测的随机性会较低，产生更保守、可预测的文本，不太可能生成意想不到或不寻常的词。当取值较高接近 1 时，预测的随机性会较高，所有词被选择的可能性更大，会产生更有创意、多样化的文本，更有可能生成不寻常或意想不到的词。</p>
+<p>对于不同的问题与应用场景，我们可能需要设置不同的 temperature。例如，在个人知识库助手项目中，我们一般将 temperature 设置为 0，从而保证助手对知识库内容的稳定使用，规避错误内容、模型幻觉；在产品智能客服、科研论文写作等场景中，我们同样更需要稳定性而不是创造性；但在个性化 AI、创意营销文案生成等场景中，我们就更需要创意性，从而更倾向于将 temperature 设置为较高的值。</p>
+<h2 id="System-Prompt"><a href="#System-Prompt" class="headerlink" title="System Prompt"></a>System Prompt</h2><p>在使用 ChatGPT API 时，你可以设置两种 Prompt：一种是 System Prompt，该种 Prompt 内容会在整个会话过程中持久地影响模型的回复，且相比于普通 Prompt 具有更高的重要性；另一种是 User Prompt，这更偏向于我们平时提到的 Prompt，即需要模型做出回复的输入。<br>System Prompt 一般在一个会话中仅有一个。在通过 System Prompt 设定好模型的人设或是初始设置后，我们可以通过 User Prompt 给出模型需要遵循的指令。<br>例如，当我们需要一个幽默风趣的个人知识库助手，并向这个助手提问我今天有什么事时，可以构造如下的 Prompt：</p>
+<div class="code-container" data-rel="Json"><figure class="iseeu highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;system prompt&quot;</span><span class="punctuation">:</span> <span class="string">&quot;你是一个幽默风趣的个人知识库助手，可以根据给定的知识库内容回答用户的提问，注意，你的回答风格应是幽默风趣的&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;user prompt&quot;</span><span class="punctuation">:</span> <span class="string">&quot;我今天有什么事务？&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure></div>
+
+
+<h2 id="Prompt工程"><a href="#Prompt工程" class="headerlink" title="Prompt工程"></a>Prompt工程</h2><p>可以理解为使用结构化的提问方式，向模型传入更详细的提问内容，引导大模型进行更精确和正确的回答<br>具体可参考<a class="link"   target="_blank" rel="noopener" href="https://github.com/datawhalechina/llm-universe/blob/main/notebook/C2%20%E4%BD%BF%E7%94%A8%20LLM%20API%20%E5%BC%80%E5%8F%91%E5%BA%94%E7%94%A8/3.%20Prompt%20Engineering.ipynb" >https://github.com/datawhalechina/llm-universe/blob/main/notebook/C2%20%E4%BD%BF%E7%94%A8%20LLM%20API%20%E5%BC%80%E5%8F%91%E5%BA%94%E7%94%A8/3.%20Prompt%20Engineering.ipynb<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h2 id="此次开发用到的官方文档"><a href="#此次开发用到的官方文档" class="headerlink" title="此次开发用到的官方文档"></a>此次开发用到的官方文档</h2><ul>
+<li><a class="link"   target="_blank" rel="noopener" href="https://python.langchain.com/v0.2/docs/integrations/llms/sparkllm/" >langchain中使用sparkllm<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   target="_blank" rel="noopener" href="https://python.langchain.com/v0.2/docs/integrations/text_embedding/sparkllm/" >langchain中使用spark的文本向量化<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   target="_blank" rel="noopener" href="https://python.langchain.com/v0.2/docs/integrations/document_loaders/unstructured_file/" >langchain中解析文件中的文本<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   target="_blank" rel="noopener" href="https://python.langchain.com/v0.2/docs/integrations/vectorstores/chroma/" >langchain中使用Chroma<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+<h2 id="还是贴个代码"><a href="#还是贴个代码" class="headerlink" title="还是贴个代码"></a>还是贴个代码</h2><p>知识库为一篇Markdown <a class="link"   target="_blank" rel="noopener" href="https://github.com/sunface/rust-course/blob/main/src/advance/macro.md" >https://github.com/sunface/rust-course/blob/main/src/advance/macro.md<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a><br>这里的代码参考datawhale的代码，只实现了链接知识库和结合上下文对话，没有用到LCEL。深入源码以及看官方文档后发现，LangChain非常多的API弃用或将被弃用，API改动这么频繁，而且有些API都不好在IDE里跳到源码，难怪langchain的争议这么大。</p>
+ <div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">from</span> langchain_text_splitters <span class="keyword">import</span> RecursiveCharacterTextSplitter</span><br><span class="line"><span class="keyword">from</span> langchain_community.llms.sparkllm <span class="keyword">import</span> SparkLLM</span><br><span class="line"><span class="keyword">from</span> langchain_community.embeddings <span class="keyword">import</span> SparkLLMTextEmbeddings</span><br><span class="line"><span class="keyword">from</span> langchain_community.document_loaders <span class="keyword">import</span> UnstructuredMarkdownLoader</span><br><span class="line"><span class="keyword">from</span> langchain.text_splitter <span class="keyword">import</span> RecursiveCharacterTextSplitter</span><br><span class="line"><span class="keyword">from</span> langchain_community.vectorstores <span class="keyword">import</span> Chroma</span><br><span class="line"><span class="keyword">from</span> langchain.prompts.chat <span class="keyword">import</span> ChatPromptTemplate,SystemMessagePromptTemplate,HumanMessagePromptTemplate</span><br><span class="line"><span class="keyword">from</span> langchain_core.output_parsers <span class="keyword">import</span> StrOutputParser</span><br><span class="line"><span class="keyword">from</span> langchain.prompts <span class="keyword">import</span> PromptTemplate</span><br><span class="line"><span class="keyword">from</span> langchain.memory <span class="keyword">import</span> ConversationBufferMemory</span><br><span class="line"><span class="keyword">from</span> langchain.chains <span class="keyword">import</span> ConversationalRetrievalChain</span><br><span class="line"></span><br><span class="line"><span class="comment"># 通过环境变量的方式设置秘钥，具体的key-value可以在IDE内点进源码查看</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">load_env</span>():</span><br><span class="line">    <span class="comment"># 星火认知大模型Spark Max的URL值，其他版本大模型URL值请前往文档（https://www.xfyun.cn/doc/spark/Web.html）查看</span></span><br><span class="line">    <span class="comment">#星火认知大模型调用秘钥信息，请前往讯飞开放平台控制台（https://console.xfyun.cn/services/bm35）查看</span></span><br><span class="line">    <span class="comment">#星火认知大模型Spark Max的domain值，其他版本大模型domain值请前往文档（https://www.xfyun.cn/doc/spark/Web.html）查看</span></span><br><span class="line">    os.environ[<span class="string">&quot;IFLYTEK_SPARK_API_URL&quot;</span>] = <span class="string">&quot;wss://spark-api.xf-yun.com/v3.5/chat&quot;</span></span><br><span class="line">    os.environ[<span class="string">&quot;IFLYTEK_SPARK_API_KEY&quot;</span>] = <span class="string">&quot;&quot;</span></span><br><span class="line">    os.environ[<span class="string">&quot;IFLYTEK_SPARK_API_SECRET&quot;</span>] = <span class="string">&quot;&quot;</span></span><br><span class="line">    os.environ[<span class="string">&quot;IFLYTEK_SPARK_APP_ID&quot;</span>] = <span class="string">&quot;&quot;</span></span><br><span class="line">    os.environ[<span class="string">&quot;IFLYTEK_SPARK_LLM_DOMAIN&quot;</span>] = <span class="string">&quot;generalv3.5&quot;</span></span><br><span class="line">    <span class="comment"># 文本向量化</span></span><br><span class="line">    os.environ[<span class="string">&quot;SPARK_APP_ID&quot;</span>] = <span class="string">&quot;&quot;</span></span><br><span class="line">    os.environ[<span class="string">&quot;SPARK_API_KEY&quot;</span>] =  <span class="string">&quot;&quot;</span></span><br><span class="line">    os.environ[<span class="string">&quot;SPARK_API_SECRET&quot;</span>] = <span class="string">&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用UnstructuredMarkdownLoader读取时似乎不能读emoji</span></span><br><span class="line"><span class="comment"># 此时需要预先处理文件，再使用API解析无emoji的Markdown文件</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">remove_emojis</span>(<span class="params">text</span>):</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        co = re.<span class="built_in">compile</span>(<span class="string">u&#x27;[\U00010000-\U0010ffff]&#x27;</span>)</span><br><span class="line">    <span class="keyword">except</span> re.error:</span><br><span class="line">        co = re.<span class="built_in">compile</span>(<span class="string">u&#x27;[\uD800-\uDBFF][\uDC00-\uDFFF]&#x27;</span>)</span><br><span class="line">    no_emojis_text = co.sub(<span class="string">r&#x27;&#x27;</span>, text)</span><br><span class="line">    <span class="keyword">return</span> no_emojis_text</span><br><span class="line"></span><br><span class="line"><span class="comment"># 长文本切分为多个小文档</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">text_split</span>(<span class="params">doc</span>):</span><br><span class="line">    <span class="comment"># 知识库中单段文本长度</span></span><br><span class="line">    CHUNK_SIZE = <span class="number">500</span></span><br><span class="line">    <span class="comment"># 知识库中相邻文本重合长度</span></span><br><span class="line">    OVERLAP_SIZE = <span class="number">50</span></span><br><span class="line">    <span class="comment"># 使用递归字符文本分割器</span></span><br><span class="line">    text_splitter = RecursiveCharacterTextSplitter(</span><br><span class="line">        chunk_size=CHUNK_SIZE,</span><br><span class="line">        chunk_overlap=OVERLAP_SIZE</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">return</span> text_splitter.split_documents(doc)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">prepare_knowledge</span>():</span><br><span class="line">    <span class="comment"># 此篇文章无emoji</span></span><br><span class="line">    files = [<span class="string">&quot;macro.md&quot;</span>]</span><br><span class="line">    md_pages = []</span><br><span class="line">    <span class="keyword">for</span> f <span class="keyword">in</span> files:</span><br><span class="line">        loader = UnstructuredMarkdownLoader(f)</span><br><span class="line">        md_page = loader.load()</span><br><span class="line">        <span class="comment"># 打印这个文档来自哪个的文件名</span></span><br><span class="line">        <span class="comment"># source = md_page.metadata[&#x27;source&#x27;]</span></span><br><span class="line">        <span class="comment"># print(source)</span></span><br><span class="line">        <span class="comment"># 删除无必要的连续换行</span></span><br><span class="line">        md_page[<span class="number">0</span>].page_content = md_page[<span class="number">0</span>].page_content.replace(<span class="string">&#x27;\n\n&#x27;</span>, <span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">        md_pages.extend(md_page)</span><br><span class="line">    <span class="comment"># 文本切分</span></span><br><span class="line">    docs = text_split(md_pages)</span><br><span class="line">    <span class="comment"># 实例化星火文本向量化接口的调用工具</span></span><br><span class="line">    embeddings = SparkLLMTextEmbeddings()</span><br><span class="line">    <span class="comment"># 可以直接调用来向量化文本</span></span><br><span class="line">    <span class="comment"># embeddings.aembed_query(text)/aembed_documents(doc)</span></span><br><span class="line">    <span class="comment"># 初始化一个Chroma向量数据库，让Chroma将文档向量化</span></span><br><span class="line">    <span class="comment"># 并将数据库文件和向量数据保存到文件夹中</span></span><br><span class="line">    vectordb = Chroma.from_documents(</span><br><span class="line">        documents=docs,</span><br><span class="line">        embedding=embeddings,</span><br><span class="line">        persist_directory=<span class="string">&#x27;./vector&#x27;</span></span><br><span class="line">    )</span><br><span class="line">    vectordb.persist()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    <span class="comment"># 设置环境变量</span></span><br><span class="line">    load_env()</span><br><span class="line">    <span class="comment"># 实例化星火大模型调用工具</span></span><br><span class="line">    llm = SparkLLM(temperature=<span class="number">0.95</span>)</span><br><span class="line">    <span class="comment"># 初始化知识库</span></span><br><span class="line">    prepare_knowledge()</span><br><span class="line">    <span class="comment"># 加载本地知识库</span></span><br><span class="line">    embeddings = SparkLLMTextEmbeddings()</span><br><span class="line">    vector_db = Chroma(persist_directory=<span class="string">&quot;./vector&quot;</span>, embedding_function=embeddings)</span><br><span class="line">    <span class="comment"># 对话历史记录</span></span><br><span class="line">    memory = ConversationBufferMemory(</span><br><span class="line">        memory_key=<span class="string">&quot;chat_history&quot;</span>,</span><br><span class="line">        return_messages=<span class="literal">True</span>,  <span class="comment"># 将以消息列表的形式返回聊天记录，而不是单个字符串</span></span><br><span class="line">    )</span><br><span class="line">    <span class="comment"># 模版</span></span><br><span class="line">    system_template = <span class="string">&quot;&quot;&quot;使用提供的上下文和聊天记录回答用户的问题。不知道也不要编造答案，回答尽量简要。并且总是在回答的最后说“谢谢你的提问！”</span></span><br><span class="line"><span class="string">    ----------------</span></span><br><span class="line"><span class="string">    CONTEXT:</span></span><br><span class="line"><span class="string">    &#123;context&#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    CHAT HISTORY:</span></span><br><span class="line"><span class="string">    &#123;chat_history&#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    USER QUESTION:</span></span><br><span class="line"><span class="string">    &#123;question&#125;</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    messages = [</span><br><span class="line">        SystemMessagePromptTemplate.from_template(system_template),</span><br><span class="line">        HumanMessagePromptTemplate.from_template(<span class="string">&quot;&#123;question&#125;&quot;</span>)</span><br><span class="line">    ]</span><br><span class="line">    qa_prompt = ChatPromptTemplate.from_messages(messages)</span><br><span class="line">    <span class="comment"># 创建问答链，为其添加检索知识库和历史记录的功能</span></span><br><span class="line">    qa = ConversationalRetrievalChain.from_llm(</span><br><span class="line">        llm,</span><br><span class="line">        retriever=vector_db.as_retriever(),</span><br><span class="line">        combine_docs_chain_kwargs=&#123;<span class="string">&#x27;prompt&#x27;</span>: qa_prompt&#125;,</span><br><span class="line">        memory=memory</span><br><span class="line">    )</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;第一次问答：&quot;</span>)</span><br><span class="line">    question = <span class="string">&quot;我可以在你这里学习到关于提示工程的知识吗？&quot;</span></span><br><span class="line">    result = qa(&#123;<span class="string">&quot;question&quot;</span>: question&#125;)</span><br><span class="line">    <span class="built_in">print</span>(result[<span class="string">&#x27;answer&#x27;</span>])</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;第二次问答：&quot;</span>)</span><br><span class="line">    question = <span class="string">&quot;为什么?&quot;</span></span><br><span class="line">    result = qa(&#123;<span class="string">&quot;question&quot;</span>: question&#125;)</span><br><span class="line">    <span class="built_in">print</span>(result[<span class="string">&#x27;answer&#x27;</span>])</span><br></pre></td></tr></table></figure></div>
+
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/datawhale%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E5%A4%8F%E4%BB%A4%E8%90%A5%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%80/dbf54ef45698422f82b4bd445c9ad2f9.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/datawhale%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E5%A4%8F%E4%BB%A4%E8%90%A5%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%80/3d79bdb36c6848a6bd5311960cf97b35.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/datawhale%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E5%A4%8F%E4%BB%A4%E8%90%A5%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%80/e02cfb7cfa184e829beb45783ebd847f.png"
+                     
+                ></p>
+<blockquote>
+<p>由于突然文本向量化接口突然报错，上述代码我这里测试不了构建知识库了。但好在可以加载之前构建好的知识库来测试后面的代码。代码总体应该没问题，之后再看看<br>Request error: 11202, {‘header’: {‘code’: 11202, ‘message’: ‘licc failed’, ‘sid’: ‘emb000fc090@dx1907452bed6738d882’}}<br>Request error: 11202, {‘header’: {‘code’: 11202, ‘message’: ‘licc failed’, ‘sid’: ‘emb000ebcb7@dx1907452bf547020882’}}</p>
+</blockquote>
+<h2 id="TODO"><a href="#TODO" class="headerlink" title="TODO"></a>TODO</h2><ul>
+<li>怎么持久化以及加载历史信息，这篇博客到时候可以参考：<a class="link"   target="_blank" rel="noopener" href="https://blog.csdn.net/u013066244/article/details/131623141" >【LangChain】对话式问答(Conversational Retrieval QA)<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>怎么将知识图谱作为知识库</li>
+<li>评测和优化</li>
+</ul>
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>标题:</strong> datawhale大模型应用开发夏令营学习笔记一</li>
+        <li><strong>作者:</strong> urlyy</li>
+        <li><strong>创建于
+                :</strong> 2024-07-03 16:02:48</li>
+        
+            <li>
+                <strong>更新于
+                    :</strong> 2025-12-21 18:39:57
+            </li>
+        
+        <li>
+            <strong>链接:</strong> https://urlyy.github.io/2024/07/03/datawhale大模型应用开发夏令营学习笔记一/
+        </li>
+        <li>
+            <strong>
+                版权声明:
+            </strong>
+            
+
+            
+                本文章采用 <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a> 进行许可。
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+		<ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/LLM/">#LLM</a>&nbsp;
+			</li>
+			
+		</ul>
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="prev" rel="prev" href="/2024/08/03/Datawhale-AI-%E5%A4%8F%E4%BB%A4%E8%90%A5%EF%BC%882024%E7%AC%AC%E4%B8%89%E6%9C%9F%EF%BC%89AI-%E9%80%BB%E8%BE%91%E6%8E%A8%E7%90%86%E6%96%B9%E5%90%91-%E6%A8%A1%E5%9E%8B%E5%BE%AE%E8%B0%83%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+					<span class="left arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-left"></i>
+					</span>
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">Datawhale AI 夏令营（2024第三期）AI+逻辑推理方向 模型微调学习笔记</span>
+						<span class="post-nav-item">上一篇</span>
+					</span>
+				</a>
+			</div>
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2024/06/16/%E5%BA%90%E5%B1%B1%E6%B8%B8%E7%8E%A9/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">庐山游玩</span>
+						<span class="post-nav-item">下一篇</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        评论
+    </div>
+    
+
+        
+            
+    <div id="giscus-container"></div>
+    <script data-swup-reload-script defer>
+        async function loadGiscus() {
+            const giscusConfig = {
+                'src': 'https://giscus.app/client.js',
+                'data-repo': 'urlyy/urlyy_blog_comments',
+                'data-repo-id': 'R_kgDONo8nwQ',
+                'data-category': 'Announcements',
+                'data-category-id': 'DIC_kwDONo8nwc4Cl7pw',
+                'data-mapping': 'title',
+                'data-strict': '0',
+                'data-reactions-enabled': '1',
+                'data-emit-metadata': '1',
+                'data-theme': 'preferred_color_scheme',
+                'data-lang': 'zh-CN',
+                'data-input-position': 'top',
+                'data-loading': 'lazy',
+                'crossorigin': 'anonymous',
+                'async': true
+            }
+            const giscusScript = document.createElement('script');
+            for (const key in giscusConfig) {
+                giscusScript.setAttribute(key, giscusConfig[key]);
+            }
+            document.getElementById('giscus-container').appendChild(giscusScript);
+        }
+        if ('true') {
+            let loadGiscusTimeout = setTimeout(() => {
+                loadGiscus();
+                clearTimeout(loadGiscusTimeout);
+            }, 1000);
+        } else {
+            document.addEventListener('DOMContentLoaded', loadGiscus);
+        }
+    </script>
+
+
+        
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">目录</div>
+		<div class="page-title">datawhale大模型应用开发夏令营学习笔记一</div>
+		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9A%8F%E4%BE%BF%E8%B0%88%E8%B0%88"><span class="nav-text">随便谈谈</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E6%AD%A5%E6%AD%A5%E5%9F%BA%E4%BA%8Elangchain%E5%AE%9E%E7%8E%B0%E8%AE%AF%E9%A3%9E%E5%A4%A7%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%B0%83%E7%94%A8%E5%92%8CRAG"><span class="nav-text">一步步基于langchain实现讯飞大模型的调用和RAG</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#RAG%E5%92%8C%E5%BE%AE%E8%B0%83%E7%9A%84%E5%AF%B9%E6%AF%94"><span class="nav-text">RAG和微调的对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LangChain"><span class="nav-text">LangChain</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Prompt"><span class="nav-text">Prompt</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Temperature"><span class="nav-text">Temperature</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#System-Prompt"><span class="nav-text">System Prompt</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Prompt%E5%B7%A5%E7%A8%8B"><span class="nav-text">Prompt工程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A4%E6%AC%A1%E5%BC%80%E5%8F%91%E7%94%A8%E5%88%B0%E7%9A%84%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3"><span class="nav-text">此次开发用到的官方文档</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%98%E6%98%AF%E8%B4%B4%E4%B8%AA%E4%BB%A3%E7%A0%81"><span class="nav-text">还是贴个代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TODO"><span class="nav-text">TODO</span></a></li></ol></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2021</span>
+              -
+            
+            2025&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">urlyy</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        共撰写了 78 篇文章
+                    </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">访问人数</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">总访问量</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">由 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a> 驱动</span>
+            <span class="text-sm lg:block">主题&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.5</a></span>
+        </div>
+        
+        
+            <div>
+                博客已运行 <span class="odometer" id="runtime_days" ></span> 天 <span class="odometer" id="runtime_hours"></span> 小时 <span class="odometer" id="runtime_minutes"></span> 分钟 <span class="odometer" id="runtime_seconds"></span> 秒
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="fa-regular fa-arrow-up"></i>
+		</li>
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+	<div class="search-pop-overlay">
+	<div class="popup search-popup">
+		<div class="search-header">
+			<span class="search-input-field-pre">
+				<i class="fa-solid fa-keyboard"></i>
+			</span>
+			<div class="search-input-container">
+				<input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="站内搜索您需要的内容..." spellcheck="false" type="search" class="search-input">
+			</div>
+			<span class="popup-btn-close">
+				<i class="fa-solid fa-times"></i>
+			</span>
+		</div>
+		<div id="search-result">
+			<div id="no-result">
+				<i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>
+			</div>
+		</div>
+	</div>
+</div>
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+	
+<script src="/js/build/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/build/utils.js" type="module"></script>
+
+<script src="/js/build/main.js" type="module"></script>
+
+<script src="/js/build/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/build/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/build/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/build/layouts/categoryList.js" type="module"></script>
+
+
+
+    
+<script src="/js/build/tools/localSearch.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/layouts/lazyload.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/runtime.js"></script>
+
+    
+<script src="/js/build/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+  
+<script src="/js/build/plugins/typed.js" type="module"></script>
+
+
+
+
+    
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@9.3.0/dist/mermaid.min.js"></script>
+    
+    
+<script src="/js/build/plugins/mermaid.js"></script>
+
+
+
+
+
+
+    
+<script src="/js/build/libs/anime.min.js"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/tocToggle.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/layouts/toc.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/plugins/tabs.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+<script src="/js/build/layouts/essays.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+
+	
+</body>
+
+</html>

@@ -1,0 +1,1998 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="urlyy">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set data attribute for CSS variables
+                root.setAttribute("data-theme", theme);
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes once DOM is ready
+            if (document.readyState !== "loading") {
+                document.body.classList.add(theme + "-mode");
+            } else {
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add(theme + "-mode");
+                    document.body.classList.remove((theme === DARK ? LIGHT : DARK) + "-mode");
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Critical CSS to prevent flash -->
+    <style>
+        :root[data-theme="dark"] {
+            --background-color: #202124;
+            --background-color-transparent: rgba(32, 33, 36, 0.6);
+            --second-background-color: #2d2e32;
+            --third-background-color: #34353a;
+            --third-background-color-transparent: rgba(32, 33, 36, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #ffffff;
+            --second-text-color: #eeeeee;
+            --third-text-color: #bebec6;
+            --fourth-text-color: #999999;
+            --default-text-color: #bebec6;
+            --invert-text-color: #373D3F;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(255, 255, 255, 0.08);
+            --shadow-color-2: rgba(255, 255, 255, 0.05);
+        }
+        
+        :root[data-theme="light"] {
+            --background-color: #fff;
+            --background-color-transparent: rgba(255, 255, 255, 0.6);
+            --second-background-color: #f8f8f8;
+            --third-background-color: #f2f2f2;
+            --third-background-color-transparent: rgba(241, 241, 241, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #16171a;
+            --second-text-color: #2f3037;
+            --third-text-color: #5e5e5e;
+            --fourth-text-color: #eeeeee;
+            --default-text-color: #373D3F;
+            --invert-text-color: #bebec6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(0, 0, 0, 0.08);
+            --shadow-color-2: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+        
+        /* Apply body classes as soon as DOM is ready */
+        :root[data-theme="dark"] body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+    </style>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://urlyy.github.io/2023/01/10/thinking/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta name="description" content="翻译+学习笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tools for better thinking">
+<meta property="og:url" content="http://urlyy.github.io/2023/01/10/thinking/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="翻译+学习笔记">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/75eb79d637bf489cb61efdf2b148dd5e.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/9ea1e22a22334e31bbcab70fec6588d8.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/f5ed507129e74253a3bc1a7c02e35c87.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/4163ea2fb0254c61a2849059ed730cfb.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/02a13e29df2e47f49adfd1a882587d2c.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/a506a66fa0b74e7a9d16c8427c86c196.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/b8d8984efc0c4e8aa3b546b1e008f79c.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/ea95b4f53386442cb2e47efa88430352.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/b83514c1f64446b4a6a3b2865ea098ee.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/e12dda7b0fa84206928fc49f7c3bcfbf.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/5e39249c00144a70b9cdc8bb55eee38b.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/9b6cdcbd16484ac2b74284461d76e930.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/563f2ec0fa894ba8b88efc860cf6f877.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/3adc0d57c84d4a2db2959af93f2f1d30.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/c4147c16d656409095095f2fb53ca379.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/032b2be5757e4e15b9ec459dbf00dfc5.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/c65fa30190394d7aab8e9529eef938f2.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/647cc7c1bc4e42898c7a3cdaacc3864f.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/56db69ed042b44db84e8b8fbd6e1bd9c.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/0da82ad6423a454fabb96d4422874e3c.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/60df122ee6aa4f46bf85adf0214578c0.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/548db8be0af04fd488f20ebcf1391661.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/08ee15b9788e4671ba68867f79d7a74a.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/abf0a27aa81d4bec8461de6e35788080.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/942ac6661d504e4c943805662c63f4a6.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/3716e8cafe4847f992fe3028951fb527.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/cf2641fb824d4194b60f5ae3215e8f0c.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/20f398f33f924f5083220c6ea7b635a0.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/06a061ac282a402a861a36aee6e858e1.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/fe377a9bf2c34ba5bbb90ddbbe3cc4fe.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/8db5d587b32c46248dd5e8da53e0560f.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/d442de6aa4e04cf3a421a5e647609977.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/150a4c8328f84fb4b58699643fdb3e5e.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/d0404168af58407986be89ac347ab7e1.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/7e9e2562a23540bf8254fe8129db224f.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/b1fb11401ce2434cb757d9d48a42f515.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/2cbec22cf5a6489c8de9181d9618532d.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/d466bb11793e4e58994a45fc9845a873.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/934aefe2aada452e888202aed2a1c78a.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/a85049a83b5744a1bfc8c1c2630129ee.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/b4e880022cc54a2581f15beed01eaa11.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/thinking/2aa15dff3a614cc689484bf2ea6ec5cb.png">
+<meta property="article:published_time" content="2023-01-10T04:58:35.000Z">
+<meta property="article:modified_time" content="2025-12-21T10:39:57.277Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://urlyy.github.io/article_images/thinking/75eb79d637bf489cb61efdf2b148dd5e.png">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/avatar.jpg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.jpg">
+    <meta name="theme-color" content="#5c701a">
+    <link rel="shortcut icon" href="/images/avatar.jpg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            Tools for better thinking | urlyy的小窝
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+        <link href="" rel="stylesheet">
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"urlyy.github.io","root":"/","language":"zh-CN","path":"search.json"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":false,"auto":false,"list":[""]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":true},"copyright":true,"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#5c701a","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":true,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":false},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"side_tools":{"gear_rotation":true,"auto_expand":false},"open_graph":true,"google_analytics":{"enable":false,"id":null},"busuanzi_counter":{"enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"pjax":true},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/bg/1.jpg","dark":"/images/bg/1.jpg"},"title":"urlyy的小窝","subtitle":{"text":["Loading..."],"hitokoto":{"enable":true,"show_author":false,"api":"https://v1.hitokoto.cn?c=a&c=b&c=d&c=k"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"style":"default","links":{"github":"https://github.com/urlyy?tab=repositories","instagram":null,"zhihu":null,"twitter":null,"email":"2213732736@qq.com"},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":true,"version":"9.3.0"}},"version":"2.8.5","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Categories":{"icon":"fa-regular fa-folder","path":"/categories/"},"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Github":{"path":"https://github.com/urlyy","icon":"fa-brands fa-github"},"个人介绍":{"path":"/personal/profile.html","icon":"fa-regular fa-user"}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"cloud"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":null},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2021/9/7 16:55:00"};
+    window.lang_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 个月前","year":"%s 年前"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                urlyy的小窝
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    首页
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/categories/"
+                                        >
+                                    <i class="fa-regular fa-folder fa-fw"></i>
+                                    分类
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/archives"
+                                        >
+                                    <i class="fa-regular fa-archive fa-fw"></i>
+                                    归档
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   target="_blank" rel="noopener" href="https://github.com/urlyy"
+                                        >
+                                    <i class="fa-brands fa-github fa-fw"></i>
+                                    GITHUB
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/personal/profile.html"
+                                        >
+                                    <i class="fa-regular fa-user fa-fw"></i>
+                                    个人介绍
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                首页
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/categories/"
+                        >
+                            <span>
+                                分类
+                            </span>
+                            
+                                <i class="fa-regular fa-folder fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/archives"
+                        >
+                            <span>
+                                归档
+                            </span>
+                            
+                                <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           target="_blank" rel="noopener" href="https://github.com/urlyy"
+                        >
+                            <span>
+                                GITHUB
+                            </span>
+                            
+                                <i class="fa-brands fa-github fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/personal/profile.html"
+                        >
+                            <span>
+                                个人介绍
+                            </span>
+                            
+                                <i class="fa-regular fa-user fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">25</div>
+        <div class="label text-third-text-color text-sm">标签</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">29</div>
+        <div class="label text-third-text-color text-sm">分类</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">78</div>
+        <div class="label text-third-text-color text-sm">文章</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">Tools for better thinking</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/avatar.jpg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">urlyy</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2023-01-10 12:58:35</span>
+        <span class="mobile">2023-01-10 12:58:35</span>
+        <span class="hover-info">创建</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2025-12-21 18:39:57</span>
+            <span class="mobile">2025-12-21 18:39:57</span>
+            <span class="hover-info">更新</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/%E8%BD%AF%E5%AE%9E%E5%8A%9B/">软实力</a>&nbsp;
+                        </li>
+                    
+                    
+                
+                    
+                        
+                            <li>></li>
+                        
+                        <li>
+                            <a href="/categories/%E8%BD%AF%E5%AE%9E%E5%8A%9B/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B/">软件工程</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<blockquote>
+<p>内容来自<a class="link"   target="_blank" rel="noopener" href="https://untools.co/" >untools官网<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>，感兴趣的可以去翻译一下，我只做下总结</p>
+</blockquote>
+<ul>
+<li>理解系统<ul>
+<li><a href="#Concept-map" title="概念图">Concept map</a></li>
+<li><a href="#Connection-circles" title="关系环">Connection circles</a></li>
+<li><a href="#Iceberg-Model" title="冰山模型">Iceberg Model</a></li>
+<li><a href="#Balancing-feedback-loop" title="平衡反馈回路">Balancing feedback loop</a></li>
+<li><a href="#Reinforcing-feedback-loop" title="强化反馈回路">Reinforcing feedback loop</a></li>
+</ul>
+</li>
+<li>做出决策<ul>
+<li><a href="#Cynefin-framework" title="Cynefin框架">Cynefin framework</a></li>
+<li><a href="#Six-Thinking-Hats" title="六顶思维帽">Six Thinking Hats</a></li>
+<li><a href="#Second-order-thinking" title="二阶思维">Second-order thinking</a></li>
+<li><a href="#Eisenhower-Matrix" title="艾森豪威尔矩阵">Eisenhower Matrix</a></li>
+<li><a href="#Ladder-of-inference" title="推理阶梯">Ladder of inference</a></li>
+<li><a href="#Decision-matrix" title="决策矩阵">Decision matrix</a></li>
+<li><a href="#Confidence-determines-speed-vs.-quality" title="信心决定“速度”还是“质量”">Confidence determines speed vs. quality</a></li>
+<li><a href="#Hard-choice-model" title="艰难抉择模型">Hard choice model</a></li>
+</ul>
+</li>
+<li>解决问题<ul>
+<li><a href="#Ishikawa-Diagram" title="鱼骨图">Ishikawa Diagram</a> </li>
+<li><a href="#Conflict-Resolution-Diagram" title="冲突解决图">Conflict Resolution Diagram</a> </li>
+<li><a href="#Productive-Thinking-Model" title="生产性思维模型">Productive Thinking Model</a> </li>
+<li><a href="#Abstraction-laddering" title="抽象阶梯">Abstraction laddering</a> </li>
+<li><a href="#Inversion" title="反演">Inversion</a> </li>
+<li><a href="#Issue-trees" title="问题树">Issue tress</a> </li>
+<li><a href="#First-principles" title="第一原则">First principles</a></li>
+</ul>
+</li>
+<li>沟通<ul>
+<li><a href="#Minto-Pyramid" title="明托金字塔">Minto Pyramid</a> </li>
+<li><a href="#Situation-Behavior-Impact" title="情况-行为-影响">Situation-Behavior-Impact</a></li>
+</ul>
+</li>
+</ul>
+<h1 id="利于思考的工具"><a href="#利于思考的工具" class="headerlink" title="利于思考的工具"></a>利于思考的工具</h1><p>下面是一系列帮助解决问题、做出决策、理解系统的思维工具和框架<br>(译者：下面是我用Mermaid画的图)</p>
+<pre class="mermaid">graph LR
+All --> A[理解系统]
+A --> A1{概念图}
+A --> A2{关系环}
+A --> A3{冰山模型}
+A --> A4{平衡反馈回路}
+A --> A5{强化反馈回路}
+All --> B[做出决策]
+B --> B1{Cynefin框架}
+B --> B2{六顶思维帽}
+B --> B3{二阶思维}
+B --> B4{艾森豪威尔矩阵}
+B --> B5{推理阶梯}
+B --> B6{决策矩阵}
+B --> B7{信心决定速度还是质量}
+B --> B8{艰难抉择模型}
+All --> C[解决问题]
+C --> C1[鱼骨图]
+C --> C2[冲突解决图]
+C --> C3[生产性思维模型]
+C --> C4[抽象阶梯]
+C --> C5[反演]
+C --> C6[问题树]
+C --> C7[第一原则]
+All --> D[沟通]
+D --> D1[明托金字塔]
+D --> D2[情况-行为-影响]</pre>
+<h2 id="理解系统"><a href="#理解系统" class="headerlink" title="理解系统"></a>理解系统</h2><h3 id="概念图"><a href="#概念图" class="headerlink" title="概念图"></a>概念图<span id="Concept-map"/></h3><blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/75eb79d637bf489cb61efdf2b148dd5e.png"
+                      alt="在这里插入图片描述"
+                >将对概念的理解可视化。</p>
+</blockquote>
+<ul>
+<li><p>制作的前提是要对相关知识有一定的了解，否则图不准确。</p>
+</li>
+<li><p>制定焦点问题，并从不同角度看待事物。</p>
+</li>
+<li><p>用一个列表记录关键实体，比如时间、地点、人物、组织、行动、过程、活动、方法等，通常15~25个，也可以更多，并且还要对这些实体排序以求概念图有更好的层次结构。</p>
+</li>
+<li><p>绘图时用线连接实体，使用动词或短语表示关系。</p>
+</li>
+<li><p>不断更新该概念图，并在迭代的过程中发现自己的认知差距并通过学习以填补差距。</p>
+<p>  <strong>Example：</strong></p>
+<ol>
+<li>首先，焦点问题：How do sharing permissions work in this product?</li>
+<li>焦点问题转为实体列表：			<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/9ea1e22a22334e31bbcab70fec6588d8.png"
+                      alt="在这里插入图片描述"
+                ></li>
+<li>使用流程图等工具可视化实体间关系<br>  <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/f5ed507129e74253a3bc1a7c02e35c87.png"
+                      alt="在这里插入图片描述"
+                ></li>
+</ol>
+</li>
+</ul>
+<h3 id="关系环"><a href="#关系环" class="headerlink" title="关系环"></a>关系环<span id="Connection-circles"/></h3><blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/4163ea2fb0254c61a2849059ed730cfb.png"
+                      alt="在这里插入图片描述"
+                > 了解系统内存在的关系并识别出反馈回路</p>
+</blockquote>
+<ul>
+<li><p>找到关键元素，“关键”的标准是 </p>
+<ul>
+<li>他们的改变对系统影响很大</li>
+<li>在系统中会增加和减少</li>
+<li>能用名词描述</li>
+</ul>
+</li>
+<li><p>寻找因果关系，以及每个关系造成的影响(涉及元素的增加和减少)，这些关系可以基于数据也可以基于假设</p>
+</li>
+<li><p>寻找关系形成的闭环，这些就是反馈回路</p>
+<p>  <strong>Example</strong></p>
+<ul>
+<li>场景：很多客户抱怨我们的产品bug太多并且响应时间太慢(慢会导致用户创建更多support tickets)，同时我们也在新增功能来让用户满意。</li>
+<li>首先确定关键元素：不开心的用户、bug、响应时间、support ticket、新功能<br>  <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/02a13e29df2e47f49adfd1a882587d2c.png"
+                      alt="在这里插入图片描述"
+                ></li>
+<li>列出关系并画在图上，本例子中，不满足的用户会创建更多的support tickets并因此增加响应时间，响应时间增加又会增加不满意的客户；推出新功能会减少不满意的客户但也会带来更多的bug，这些bug又会增加不满意的客户。<br>  <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/a506a66fa0b74e7a9d16c8427c86c196.png"
+                      alt="在这里插入图片描述"
+                ></li>
+</ul>
+</li>
+</ul>
+<p>从中能找到一个正反馈回路。接下来的目标就是消除这些正反馈回路了<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/b8d8984efc0c4e8aa3b546b1e008f79c.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h3 id="冰山模型"><a href="#冰山模型" class="headerlink" title="冰山模型"></a>冰山模型<span id="Iceberg-Model"/></h3><blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/ea95b4f53386442cb2e47efa88430352.png"
+                      alt="在这里插入图片描述"
+                ><br>分析问题要透过现象看本质</p>
+</blockquote>
+<ul>
+<li><p>不能只通过当前发生的事件定位问题，真正的原因往往在更深层。</p>
+</li>
+<li><p>冰山模型包括四个层次：<br>事件、模式、结构、心智模型。<br>模式是事件随事件变化的趋势，是理解系统结构的线索。<br>结构是系统内部的关系和反馈回路。<br>人们潜在的心智模型导致了这种系统结构。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/b83514c1f64446b4a6a3b2865ea098ee.png"
+                      alt="在这里插入图片描述"
+                ></p>
+</li>
+<li><p>事件和模式显示是外在表现，结构和心智模型是发生的原因、本质。所以在冰山上探索的越深，越能做出大的影响</p>
+</li>
+<li><p>一些帮助分析各层次的问题：<br>  事件：现在发生了什么？<br>  模式：随着时间的推移发生了什么？趋势是什么？<br>  结构：是什么影响了这些模式？模式之间的联系在哪里？<br>  心智模型：什么样的价值观、信念或假设塑造了这个系统？<br>  (注意上面这些问题往往很复杂，是需要研究和挖掘的)</p>
+<p>  <strong>Example</strong></p>
+<ul>
+<li>事件：您的产品团队刚刚发布的功能有几个bug</li>
+<li>模式：回顾过去，每次发布新功能时都会带有几个bug</li>
+<li>结构：调查之后发现团队在发布功能之前没有测试的计划，QA(质量保证)也只在发布后进行；团队的deadline很紧迫。</li>
+<li>心智模型：进一步调查发现团队更重视按时交付而不是产品质量；产品经理强加了紧迫的ddl，团队成员不能推迟交付。</li>
+<li>问题的原因就找到了，这样就能通过一次事件解决一个公司中存在的问题，利于公司未来的发展。</li>
+</ul>
+</li>
+</ul>
+<h3 id="平衡反馈回路"><a href="#平衡反馈回路" class="headerlink" title="平衡反馈回路"></a>平衡反馈回路<span id="Balancing-feedback-loop"/></h3><blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/e12dda7b0fa84206928fc49f7c3bcfbf.png"
+                      alt="在这里插入图片描述"
+                ><br>使系统自我调节</p>
+</blockquote>
+<ul>
+<li><p>用一个反方向的变化来抵消另一个方向的变化，并试图以此稳定一个系统，往往与强化反馈回路(下面会有)一起出现以产生指数级的变化</p>
+</li>
+<li><p>重要部分：</p>
+<ul>
+<li>目标或期望水平</li>
+<li>实际水平</li>
+<li>两者之间的差距<br>  期望水平发现差距后触发纠正措施，使某物的实际水平接近所需水平。<br>  关键在找到目标或期望水平，这个可能不是很明确或马上找得到的。<br>  <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/5e39249c00144a70b9cdc8bb55eee38b.png"
+                      alt="在这里插入图片描述"
+                ></li>
+</ul>
+<p>  <strong>Example</strong><br>  恒温器在发现室温(实际水平)低于或高于阈值(期望)时，通过加热或冷却以稳定房间内温度。</p>
+</li>
+</ul>
+<h3 id="强化反馈回路"><a href="#强化反馈回路" class="headerlink" title="强化反馈回路"></a>强化反馈回路<span id="Reinforcing-feedback-loop"/></h3><blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/9b6cdcbd16484ac2b74284461d76e930.png"
+                      alt="在这里插入图片描述"
+                ><br>正反馈循环</p>
+</blockquote>
+<ul>
+<li>就是正反馈循环，某次循环的输出成为下次循环的输入，同时有一个外部变量影响整个循环。例如利滚利，有账户余额和利息收入，外部变量为利率。</li>
+<li>系统中通常同时存在强化反馈回路和平衡反馈回路，一个以指数级的方式增加收益，一个维持系统稳定性。</li>
+</ul>
+<h2 id="做出决策"><a href="#做出决策" class="headerlink" title="做出决策"></a>做出决策</h2><h4 id="Cynefin框架"><a href="#Cynefin框架" class="headerlink" title="Cynefin框架 "></a>Cynefin框架 <span id="Cynefin-framework"/></h4><blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/563f2ec0fa894ba8b88efc860cf6f877.png"
+                      alt="在这里插入图片描述"
+                ><br>不同问题不同处理，确定问题的类型，并选取正确的解决方式</p>
+</blockquote>
+<ul>
+<li>Cynefin发音为 &#x2F;kənɛvɪn&#x2F;</li>
+<li>不同情况需要不同的处理方式</li>
+<li>该框架用来确定在哪个情况，并根据其特征选择适当的操作。确定了五个领域来进行分类：清晰、complicated、complex、混乱、无序<br>  <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/3adc0d57c84d4a2db2959af93f2f1d30.png"
+                      alt="在这里插入图片描述"
+                ><ul>
+<li>清晰：问题很明确、解决方法也很明确，不需要太多专业知识。正确方法就是了解情况(感知)-&gt;分类-&gt;应用最佳实践解决方案。</li>
+<li>complicated：问题明确，但是解决方案有多个。最好方法是感知-&gt;分析-&gt;应用方案。这里的分析是需要有专业知识的专业进行评估，调查可能的解决方案并选择。</li>
+<li>complex：不知道要解决什么问题，无法通过分析来理解，因为了解不够。正确做法是先做实验来了解问题，感受正在处理的事并做出适当的响应，目标是充分理解并将问题或情况转移到更容易处理的complicated领域。</li>
+<li>混乱：事情不受控制，因果关系不清楚。此时要采取行动稳定、遏制局势，才能在相对有序的complex领域来分析问题。当然这种领域下也有尝试新颖解决方案的机会，因为此时人们对这些方案也更开放、包容。</li>
+<li>无序：甚至不知道自己的立场。此时应该快速确定正确的领域，将问题或情况分解并分配给合适的领域。</li>
+</ul>
+</li>
+<li>一组可用的问题：<ul>
+<li>什么原因造成这种情况的？</li>
+<li>情况是否得到控制？</li>
+<li>对它了解多少？</li>
+<li>解决它需要专业知识吗？</li>
+</ul>
+</li>
+</ul>
+<h3 id="六顶思维帽子"><a href="#六顶思维帽子" class="headerlink" title="六顶思维帽子"></a>六顶思维帽子<span id="Six-Thinking-Hats"></span></h3><blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/c4147c16d656409095095f2fb53ca379.png"
+                      alt="在这里插入图片描述"
+                ><br>从不同角度思考问题</p>
+</blockquote>
+<ul>
+<li><p>每个帽子代表一种镜头、视角、思维方式，尝试戴上不同的帽子来审视决策。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/032b2be5757e4e15b9ec459dbf00dfc5.png"
+                      alt="在这里插入图片描述"
+                ></p>
+</li>
+<li><p>团队合作时可以分配帽子来获得相对平衡的讨论。</p>
+</li>
+<li><p>🟡黄帽代表积极性，看这个决策的好处和带来的机遇。</p>
+</li>
+<li><p>🟢绿帽代表创造力。解放您的思想以提出有创意的选择和解决方案。可以使用高效思维模型(下面有)或第一原则(下面有)等工具。</p>
+</li>
+<li><p>🔴红帽代表感性。看自己和其他人仅通过直觉时，对决策的反应情况。</p>
+</li>
+<li><p>⚪️白帽代表理性。分析可用数据和趋势来评判决策。</p>
+</li>
+<li><p>⚫️黑帽代表不利因素。想想潜在的负面结果、最坏的情况、不起作用的因素。可以使用反演(下面有)。</p>
+</li>
+<li><p>🔵蓝帽子代表流程控制。比如在没有进展的情况下，通过“换帽子”来推动团队前进。</p>
+<p>  Example(这个会议内容是有争议的，比如可能有人厌恶被🔵打断)<br>  您正在会议上决定是否在产品中引入新产品以应对销量下滑</p>
+<ul>
+<li>🟡新产品可能迎合很大的市场份额，是获得大量收入的好机会</li>
+<li>⚫️如果新产品蚕食我们的现有产品怎么办？如果人们不满足产品质量而不购买怎么办？</li>
+<li>⚪️当前掌握的数据显示了有一些未满足的需求。同时现有产品的销量下降预示着整个市场正在转向不同的解决方案。</li>
+<li>再次🟡，通过数据支持发现市场上未满足的需求，这代表一个坚实的机会。</li>
+<li>如何确保产品有足够的价值？🟢想出新产品原型并与其他人讨论。</li>
+<li>创作性的讨论已经进行了一段时间了，🔵协调员建议先别做出引入新产品这个决策，除非新产品被所有人证明有价值</li>
+<li>🔴统计每个人对这个决策的看法，人们一致认为是个高风险的决策，最好先降低风险再进行决策。这减少了所有人的焦虑情绪。</li>
+</ul>
+<p>  <a class="link"   target="_blank" rel="noopener" href="https://www.goodreads.com/book/show/97030.Six_Thinking_Hats" >该网站作者所参考的书籍<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>，分数不是很高而且评论区也有不满的观点</p>
+</li>
+</ul>
+<h3 id="二阶思考"><a href="#二阶思考" class="headerlink" title="二阶思考"></a>二阶思考<span id="Second-order-thinking"></span></h3><blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/c65fa30190394d7aab8e9529eef938f2.png"
+                      alt="在这里插入图片描述"
+                ><br>思考决策的长远影响</p>
+</blockquote>
+<ul>
+<li><p>有些决策一开始是正确的，但随着时间的推移会变得不合理。二阶思考可以帮助检查决策的长期影响</p>
+</li>
+<li><p>决策的直接影响是第一阶思考，对每个影响问自己“然后呢？”，这个然后可以是10分钟、10月、10年<br>  <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/647cc7c1bc4e42898c7a3cdaacc3864f.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<p>  Example</p>
+<ul>
+<li>决策：在城外买房子</li>
+<li>直接影响：拥有一个花园，家人有更多空间，但是离工作地点的路程多了一个小时</li>
+<li>二阶影响<ul>
+<li>拥有花园-&gt;能自己种农产品-&gt;有新鲜的蔬菜</li>
+<li>家人更多空间-&gt;更多需要打扫的房间-&gt;房间凌乱带来更多压力</li>
+<li>工作通勤增加一小时-&gt;需要买辆车-&gt;每天多花两个小时在车里</li>
+</ul>
+</li>
+<li>以上是一小部分的二阶思考，可以体现出更长期的后果，基于此可以进行更明智的决策。、</li>
+</ul>
+</li>
+</ul>
+<h3 id="艾森豪威尔矩阵"><a href="#艾森豪威尔矩阵" class="headerlink" title="艾森豪威尔矩阵"></a>艾森豪威尔矩阵</h3><blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/56db69ed042b44db84e8b8fbd6e1bd9c.png"
+                      alt="在这里插入图片描述"
+                ><br>按重要性和紧迫性对您的行动和任务进行优先排序</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>紧迫</th>
+<th>不紧迫</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>重要</td>
+<td>马上做</td>
+<td>安排时间做</td>
+</tr>
+<tr>
+<td>不重要</td>
+<td>委托</td>
+<td>不做</td>
+</tr>
+</tbody></table>
+<ul>
+<li><p>该矩阵为2x2，四个象限分别为：</p>
+<ul>
+<li>重要紧急-&gt;马上做：需要尽快完成的任务，是现在不采取行动会产生负面后果的事</li>
+<li>重要但不紧急-&gt;安排时间做：这个事项通常是深入的工作发生的地方。通常是有利于项目或长期目标的事项。</li>
+<li>紧急但不重要-&gt;委托：尽量委托给其他人；如果实在无人委托就安排时间做，但是在这之前还是先完成重要但不紧急的工作。通常是有ddl但是不重要的管理任务。</li>
+<li>不紧急不重要-&gt;不做：不值得花时间，根本不应该做。</li>
+</ul>
+</li>
+<li><p>紧急任务通常有明确的截止时间或要求立即做出反应，重要任务往往与长期目标保持一致并推动项目向前发展。确定紧迫性和重要性始终取决于您的环境以及您识别真正紧迫和真正重要的事情的能力。</p>
+<p>  Example</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>紧迫</th>
+<th>不紧迫</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>重要</td>
+<td>完成一份临期报告<br>将草案发给客户<br>修复Bug</td>
+<td>设计一个新功能<br>写一篇博客<br>健身</td>
+</tr>
+<tr>
+<td>不重要</td>
+<td>安排面试<br>购买门票<br>回复电子邮件</td>
+<td>参加没有议程的会议<br>检查社交媒体消息</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<h3 id="推理阶梯"><a href="#推理阶梯" class="headerlink" title="推理阶梯"></a>推理阶梯<span id="Ladder-of-inference"></span></h3><blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/0da82ad6423a454fabb96d4422874e3c.png"
+                      alt="在这里插入图片描述"
+                ><br>通过一步步的推导得到结论而不是不管隐情、直接从事件外表得到结论<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/60df122ee6aa4f46bf85adf0214578c0.png"
+                      alt="在这里插入图片描述"
+                ></p>
+</blockquote>
+<ul>
+<li><p>梯子上有七个步骤，从下往上分别是：</p>
+<ol>
+<li>可用数据：可观察到的现实</li>
+<li>所选数据：从可用数据中挑选出的重点关注的内容。</li>
+<li>释义：解释所选数据以理解它</li>
+<li>假设：根据解释做出个人假设</li>
+<li>结论：从假设中得到结论</li>
+<li>信念：从得出的结论发展出信念</li>
+<li>动作：基于信念采取行动</li>
+</ol>
+</li>
+<li><p>在进行决策时，停下来质疑自己的推理，步骤如下：</p>
+<ul>
+<li>首先确定当前处于阶梯的哪一步</li>
+<li>然后沿着阶梯向下走，每一步使用以下的指导问题：<ul>
+<li>动作：为什么我认为这是正确的行动？有哪些替代选择？</li>
+<li>信念：我对此持有什么信念？它们基于什么结论？</li>
+<li>假设：为什么我得出这个结论？我的假设是什么？</li>
+<li>释义：我是否客观地看待这些数据？它们还有什么其他含义？</li>
+<li>所选数据：我忽略或没有注意什么？还有我没考虑的其他可用数据吗？</li>
+<li>到达底部后再次努力向上，这次会更清醒、更慎重</li>
+</ul>
+</li>
+</ul>
+<p>  Example</p>
+<ul>
+<li>我在管理一个开发团队，一个组员总是不能按时完成任务，这导致几个项目进度被推迟了。我断定他不适合这个工作并决定解雇他。但此时我准备使用推理阶梯来做出更好的决定。</li>
+<li>为什么解雇他是正确的决定？因为我清楚他不适合这份工作。</li>
+<li>这种信念基于什么结论？他不是一个好的开发人员</li>
+<li>我的假设是什么?我认为他最近的表现代表了他的工作素质</li>
+<li>我为什么要这样假设？因为不能按时完成意味着他没有效率</li>
+<li>我正在查看的数据还有什么其他含义？不能按时完成可能意味着ddl设置不合理，或者他花费了额外的时间来提高代码质量</li>
+<li>我还有没考虑的可用数据吗？我还没有当面询问他的情况，如果我这样做，可能可以找到真正原因</li>
+<li>通过上面的思考可能就避免了解雇一个正在解决个人问题或注重代码质量或迫于不合理的ddl的开发人员。避免了错误和过早的决定。</li>
+</ul>
+</li>
+</ul>
+<h3 id="决策矩阵"><a href="#决策矩阵" class="headerlink" title="决策矩阵"></a>决策矩阵<span id="Decision-matrix"></span></h3><blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/548db8be0af04fd488f20ebcf1391661.png"
+                      alt="在这里插入图片描述"
+                ><br>存在多个决策和影响因素时，使用表格进行打分，用分数辅助决策</p>
+</blockquote>
+<ul>
+<li><p>多个决策涉及多个因素时，不太好做出决定。此时可以使用决策矩阵</p>
+</li>
+<li><p>决策矩阵包括决策和因素，通过对他们的交叉点打分并计算总分，辅助做出决策</p>
+</li>
+<li><p>创建矩阵的步骤为：</p>
+<ul>
+<li>列出决策选项 	</li>
+<li>列出要考虑的因素</li>
+<li>根据事实对每个因素的决策选项进行评分</li>
+<li>为每个因素赋以权重</li>
+<li>权重乘分数并相加计算总分</li>
+<li>选择得分最高的选项</li>
+</ul>
+<p>  Example</p>
+<ul>
+<li>您领导了一个设计团队，正在决定使用的设计工具，选择了Figma、Sketch、Framer。接着您确定预算为首要因素，同时与团队讨论后同意将最为重要的功能，即原型制作和协作功能作为影响因素</li>
+<li>绘制了如下表格<table>
+<thead>
+<tr>
+<th>因素</th>
+<th>成本</th>
+<th>原型制作</th>
+<th>协作</th>
+<th>分数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>权重</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Sketch</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Figma</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Framer</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+</li>
+<li>成本上Figma和Sketch都是12 $，Sketch为9 $；原型制作上Framer最为强大，Figma比Sketch稍微好一点；协作上经过团队评估后，认为Figma最适合。打分如下<table>
+<thead>
+<tr>
+<th>因素</th>
+<th>成本</th>
+<th>原型制作</th>
+<th>协作</th>
+<th>分数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>权重</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Sketch</td>
+<td>4</td>
+<td>2</td>
+<td>3</td>
+<td></td>
+</tr>
+<tr>
+<td>Figma</td>
+<td>3</td>
+<td>3</td>
+<td>5</td>
+<td></td>
+</tr>
+<tr>
+<td>Framer</td>
+<td>3</td>
+<td>5</td>
+<td>3</td>
+<td></td>
+</tr>
+</tbody></table>
+</li>
+<li>一开始就确定了预算最为重要；之后经过团队讨论认为协作比原型制作更重要，于是添加权重并计算后如下<table>
+<thead>
+<tr>
+<th>因素</th>
+<th>成本</th>
+<th>原型制作</th>
+<th>协作</th>
+<th>分数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>权重</td>
+<td>5</td>
+<td>4</td>
+<td>3</td>
+<td></td>
+</tr>
+<tr>
+<td>Sketch</td>
+<td>4</td>
+<td>2</td>
+<td>3</td>
+<td>37</td>
+</tr>
+<tr>
+<td>Figma</td>
+<td>3</td>
+<td>3</td>
+<td>5</td>
+<td>42</td>
+</tr>
+<tr>
+<td>Framer</td>
+<td>3</td>
+<td>5</td>
+<td>3</td>
+<td>44</td>
+</tr>
+</tbody></table>
+</li>
+<li>Framer分数最高，于是选择Framer</li>
+</ul>
+</li>
+</ul>
+<h3 id="信心决定“速度”还是“质量”"><a href="#信心决定“速度”还是“质量”" class="headerlink" title="信心决定“速度”还是“质量”"></a>信心决定“速度”还是“质量”<span id="Confidence-determines-speed-vs.-quality"></span></h3><blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/08ee15b9788e4671ba68867f79d7a74a.png"
+                      alt="在这里插入图片描述"
+                ><br>评估问题的重要性和团队的能力后再确定要速度还是要质量</p>
+</blockquote>
+<ul>
+<li>在产品开发中往往要在速度和质量之间做出抉择</li>
+<li>此时需要评判自身对问题的重要性和解决能力的自信<table>
+<thead>
+<tr>
+<th></th>
+<th>解决能力高</th>
+<th>解决能力低</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>重要性高</td>
+<td>又快又好，干就完了</td>
+<td>质量</td>
+</tr>
+<tr>
+<td>重要性低</td>
+<td>速度</td>
+<td>再做权衡</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<h3 id="艰难抉择模型"><a href="#艰难抉择模型" class="headerlink" title="艰难抉择模型"></a>艰难抉择模型<span id="Hard-choice-model"></span></h3><blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/abf0a27aa81d4bec8461de6e35788080.png"
+                      alt="在这里插入图片描述"
+                ></p>
+</blockquote>
+<ul>
+<li><p>该模型可以帮助您确定您的决策是什么类型的，这将影响您对决策的推行</p>
+</li>
+<li><p>考虑两个因素：</p>
+<ul>
+<li>决策的影响有多大？</li>
+<li>比较各个决策选项有多容易？</li>
+</ul>
+<p>  基于这两个因素产生了下面这个2*2的矩阵</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>决策影响较小</th>
+<th>决策影响较大</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>比较多个决策选项是很难的</td>
+<td><strong>苹果&#x2F;橙子的选择</strong><br>需要基于你到底觉得哪个重要来改善选项</td>
+<td><strong>大选择</strong><br>决策前获得信心</td>
+</tr>
+<tr>
+<td>比较多个决策选项是很容易的</td>
+<td><strong>无脑的</strong><br>使用直觉，快速决定</td>
+<td><strong>艰难的抉择</strong><br>使用决策矩阵(上面有)</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<h2 id="解决问题"><a href="#解决问题" class="headerlink" title="解决问题"></a>解决问题</h2><h3 id="鱼骨图"><a href="#鱼骨图" class="headerlink" title="鱼骨图"></a>鱼骨图<span id="Ishikawa-Diagram"></span></h3><blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/942ac6661d504e4c943805662c63f4a6.png"
+                      alt="在这里插入图片描述"
+                ><br>分解问题+列举原因</p>
+</blockquote>
+<ul>
+<li>原名石川图(我才知道这个图是日文名字)，也叫因果图</li>
+<li>其实就是多维度分解问题+列举可能原因<br>Example</li>
+<li>您是一个产品经理，正在解决一个新用户越来越少的问题</li>
+<li>您将问题分解为页面问题、外部竞争、市场，并各自列举出了一些可能的原因</li>
+<li>画图如下<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/3716e8cafe4847f992fe3028951fb527.png"
+                      alt="在这里插入图片描述"
+                ></li>
+</ul>
+<h3 id="冲突解决图"><a href="#冲突解决图" class="headerlink" title="冲突解决图"></a>冲突解决图<span id="Conflict-Resolution-Diagram"></span></h3><blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/cf2641fb824d4194b60f5ae3215e8f0c.png"
+                      alt="在这里插入图片描述"
+                ><br>逐步发掘冲突双方的共同目的，以此团结双方，继而寻求双赢方案。</p>
+</blockquote>
+<ul>
+<li><p>这张图分为三部分：</p>
+<ol>
+<li>双方的直接需求和建议(通常是互斥的，即冲突的原因)。问：对方想干嘛？我想干嘛？ </li>
+<li>双方的潜在需求。问：双方的提议能满足什么需求？</li>
+<li>需求背后的共同目标(解决冲突的关键)。问：满足双方的需求后，会得到什么？<br>  <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/20f398f33f924f5083220c6ea7b635a0.png"
+                      alt="在这里插入图片描述"
+                ></li>
+</ol>
+<p>  Example</p>
+<ul>
+<li>场景：您与同事讨论重新设计产品网站。您反对，但同事想推动。</li>
+<li>双方的建议：不重新设计和重新设计</li>
+<li>背后的需求：您反对是因为想尽量减少人力资源浪费，同时重新设计也有很大的风险。同事想推进是想提高网站转化率。</li>
+<li>共同目标：你们都想实现公司的财务目标。<br>  <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/06a061ac282a402a861a36aee6e858e1.png"
+                      alt="在这里插入图片描述"
+                ></li>
+<li>基于这个共同目标，您提出一个双赢的解决方案，比如运行一个小型的有针对性的实验，这样就不必占用大量资源，同时提高转化率。</li>
+</ul>
+</li>
+</ul>
+<h3 id="生产性思维模型"><a href="#生产性思维模型" class="headerlink" title="生产性思维模型"></a>生产性思维模型<span id="Productive-Thinking-Model"></span></h3><blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/fe377a9bf2c34ba5bbb90ddbbe3cc4fe.png"
+                      alt="在这里插入图片描述"
+                ><br>一套循序渐进的思维过程</p>
+</blockquote>
+<ul>
+<li><p>当问题已经定义好并正在寻找创造性的解决方案时，使用这个工具。</p>
+</li>
+<li><p>这个工具是应用更有条理和批判性的思维。</p>
+</li>
+<li><p>六个步骤：</p>
+<ol>
+<li>发生什么了？</li>
+<li>怎样才算成功</li>
+<li>问题是什么</li>
+<li>生成答案</li>
+<li>指定解决方案</li>
+<li>对齐资源<br>  <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/8db5d587b32c46248dd5e8da53e0560f.png"
+                      alt="在这里插入图片描述"
+                ></li>
+</ol>
+</li>
+<li><p>发生什么了？这一步是帮助更好的理解问题。下列是一些指导性的问题：</p>
+<ul>
+<li>究竟是什么问题？</li>
+<li>这个问题会带来什么影响？</li>
+<li>我目前掌握了什么信息？</li>
+<li>哪些人参与其中？</li>
+<li>问题解决后的未来愿景是什么？</li>
+</ul>
+<p>  请记录上面提问的答案</p>
+</li>
+<li><p>怎样才算成功？这一步帮助定义未来愿景中的成功。使用DRIVE框架如下</p>
+<ul>
+<li>您希望解决方案能做什么？</li>
+<li>有什么限制？它不能做什么？(这里可以采用反演)</li>
+<li>我没可以投入哪些资源?</li>
+<li>解决方案应该有什么价值？</li>
+<li>重要成果应该是哪些？</li>
+</ul>
+<p>  随意、循环的回答这些问题知道对“成功”有了清晰的认识</p>
+</li>
+<li><p>问题是什么？提出类似以下的问题：</p>
+<ul>
+<li>我们可能实现…吗？</li>
+<li>我们怎么实现…？</li>
+</ul>
+</li>
+<li><p>生成答案。对之前提出的问题提出尽可能多的答案，集思广益，只收集而不要去评判。</p>
+</li>
+<li><p>指定解决方案。从上一步中获取问题列表，并根据成功标准评估每个想法&#x2F;解决方案，这里可以采用决策矩阵。</p>
+</li>
+<li><p>资源对齐。写下实现目标需要的行动、资源、人员，越详尽越好，以便生成清晰的计划，然后就可以开始执行解决方案了。</p>
+<p>  Example</p>
+<ul>
+<li><p>发生什么了？您要解决的问题是赢得一个潜在客户，经调查发现该用户要求苛刻但是能带来大量收入，失去该收入会带来重大负面影响，您的团队已经与他保持联系，并且知道他很重视易用性。您的愿景是该客户在岗位上每天使用您的产品并带来收入。</p>
+</li>
+<li><p>定义成功。</p>
+<ul>
+<li>解决方案需要做什么？向用户展示您产品的价值以及您会如何照顾他们。</li>
+<li>限制是什么？解决方案必须表明我们满足了需求并且产品易用。</li>
+<li>我们可以投入哪些资源？可以分配两个星期的两名销售人员和一个星期的设计师和工程师。</li>
+<li>解决方案的价值？令人信服、透明、经过深思熟虑。</li>
+<li>重要结果是哪些？客户同意签订合同。</li>
+</ul>
+</li>
+<li><p>定义相关问题。</p>
+<ul>
+<li>我们如何展现出满足了他们的需求？</li>
+<li>如何证明易用性？</li>
+</ul>
+<p>  这里给出了一些可用方案：</p>
+<ul>
+<li>展示包含产品和公司的亮点的PPT</li>
+<li>为客户提供个性化的交互演示</li>
+<li>让用户亲身参观、体验产品</li>
+</ul>
+</li>
+<li><p>选择最有希望的解决方案。使用决策矩阵后证明最好的解决方案是让用户亲自体验产品</p>
+</li>
+<li><p>调配资源。派出一个由两名销售人员和一名工程师组成的小团队前往客户那里一天。销售副总裁将负责协调此事。工程经理将负责为试用准备正确版本的产品。</p>
+</li>
+<li><p>最有希望的、明确的行动计划产生了。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="抽象阶梯"><a href="#抽象阶梯" class="headerlink" title="抽象阶梯"></a>抽象阶梯<span id="Abstraction-laddering"></span></h3><blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/d442de6aa4e04cf3a421a5e647609977.png"
+                      alt="在这里插入图片描述"
+                ></p>
+</blockquote>
+<ul>
+<li>看的不是很懂。。好像就是交替、渐进地问How、Why<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/150a4c8328f84fb4b58699643fdb3e5e.png"
+                      alt="在这里插入图片描述"
+                ></li>
+</ul>
+<h3 id="反演"><a href="#反演" class="headerlink" title="反演"></a>反演<span id="Inversion"></span></h3><blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/d0404168af58407986be89ac347ab7e1.png"
+                      alt="在这里插入图片描述"
+                ><br>反向思考</p>
+</blockquote>
+<ul>
+<li>从避免负面影响的方法推出产生正面影响的方法<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/7e9e2562a23540bf8254fe8129db224f.png"
+                      alt="在这里插入图片描述"
+                ></li>
+</ul>
+<h3 id="问题树"><a href="#问题树" class="headerlink" title="问题树"></a>问题树<span id="Issue-trees"></span></h3><blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/b1fb11401ce2434cb757d9d48a42f515.png"
+                      alt="在这里插入图片描述"
+                ><br>结构化问题和解决方案并分而治之</p>
+</blockquote>
+<ul>
+<li>创建一个问题的问题树时问“为什么”， 解决方案树问’怎么了’ </li>
+<li>创建的原则是互斥、详尽</li>
+</ul>
+<p>Example<br>您正在开发一种产品，您的客户很少使用您的一个功能。</p>
+<pre class="mermaid">graph LR
+A[某功能不被使用] -->  B(客户不知道这个功能)
+A --> B1(客户知道但是仍然不用)
+B --> C(这个功能在产品中不可见)
+B1 --> C1(客户没有学习这个功能)
+C --> D(客户还没试用这个功能)
+C --> D1(客户试用了但是不准备继续用)
+D --> E(客户不相信这个功能是有用的)
+D1 --> E1(功能不可用)
+D1 --> E2(功能有Bug)
+D1 --> E3(功能不满足用户的需求)</pre>
+<h3 id="第一原则"><a href="#第一原则" class="headerlink" title="第一原则"></a>第一原则<span id="First-principles"></span></h3><blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/2cbec22cf5a6489c8de9181d9618532d.png"
+                      alt="在这里插入图片描述"
+                ><br>不断分解问题直至无法分解，接着对每个元问题做出解答，即分而治之</p>
+</blockquote>
+<ul>
+<li><p>可以不断提出以下问题：</p>
+<ul>
+<li>你说的…是什么意思？</li>
+<li>我们可以假设什么？</li>
+<li>你凭什么认为这是真的？</li>
+<li>那会造成什么影响？</li>
+<li>有替代方案吗？是什么？</li>
+<li>这个问题的意义在哪？</li>
+</ul>
+<p>  如果提出的问题的范围太大，可以继续分解，就继续使用上面的提问方式提出子问题<br>  <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/d466bb11793e4e58994a45fc9845a873.png"
+                      alt="在这里插入图片描述"
+                ></p>
+</li>
+</ul>
+<h2 id="沟通"><a href="#沟通" class="headerlink" title="沟通"></a>沟通</h2><h3 id="明托金字塔"><a href="#明托金字塔" class="headerlink" title="明托金字塔"></a>明托金字塔<span id="Minto-Pyramid"></span></h3><blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/934aefe2aada452e888202aed2a1c78a.png"
+                      alt="在这里插入图片描述"
+                ><br>展现的内容先吸引眼球-再大致概括-再详细论证</p>
+</blockquote>
+<ul>
+<li><p>没人愿意花时间阅读长篇大论，需要更清晰高效的内容</p>
+</li>
+<li><p>明托金字塔自上而下为结论、关键论点、详细论据<br>  大概就是结论吸引眼球、论点起概括作用、论据让人信服<br>  <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/a85049a83b5744a1bfc8c1c2630129ee.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<p>  Example</p>
+<ul>
+<li>您刚完成了一项研究并准备与同事分享结果、提出建议</li>
+<li>一篇以明托金字塔为结构的信件内容如下(懒得翻译了，应该看得懂吧…)<br>  <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/b4e880022cc54a2581f15beed01eaa11.png"
+                      alt="在这里插入图片描述"
+                ></li>
+</ul>
+</li>
+</ul>
+<h3 id="情况-表现-影响"><a href="#情况-表现-影响" class="headerlink" title="情况-表现-影响"></a>情况-表现-影响<span id="Situation-Behavior-Impact"></span></h3><blockquote>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/thinking/2aa15dff3a614cc689484bf2ea6ec5cb.png"
+                      alt="在这里插入图片描述"
+                ><br>在对他人行为不满并要做出质问时，不要直接主观的给出评价，可以按情况-表现-影响三段式(其实不止)做出表述，这可以引出一段相对健康和客观的讨论</p>
+</blockquote>
+<ul>
+<li><p>将您表述划为三段：</p>
+<ol>
+<li>情况，具体的时间、地点、人物</li>
+<li>行为：对方做了什么(或没做什么)</li>
+<li>影响：这个行为对其他人或团队造成的影响</li>
+<li>意图(作者后加的)：追问行为背后的意图，因为可能有一个您不知道或与您的假设不同的合理意图</li>
+<li>鼓励反思(也是后加的)：鼓励对方反思您说的话，反思未来应采取的行动</li>
+</ol>
+<p>  Example</p>
+<ul>
+<li>情况：“在昨天的产品审查会议上，当你提供你团队的最新信息时”</li>
+<li>行为：“你没有分享任何关于我们的客户是如何使用我们新功能的最新了解”</li>
+<li>影响：“没有你的报告，我们会做出错误的决策”</li>
+<li>意图：“所以你为什么没有分享任何东西？”</li>
+</ul>
+</li>
+</ul>
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>标题:</strong> Tools for better thinking</li>
+        <li><strong>作者:</strong> urlyy</li>
+        <li><strong>创建于
+                :</strong> 2023-01-10 12:58:35</li>
+        
+            <li>
+                <strong>更新于
+                    :</strong> 2025-12-21 18:39:57
+            </li>
+        
+        <li>
+            <strong>链接:</strong> https://urlyy.github.io/2023/01/10/thinking/
+        </li>
+        <li>
+            <strong>
+                版权声明:
+            </strong>
+            
+
+            
+                本文章采用 <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a> 进行许可。
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="prev" rel="prev" href="/2023/01/23/casbin%E6%9D%83%E9%99%90%E5%92%8C%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E7%90%86%E8%A7%A3/">
+					<span class="left arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-left"></i>
+					</span>
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">casbin权限和配置文件的理解</span>
+						<span class="post-nav-item">上一篇</span>
+					</span>
+				</a>
+			</div>
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2023/01/01/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99%E8%AE%B0%E5%BD%95/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">学习资料记录</span>
+						<span class="post-nav-item">下一篇</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        评论
+    </div>
+    
+
+        
+            
+    <div id="giscus-container"></div>
+    <script data-swup-reload-script defer>
+        async function loadGiscus() {
+            const giscusConfig = {
+                'src': 'https://giscus.app/client.js',
+                'data-repo': 'urlyy/urlyy_blog_comments',
+                'data-repo-id': 'R_kgDONo8nwQ',
+                'data-category': 'Announcements',
+                'data-category-id': 'DIC_kwDONo8nwc4Cl7pw',
+                'data-mapping': 'title',
+                'data-strict': '0',
+                'data-reactions-enabled': '1',
+                'data-emit-metadata': '1',
+                'data-theme': 'preferred_color_scheme',
+                'data-lang': 'zh-CN',
+                'data-input-position': 'top',
+                'data-loading': 'lazy',
+                'crossorigin': 'anonymous',
+                'async': true
+            }
+            const giscusScript = document.createElement('script');
+            for (const key in giscusConfig) {
+                giscusScript.setAttribute(key, giscusConfig[key]);
+            }
+            document.getElementById('giscus-container').appendChild(giscusScript);
+        }
+        if ('true') {
+            let loadGiscusTimeout = setTimeout(() => {
+                loadGiscus();
+                clearTimeout(loadGiscusTimeout);
+            }, 1000);
+        } else {
+            document.addEventListener('DOMContentLoaded', loadGiscus);
+        }
+    </script>
+
+
+        
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">目录</div>
+		<div class="page-title">Tools for better thinking</div>
+		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%A9%E4%BA%8E%E6%80%9D%E8%80%83%E7%9A%84%E5%B7%A5%E5%85%B7"><span class="nav-text">利于思考的工具</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%90%86%E8%A7%A3%E7%B3%BB%E7%BB%9F"><span class="nav-text">理解系统</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5%E5%9B%BE"><span class="nav-text">概念图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E7%B3%BB%E7%8E%AF"><span class="nav-text">关系环</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%B0%E5%B1%B1%E6%A8%A1%E5%9E%8B"><span class="nav-text">冰山模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B9%B3%E8%A1%A1%E5%8F%8D%E9%A6%88%E5%9B%9E%E8%B7%AF"><span class="nav-text">平衡反馈回路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%BA%E5%8C%96%E5%8F%8D%E9%A6%88%E5%9B%9E%E8%B7%AF"><span class="nav-text">强化反馈回路</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%81%9A%E5%87%BA%E5%86%B3%E7%AD%96"><span class="nav-text">做出决策</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%AD%E9%A1%B6%E6%80%9D%E7%BB%B4%E5%B8%BD%E5%AD%90"><span class="nav-text">六顶思维帽子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E9%98%B6%E6%80%9D%E8%80%83"><span class="nav-text">二阶思考</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%89%BE%E6%A3%AE%E8%B1%AA%E5%A8%81%E5%B0%94%E7%9F%A9%E9%98%B5"><span class="nav-text">艾森豪威尔矩阵</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A8%E7%90%86%E9%98%B6%E6%A2%AF"><span class="nav-text">推理阶梯</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%B3%E7%AD%96%E7%9F%A9%E9%98%B5"><span class="nav-text">决策矩阵</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%A1%E5%BF%83%E5%86%B3%E5%AE%9A%E2%80%9C%E9%80%9F%E5%BA%A6%E2%80%9D%E8%BF%98%E6%98%AF%E2%80%9C%E8%B4%A8%E9%87%8F%E2%80%9D"><span class="nav-text">信心决定“速度”还是“质量”</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%89%B0%E9%9A%BE%E6%8A%89%E6%8B%A9%E6%A8%A1%E5%9E%8B"><span class="nav-text">艰难抉择模型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E9%97%AE%E9%A2%98"><span class="nav-text">解决问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%B1%BC%E9%AA%A8%E5%9B%BE"><span class="nav-text">鱼骨图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%B2%E7%AA%81%E8%A7%A3%E5%86%B3%E5%9B%BE"><span class="nav-text">冲突解决图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%9F%E4%BA%A7%E6%80%A7%E6%80%9D%E7%BB%B4%E6%A8%A1%E5%9E%8B"><span class="nav-text">生产性思维模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8A%BD%E8%B1%A1%E9%98%B6%E6%A2%AF"><span class="nav-text">抽象阶梯</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8D%E6%BC%94"><span class="nav-text">反演</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E6%A0%91"><span class="nav-text">问题树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E5%8E%9F%E5%88%99"><span class="nav-text">第一原则</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B2%9F%E9%80%9A"><span class="nav-text">沟通</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%98%8E%E6%89%98%E9%87%91%E5%AD%97%E5%A1%94"><span class="nav-text">明托金字塔</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%83%85%E5%86%B5-%E8%A1%A8%E7%8E%B0-%E5%BD%B1%E5%93%8D"><span class="nav-text">情况-表现-影响</span></a></li></ol></li></ol></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2021</span>
+              -
+            
+            2025&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">urlyy</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        共撰写了 78 篇文章
+                    </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">访问人数</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">总访问量</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">由 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a> 驱动</span>
+            <span class="text-sm lg:block">主题&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.5</a></span>
+        </div>
+        
+        
+            <div>
+                博客已运行 <span class="odometer" id="runtime_days" ></span> 天 <span class="odometer" id="runtime_hours"></span> 小时 <span class="odometer" id="runtime_minutes"></span> 分钟 <span class="odometer" id="runtime_seconds"></span> 秒
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="fa-regular fa-arrow-up"></i>
+		</li>
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+	<div class="search-pop-overlay">
+	<div class="popup search-popup">
+		<div class="search-header">
+			<span class="search-input-field-pre">
+				<i class="fa-solid fa-keyboard"></i>
+			</span>
+			<div class="search-input-container">
+				<input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="站内搜索您需要的内容..." spellcheck="false" type="search" class="search-input">
+			</div>
+			<span class="popup-btn-close">
+				<i class="fa-solid fa-times"></i>
+			</span>
+		</div>
+		<div id="search-result">
+			<div id="no-result">
+				<i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>
+			</div>
+		</div>
+	</div>
+</div>
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+	
+<script src="/js/build/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/build/utils.js" type="module"></script>
+
+<script src="/js/build/main.js" type="module"></script>
+
+<script src="/js/build/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/build/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/build/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/build/layouts/categoryList.js" type="module"></script>
+
+
+
+    
+<script src="/js/build/tools/localSearch.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/layouts/lazyload.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/runtime.js"></script>
+
+    
+<script src="/js/build/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+  
+<script src="/js/build/plugins/typed.js" type="module"></script>
+
+
+
+
+    
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@9.3.0/dist/mermaid.min.js"></script>
+    
+    
+<script src="/js/build/plugins/mermaid.js"></script>
+
+
+
+
+
+
+    
+<script src="/js/build/libs/anime.min.js"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/tocToggle.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/layouts/toc.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/plugins/tabs.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+<script src="/js/build/layouts/essays.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+
+	
+</body>
+
+</html>

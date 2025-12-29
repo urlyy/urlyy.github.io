@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="urlyy">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set data attribute for CSS variables
+                root.setAttribute("data-theme", theme);
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes once DOM is ready
+            if (document.readyState !== "loading") {
+                document.body.classList.add(theme + "-mode");
+            } else {
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add(theme + "-mode");
+                    document.body.classList.remove((theme === DARK ? LIGHT : DARK) + "-mode");
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Critical CSS to prevent flash -->
+    <style>
+        :root[data-theme="dark"] {
+            --background-color: #202124;
+            --background-color-transparent: rgba(32, 33, 36, 0.6);
+            --second-background-color: #2d2e32;
+            --third-background-color: #34353a;
+            --third-background-color-transparent: rgba(32, 33, 36, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #ffffff;
+            --second-text-color: #eeeeee;
+            --third-text-color: #bebec6;
+            --fourth-text-color: #999999;
+            --default-text-color: #bebec6;
+            --invert-text-color: #373D3F;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(255, 255, 255, 0.08);
+            --shadow-color-2: rgba(255, 255, 255, 0.05);
+        }
+        
+        :root[data-theme="light"] {
+            --background-color: #fff;
+            --background-color-transparent: rgba(255, 255, 255, 0.6);
+            --second-background-color: #f8f8f8;
+            --third-background-color: #f2f2f2;
+            --third-background-color-transparent: rgba(241, 241, 241, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #16171a;
+            --second-text-color: #2f3037;
+            --third-text-color: #5e5e5e;
+            --fourth-text-color: #eeeeee;
+            --default-text-color: #373D3F;
+            --invert-text-color: #bebec6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(0, 0, 0, 0.08);
+            --shadow-color-2: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+        
+        /* Apply body classes as soon as DOM is ready */
+        :root[data-theme="dark"] body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+    </style>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://urlyy.github.io/2023/05/08/deepin搭建nvim的go开发环境/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta name="description" content="安装deepin虚拟机官网下载地址vmware中记得版本选择是debian 10.x 64位然后就是一些确认操作，然后就可以了 安装git1234567891011apt install geditapt install gitgit config --global user.name &quot;hello&quot;git config --global user.email hello@12">
+<meta property="og:type" content="article">
+<meta property="og:title" content="deepin搭建go开发环境（git、go、neovim、nvchad、nerd)">
+<meta property="og:url" content="http://urlyy.github.io/2023/05/08/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="安装deepin虚拟机官网下载地址vmware中记得版本选择是debian 10.x 64位然后就是一些确认操作，然后就可以了 安装git1234567891011apt install geditapt install gitgit config --global user.name &quot;hello&quot;git config --global user.email hello@12">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://urlyy.github.io/article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/779477f8707349fdb3b12422de41d674.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/1773b057fe03459490f9e825b6c69d0f.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/3ce95e7c730a43feb88d1440a11210e7.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/07da57a3f0ea4c548fdd13993cb437e9.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/123077b0f8ad433f88676290cbe24196.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/410c813a4ccb4ab39d1d3200f43a6c96.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/7a69a6ecad1b45e5a15df5543396ebfd.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/ba5e51e6f8624d8db666e1fc78d69907.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/adeba8ca4c864e5c9105e2b55c9177c4.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/f02f262f9ec84c4db14308ea8c312289.png">
+<meta property="article:published_time" content="2023-05-08T14:17:03.000Z">
+<meta property="article:modified_time" content="2025-12-21T10:39:57.269Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="neovim">
+<meta property="article:tag" content="go">
+<meta property="article:tag" content="deeepin">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://urlyy.github.io/article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/779477f8707349fdb3b12422de41d674.png">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/avatar.jpg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.jpg">
+    <meta name="theme-color" content="#5c701a">
+    <link rel="shortcut icon" href="/images/avatar.jpg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            deepin搭建go开发环境（git、go、neovim、nvchad、nerd) | urlyy的小窝
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+        <link href="" rel="stylesheet">
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"urlyy.github.io","root":"/","language":"zh-CN","path":"search.json"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":false,"auto":false,"list":[""]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":true},"copyright":true,"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#5c701a","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":true,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":false},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"side_tools":{"gear_rotation":true,"auto_expand":false},"open_graph":true,"google_analytics":{"enable":false,"id":null},"busuanzi_counter":{"enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"pjax":true},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/bg/1.jpg","dark":"/images/bg/1.jpg"},"title":"urlyy的小窝","subtitle":{"text":["Loading..."],"hitokoto":{"enable":true,"show_author":false,"api":"https://v1.hitokoto.cn?c=a&c=b&c=d&c=k"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"style":"default","links":{"github":"https://github.com/urlyy?tab=repositories","instagram":null,"zhihu":null,"twitter":null,"email":"2213732736@qq.com"},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":true,"version":"9.3.0"}},"version":"2.8.5","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Categories":{"icon":"fa-regular fa-folder","path":"/categories/"},"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Github":{"path":"https://github.com/urlyy","icon":"fa-brands fa-github"},"个人介绍":{"path":"/personal/profile.html","icon":"fa-regular fa-user"}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"cloud"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":null},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2021/9/7 16:55:00"};
+    window.lang_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 个月前","year":"%s 年前"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                urlyy的小窝
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    首页
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/categories/"
+                                        >
+                                    <i class="fa-regular fa-folder fa-fw"></i>
+                                    分类
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/archives"
+                                        >
+                                    <i class="fa-regular fa-archive fa-fw"></i>
+                                    归档
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   target="_blank" rel="noopener" href="https://github.com/urlyy"
+                                        >
+                                    <i class="fa-brands fa-github fa-fw"></i>
+                                    GITHUB
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/personal/profile.html"
+                                        >
+                                    <i class="fa-regular fa-user fa-fw"></i>
+                                    个人介绍
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                首页
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/categories/"
+                        >
+                            <span>
+                                分类
+                            </span>
+                            
+                                <i class="fa-regular fa-folder fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/archives"
+                        >
+                            <span>
+                                归档
+                            </span>
+                            
+                                <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           target="_blank" rel="noopener" href="https://github.com/urlyy"
+                        >
+                            <span>
+                                GITHUB
+                            </span>
+                            
+                                <i class="fa-brands fa-github fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/personal/profile.html"
+                        >
+                            <span>
+                                个人介绍
+                            </span>
+                            
+                                <i class="fa-regular fa-user fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">25</div>
+        <div class="label text-third-text-color text-sm">标签</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">29</div>
+        <div class="label text-third-text-color text-sm">分类</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">78</div>
+        <div class="label text-third-text-color text-sm">文章</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">deepin搭建go开发环境（git、go、neovim、nvchad、nerd)</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/avatar.jpg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">urlyy</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2023-05-08 22:17:03</span>
+        <span class="mobile">2023-05-08 22:17:03</span>
+        <span class="hover-info">创建</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2025-12-21 18:39:57</span>
+            <span class="mobile">2025-12-21 18:39:57</span>
+            <span class="hover-info">更新</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/%E8%BF%90%E7%BB%B4/">运维</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa-regular fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/neovim/">neovim</a>&nbsp;
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/go/">go</a>&nbsp;
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/deeepin/">deeepin</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<h1 id="安装deepin虚拟机"><a href="#安装deepin虚拟机" class="headerlink" title="安装deepin虚拟机"></a>安装deepin虚拟机</h1><p><a class="link"   target="_blank" rel="noopener" href="https://www.deepin.org/zh/download/" >官网下载地址<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a><br>vmware中记得版本选择是<code>debian 10.x 64位</code><br>然后就是一些确认操作，然后就可以了</p>
+<h1 id="安装git"><a href="#安装git" class="headerlink" title="安装git"></a>安装git</h1><div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">apt install gedit</span><br><span class="line">apt install git</span><br><span class="line">git config --global user.name &quot;hello&quot;</span><br><span class="line">git config --global user.email hello@126.com</span><br><span class="line">git config --list</span><br><span class="line"></span><br><span class="line">ssh-keygen -t rsa </span><br><span class="line">cd /root/.ssh</span><br><span class="line">gedit id_rsa.pub</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">下面这个可以解决Failed to connect to github.com port 443: 拒绝连接</span></span><br><span class="line">git config --global url.&quot;https://ghproxy.com/https://github.com&quot;.insteadOf &quot;https://github.com&quot;</span><br></pre></td></tr></table></figure></div>
+
+
+
+<p>再上传这个id_rsa.pub里的文本(即公钥)<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/779477f8707349fdb3b12422de41d674.png"
+                      alt="在这里插入图片描述"
+                ><br>输入这行命令以验证是否成功<br><code>ssh -T git@github.com</code></p>
+<h1 id="安装golang"><a href="#安装golang" class="headerlink" title="安装golang"></a>安装golang</h1><ol>
+<li>下载<br><a class="link"   target="_blank" rel="noopener" href="https://studygolang.com/dl" >下载地址<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a><br>也可<code>wget https://studygolang.com/dl/golang/go1.20.4.linux-amd64.tar.gz</code></li>
+<li>解压</li>
+<li>配环境变量<br> 配置GOROOT(go核心内容的文件夹，即从官网下的那个)和GOPATH(go mod时存储第三方库的文件夹) <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/profile</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">即刚刚解压的压缩包的文件夹</span></span><br><span class="line">export GOROOT=/usr/local/env/go</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">你自己指定一个存第三方库的文件夹</span></span><br><span class="line">export GOPATH=/usr/local/env/gopath</span><br><span class="line">export PATH=$PATH:$GOROOT/bin:$GOPATH/bin</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">保存退出</span></span><br><span class="line">:wq</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">配置生效</span></span><br><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure></div>
+ 完全使用命令就是 <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">echo &#x27;export GOROOT=/usr/local/env/go&#x27; &gt;&gt; /etc/profile</span><br><span class="line">echo &#x27;export GOPATH=/usr/local/env/gopath&#x27; &gt;&gt; /etc/profile</span><br><span class="line">echo &#x27;export PATH=$PATH:$GOROOT/bin:$GOPATH/bin&#x27; &gt;&gt; /etc/profile</span><br><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure></div></li>
+<li>改下go的配置，即开启module模式和下载的镜像源 <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">go env -w GO111MODULE=on</span><br><span class="line">go env -w GOPROXY=https://mirrors.aliyun.com/goproxy/</span><br></pre></td></tr></table></figure></div>
+ 测试 <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">go version</span><br><span class="line">go env</span><br></pre></td></tr></table></figure></div></li>
+<li>其他<br> 我发现每次开个新shell，都要重新<code>source /etc/profile</code>才能正常使用<code>go version</code><br> 看博客知道要再配一下<br> 注意每个用户都要配一下这个 <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo &#x27;source /etc/profile&#x27; &gt;&gt; ~/.bashrc</span><br></pre></td></tr></table></figure></div>
+ 这样子每次开新shell就会触发这个命令</li>
+</ol>
+<h1 id="安装neovim"><a href="#安装neovim" class="headerlink" title="安装neovim"></a>安装neovim</h1><blockquote>
+<p>参考<a target="_blank" rel="noopener" href="https://bbs.deepin.org/post/256016">[经验分享] Deepin<br>v20下编译安装vim9和neovim9，默认的vim和neovim版本太低</a></p>
+</blockquote>
+<h2 id="一、编译vim9"><a href="#一、编译vim9" class="headerlink" title="一、编译vim9"></a>一、编译vim9</h2><ol>
+<li><p>先卸载默认的vim8</p>
+ <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt purge vim vim-*</span><br><span class="line">sudo apt autoremove</span><br></pre></td></tr></table></figure></div></li>
+<li><p>安装编译依赖</p>
+ <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install lua5.3 liblua5.3-dev ruby2.5-dev python3-pip cmake gettext</span><br></pre></td></tr></table></figure></div></li>
+<li><p>下载源码</p>
+ <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone -b v9.0.1504 https://github.com/vim/vim.git ~/Downloads/vim9</span><br></pre></td></tr></table></figure></div>
+
+</li>
+<li><p>编译与安装</p>
+ <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">cd ~/Downloads/vim9</span><br><span class="line"></span><br><span class="line">./configure --prefix=/opt/vim \</span><br><span class="line">    --with-features=huge \</span><br><span class="line">    --enable-multibyte \</span><br><span class="line">    --enable-rubyinterp=yes \</span><br><span class="line">    --enable-python3interp=yes \</span><br><span class="line">    --enable-luainterp=yes \</span><br><span class="line">    --enable-gui=gtk2 \</span><br><span class="line">    --enable-cscope \</span><br><span class="line">    --enable-fail-if-missing</span><br><span class="line"></span><br><span class="line">make -j6</span><br><span class="line"></span><br><span class="line">sudo make install</span><br><span class="line"></span><br><span class="line">sudo ln -s /opt/vim/bin/vim /usr/local/bin/vim</span><br></pre></td></tr></table></figure></div></li>
+</ol>
+<h2 id="二、编译neovim"><a href="#二、编译neovim" class="headerlink" title="二、编译neovim"></a>二、编译neovim</h2><ol>
+<li>下载源码 <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone -b v0.9.0 https://github.com/neovim/neovim.git ~/Downloads/neovim9</span><br></pre></td></tr></table></figure></div></li>
+<li>编译与安装<br> 注意第二行的下载操作，可能会总是拉取不到github的项目，实在不行就进浏览器手动下，然后放在对应的位置，下载网址和放置路径在dos里都有展示 <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cd ~/Downloads/neovim9</span><br><span class="line">make CMAKE_EXTRA_FLAGS=&quot;-DCMAKE_INSTALL_PREFIX=/opt/neovim&quot;</span><br><span class="line">sudo make install</span><br><span class="line">sudo ln -s /opt/neovim/bin/nvim /usr/local/bin/nvim</span><br></pre></td></tr></table></figure></div></li>
+<li>测试<br>输入<code>nvim test.txt</code></li>
+<li>起别名，使<code>vim</code>命令会打开<code>nvim</code> <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;alias vim=&#x27;nvim&#x27;&quot; &gt;&gt; /etc/profile</span><br><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure></div>
+ treesitter报错可以不用管</li>
+</ol>
+<ul>
+<li><p>安装NvChad<br><a class="link"   target="_blank" rel="noopener" href="https://docs.rockylinux.org/books/nvchad/install_nvchad/" >Turning Neovim into an advanced IDE<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a><br>参考视频<a class="link"   target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1nu411t7NM/?spm_id_from=333.337.search-card.all.click&vd_source=43b6af819307ca6bdad60477a02d8d1c" >针对Golang的NeoVim完美配置<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+  <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/NvChad/NvChad.git ~/.config/nvim</span><br></pre></td></tr></table></figure></div>
+<p>  然后输入nvim<br>  <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/1773b057fe03459490f9e825b6c69d0f.png"
+                      alt="在这里插入图片描述"
+                ><br>  然后输入N<br>  然后等他把相关的插件下完(好像挂着梯子下快一点？)<br>  到这个界面就是下好了<br>  <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/3ce95e7c730a43feb88d1440a11210e7.png"
+                      alt="在这里插入图片描述"
+                ><br>然后输入<code>空格 th</code>来选主题<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/07da57a3f0ea4c548fdd13993cb437e9.png"
+                      alt="在这里插入图片描述"
+                ></p>
+</li>
+<li><p><strong>两个的卸载方法：<br>删除<code>~/.local/state/nvim</code> 和 <code>~/.local/share/nvim</code>和<code>~/.config/nvim</code></strong></p>
+</li>
+</ul>
+<h1 id="安装go的lsp"><a href="#安装go的lsp" class="headerlink" title="安装go的lsp"></a>安装go的lsp</h1><div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd /root/.config/nvim/lua/custom</span><br><span class="line">touch plugins.lua</span><br></pre></td></tr></table></figure></div>
+<p>在<code>plugins.lua</code>中写入如下内容</p>
+<div class="code-container" data-rel="Lua"><figure class="iseeu highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">local</span> plugins = &#123;</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="string">&quot;williamboman/mason.nvim&quot;</span>,</span><br><span class="line">		opts = &#123;</span><br><span class="line">			ensure_installed = &#123;</span><br><span class="line">				<span class="string">&quot;gopls&quot;</span>,</span><br><span class="line">			&#125;,</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;,</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> plugins</span><br></pre></td></tr></table></figure></div>
+<p>再在<code>/root/.config/nvim/lua/custom/chadrc.lua</code>中做如下添加</p>
+<div class="code-container" data-rel="Lua"><figure class="iseeu highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">M.plugins = <span class="string">&quot;custom.plugins</span></span><br></pre></td></tr></table></figure></div>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/123077b0f8ad433f88676290cbe24196.png"
+                      alt="在这里插入图片描述"
+                ><br>然后退出vim，再输入vim，输入命令<code>:MasonInstallAll</code><br>此时等一小会会出现<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/410c813a4ccb4ab39d1d3200f43a6c96.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<p>再添加如下</p>
+<div class="code-container" data-rel="Lua"><figure class="iseeu highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;neovim/nvim-lspconfig&quot;</span>,</span><br><span class="line">    <span class="built_in">config</span> = <span class="function"><span class="keyword">function</span><span class="params">()</span></span></span><br><span class="line">      <span class="built_in">require</span> <span class="string">&quot;plugins.configs.lspconfig&quot;</span></span><br><span class="line">      <span class="built_in">require</span> <span class="string">&quot;custom.configs.lspconfig&quot;</span></span><br><span class="line">    <span class="keyword">end</span>,</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure></div>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/7a69a6ecad1b45e5a15df5543396ebfd.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<blockquote>
+<p>如果使用可视化的编辑器，可能会出现<br>E37: No write since last change<br>E162: No write since last change for buffer “xxxxx”<br>Press ENTER or type command to continue<br>这时用<br>:set fileencoding&#x3D;utf-8</p>
+</blockquote>
+<p>然后</p>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir /root/.config/nvim/lua/custom/configs</span><br><span class="line">touch configs/lspconfig.lua</span><br></pre></td></tr></table></figure></div>
+
+<p>在lspconfig.lua中写入</p>
+<div class="code-container" data-rel="Lua"><figure class="iseeu highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">local</span> on_attach = <span class="built_in">require</span>(<span class="string">&quot;plugins.configs.lspconfig&quot;</span>).on_attach</span><br><span class="line"><span class="keyword">local</span> capabilities = <span class="built_in">require</span>(<span class="string">&quot;plugins.configs.lspconfig&quot;</span>).capabilities</span><br><span class="line"></span><br><span class="line"><span class="keyword">local</span> lspconfig = <span class="built_in">require</span>(<span class="string">&quot;lspconfig&quot;</span>)</span><br><span class="line"><span class="keyword">local</span> util = <span class="built_in">require</span> <span class="string">&quot;lspconfig/util&quot;</span></span><br><span class="line"></span><br><span class="line">lspconfig.gopls.setup &#123;</span><br><span class="line">	on_attach = on_attach,</span><br><span class="line">	capabilities = capabilities,</span><br><span class="line">	cmd = &#123;<span class="string">&quot;gopls&quot;</span>&#125;,</span><br><span class="line">	filetypes = &#123;<span class="string">&quot;go&quot;</span>,<span class="string">&quot;gomod&quot;</span>,<span class="string">&quot;gowork&quot;</span>,<span class="string">&quot;gotmpl&quot;</span>&#125;,</span><br><span class="line">	root_dir = util.root_pattern(<span class="string">&quot;go.work&quot;</span>,<span class="string">&quot;go.mod&quot;</span>,<span class="string">&quot;.git&quot;</span>),</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>再加一点设置，使得nvim里面可以自动导go的包、未使用警告等</p>
+<div class="code-container" data-rel="Lua"><figure class="iseeu highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">settings = &#123;</span><br><span class="line">		gopls = &#123;</span><br><span class="line">			completeUnimported = <span class="literal">true</span>,</span><br><span class="line">			usePlaceholders = <span class="literal">true</span>,</span><br><span class="line">			analyses = &#123;</span><br><span class="line">				unusedparams = <span class="literal">true</span>,</span><br><span class="line">			&#125;,</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;,</span><br></pre></td></tr></table></figure></div>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/ba5e51e6f8624d8db666e1fc78d69907.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<p>……………………..不想写了，跟着视频配吧</p>
+<p>​	</p>
+<h1 id="安装Nerd字体"><a href="#安装Nerd字体" class="headerlink" title="安装Nerd字体"></a>安装Nerd字体</h1><p><a class="link"   target="_blank" rel="noopener" href="https://blog.csdn.net/HUSTHY/article/details/104023077" >ubuntu系统添加新的字体——JetBrains Mono 字体添加实例<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a><br><a class="link"   target="_blank" rel="noopener" href="https://www.nerdfonts.com/font-downloads" >字体下载网站<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<p>用jetbrains mono即可</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/adeba8ca4c864e5c9105e2b55c9177c4.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/f02f262f9ec84c4db14308ea8c312289.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h1 id="nvim-tree"><a href="#nvim-tree" class="headerlink" title="nvim-tree"></a>nvim-tree</h1><p>自带，在normal模式下用<code>ctrl n</code>唤出<br><code>ctrl h</code>和<code>ctrl l</code>切换左右</p>
+<h1 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h1><p>输入<code>:Lazy</code>进入包管理界面</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>&#x2F;root&#x2F;.config&#x2F;nvim&#x2F;lua&#x2F;custom&#x2F;chadrc.lua</p>
+<div class="code-container" data-rel="Lua"><figure class="iseeu highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">---@type ChadrcConfig </span></span><br><span class="line"> <span class="keyword">local</span> M = &#123;&#125;</span><br><span class="line"> M.ui = &#123;theme = <span class="string">&#x27;catppuccin&#x27;</span>&#125;</span><br><span class="line"> M.plugins = <span class="string">&quot;custom.plugins&quot;</span></span><br><span class="line"> M.mappings = <span class="built_in">require</span> <span class="string">&quot;custom.mappings&quot;</span></span><br><span class="line"> <span class="keyword">return</span> M</span><br></pre></td></tr></table></figure></div>
+<p>&#x2F;root&#x2F;.config&#x2F;nvim&#x2F;lua&#x2F;custom&#x2F;mappings.lua</p>
+<div class="code-container" data-rel="Lua"><figure class="iseeu highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">local</span> M =&#123;&#125;</span><br><span class="line"></span><br><span class="line">M.dap = &#123;</span><br><span class="line">  plugin = <span class="literal">true</span>,</span><br><span class="line">  n = &#123;</span><br><span class="line">    [<span class="string">&quot;&lt;leader&gt;db&quot;</span>] = &#123;</span><br><span class="line">      <span class="string">&quot;&lt;cmd&gt; DapToggleBreakpoint &lt;CR&gt;&quot;</span>,</span><br><span class="line">      <span class="string">&quot;Add breakpoint at line&quot;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  [<span class="string">&quot;&lt;leader&gt;dus&quot;</span>] = &#123;</span><br><span class="line">      <span class="function"><span class="keyword">function</span> <span class="params">()</span></span></span><br><span class="line">        <span class="keyword">local</span> widgets = <span class="built_in">require</span>(<span class="string">&quot;dap.ui.widgets&quot;</span>);</span><br><span class="line">        <span class="keyword">local</span> siderbar = widgets.sidebar(widgets.scopes);</span><br><span class="line">      <span class="keyword">end</span>,</span><br><span class="line">      <span class="string">&quot;Open debugging sidebar&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">M.dap_go = &#123;</span><br><span class="line">  plugin = <span class="literal">true</span>,</span><br><span class="line">    n = &#123;</span><br><span class="line">      [<span class="string">&quot;&lt;leader&gt;dgt&quot;</span>] = &#123;</span><br><span class="line">        <span class="function"><span class="keyword">function</span><span class="params">()</span></span></span><br><span class="line">          <span class="built_in">require</span>(<span class="string">&quot;dap-go&quot;</span>).debug_test()</span><br><span class="line">        <span class="keyword">end</span>,</span><br><span class="line">        <span class="string">&quot;Debug go test&quot;</span></span><br><span class="line">    &#125;,</span><br><span class="line">    [<span class="string">&quot;&lt;leader&gt;dgl&quot;</span>] = &#123;</span><br><span class="line">      <span class="function"><span class="keyword">function</span><span class="params">()</span></span></span><br><span class="line">          <span class="built_in">require</span>(<span class="string">&quot;dap-go&quot;</span>).debug_test()</span><br><span class="line">      <span class="keyword">end</span>,</span><br><span class="line">      <span class="string">&quot;Debug last go test&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> M</span><br></pre></td></tr></table></figure></div>
+<p>&#x2F;root&#x2F;.config&#x2F;nvim&#x2F;lua&#x2F;custom&#x2F;plugins.lua</p>
+<div class="code-container" data-rel="Lua"><figure class="iseeu highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">local</span> plugins = &#123;</span><br><span class="line">        &#123;</span><br><span class="line">                <span class="string">&quot;williamboman/mason.nvim&quot;</span>,</span><br><span class="line">                opts = &#123;</span><br><span class="line">                        ensure_installed = &#123;</span><br><span class="line">                                <span class="string">&quot;gopls&quot;</span>,</span><br><span class="line">                        &#125;,</span><br><span class="line">                &#125;,</span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">                <span class="string">&quot;mfussenegger/nvim-dap&quot;</span>,</span><br><span class="line">                init = <span class="function"><span class="keyword">function</span><span class="params">()</span></span></span><br><span class="line">                        <span class="built_in">require</span>(<span class="string">&quot;core.utils&quot;</span>).load_mappings(<span class="string">&quot;dap&quot;</span>)</span><br><span class="line">                <span class="keyword">end</span></span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">                <span class="string">&quot;leoluz/nvim-dap-go&quot;</span>,</span><br><span class="line">                ft = <span class="string">&quot;go&quot;</span>,</span><br><span class="line">                dependencies = <span class="string">&quot;mfussenegger/nvim-dap&quot;</span>,</span><br><span class="line">                <span class="built_in">config</span> = <span class="function"><span class="keyword">function</span><span class="params">(_,opts)</span></span></span><br><span class="line">                        <span class="built_in">require</span>(<span class="string">&quot;dap-go&quot;</span>).setup(opts)</span><br><span class="line">                        <span class="built_in">require</span>(<span class="string">&quot;core.utils&quot;</span>).load_mappings(<span class="string">&quot;dap_go&quot;</span>)</span><br><span class="line">                <span class="keyword">end</span></span><br><span class="line">        &#125;,  </span><br><span class="line">        &#123;</span><br><span class="line">                <span class="string">&quot;neovim/nvim-lspconfig&quot;</span>,</span><br><span class="line">                <span class="built_in">config</span> = <span class="function"><span class="keyword">function</span><span class="params">()</span></span></span><br><span class="line">                        <span class="built_in">require</span> <span class="string">&quot;plugins.configs.lspconfig&quot;</span></span><br><span class="line">                        <span class="built_in">require</span> <span class="string">&quot;custom.configs.lspconfig&quot;</span></span><br><span class="line">                <span class="keyword">end</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">                <span class="string">&quot;jose-elias-alvarez/null-ls.nvim&quot;</span>,</span><br><span class="line">                ft = <span class="string">&quot;go&quot;</span>,</span><br><span class="line">                opts = <span class="function"><span class="keyword">function</span><span class="params">()</span></span></span><br><span class="line">                        <span class="keyword">return</span> <span class="built_in">require</span> <span class="string">&quot;custom.configs.null-ls&quot;</span></span><br><span class="line">                <span class="keyword">end</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">                <span class="string">&quot;olexsmir/gopher.nvim&quot;</span>,</span><br><span class="line">                ft=<span class="string">&quot;go&quot;</span>,</span><br><span class="line">                <span class="built_in">config</span> = <span class="function"><span class="keyword">function</span><span class="params">(_,opts)</span></span></span><br><span class="line">                        <span class="built_in">require</span>(<span class="string">&quot;gopher&quot;</span>).setup(opts)</span><br><span class="line">                <span class="keyword">end</span>,</span><br><span class="line">                build = <span class="function"><span class="keyword">function</span><span class="params">()</span></span></span><br><span class="line">                        vim.cmd <span class="string">[[silent! GoInstallDeps]]</span></span><br><span class="line">                <span class="keyword">end</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> plugins</span><br></pre></td></tr></table></figure></div>
+
+
+<p>&#x2F;root&#x2F;.config&#x2F;nvim&#x2F;lua&#x2F;custom&#x2F;configs&#x2F;lspconfig.lua</p>
+<div class="code-container" data-rel="Lua"><figure class="iseeu highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">local</span> on_attach = <span class="built_in">require</span>(<span class="string">&quot;plugins.configs.lspconfig&quot;</span>).on_attach</span><br><span class="line"><span class="keyword">local</span> capabilities = <span class="built_in">require</span>(<span class="string">&quot;plugins.configs.lspconfig&quot;</span>).capabilities</span><br><span class="line"></span><br><span class="line"><span class="keyword">local</span> lspconfig = <span class="built_in">require</span>(<span class="string">&quot;lspconfig&quot;</span>)</span><br><span class="line"><span class="keyword">local</span> util = <span class="built_in">require</span> <span class="string">&quot;lspconfig/util&quot;</span></span><br><span class="line"></span><br><span class="line">lspconfig.gopls.setup &#123;</span><br><span class="line">        on_attach = on_attach,</span><br><span class="line">        capabilities = capabilities,</span><br><span class="line">        cmd = &#123;<span class="string">&quot;gopls&quot;</span>&#125;,</span><br><span class="line">        filetypes = &#123;<span class="string">&quot;go&quot;</span>,<span class="string">&quot;gomod&quot;</span>,<span class="string">&quot;gowork&quot;</span>,<span class="string">&quot;gotmpl&quot;</span>&#125;,</span><br><span class="line">        root_dir = util.root_pattern(<span class="string">&quot;go.work&quot;</span>,<span class="string">&quot;go.mod&quot;</span>,<span class="string">&quot;.git&quot;</span>),</span><br><span class="line">        settings = &#123;</span><br><span class="line">                gopls = &#123;</span><br><span class="line">                        completeUnimported = <span class="literal">true</span>,</span><br><span class="line">                        usePlaceholders = <span class="literal">true</span>,</span><br><span class="line">                        analyses = &#123;</span><br><span class="line">                                unusedparams = <span class="literal">true</span>,</span><br><span class="line">                        &#125;,</span><br><span class="line">                &#125;,</span><br><span class="line">        &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>&#x2F;root&#x2F;.config&#x2F;nvim&#x2F;lua&#x2F;custom&#x2F;configs&#x2F;null-ls.lua</p>
+<div class="code-container" data-rel="Lua"><figure class="iseeu highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">local</span> null_ls = <span class="built_in">require</span>(<span class="string">&quot;null-ls&quot;</span>)</span><br><span class="line"><span class="keyword">local</span> augroup = vim.api.nvim_create_augroup(<span class="string">&quot;LspFormatting&quot;</span>,&#123;&#125;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">local</span> opts = &#123;</span><br><span class="line">        sources = &#123;</span><br><span class="line">                null_ls.builtins.formatting.gofmt,</span><br><span class="line">                null_ls.builtins.formatting.goimports_reviser,</span><br><span class="line">                null_ls.builtins.formatting.golines,</span><br><span class="line">        &#125;,</span><br><span class="line">        on_attach = <span class="function"><span class="keyword">function</span><span class="params">(client,bufnr)</span></span></span><br><span class="line">                <span class="keyword">if</span> client.supports_method(<span class="string">&quot;textDocument/formatting&quot;</span>) <span class="keyword">then</span></span><br><span class="line">                        vim.api.nvim_clear_autocmds(&#123;</span><br><span class="line">                                group = augroup,</span><br><span class="line">                                buffer = bufnr,</span><br><span class="line">                        &#125;)</span><br><span class="line">                        vim.api.nvim_create_autocmd(<span class="string">&quot;BufWritePre&quot;</span>,&#123;</span><br><span class="line">                                group = augroup,</span><br><span class="line">                                buffer = bufnr,</span><br><span class="line">                                callback = <span class="function"><span class="keyword">function</span><span class="params">()</span></span></span><br><span class="line">                                        vim.lsp.buf.<span class="built_in">format</span>(&#123;bufnr = bufnr&#125;)</span><br><span class="line">                                <span class="keyword">end</span>,</span><br><span class="line">                        &#125;)</span><br><span class="line">                <span class="keyword">end</span></span><br><span class="line">        <span class="keyword">end</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<h1 id="设置在vim中可以复制到系统剪贴板"><a href="#设置在vim中可以复制到系统剪贴板" class="headerlink" title="设置在vim中可以复制到系统剪贴板"></a>设置在vim中可以复制到系统剪贴板</h1><div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt install xclip</span><br></pre></td></tr></table></figure></div>
+<p>创建init.vim</p>
+<div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim ~/.config/nvim/init.lua</span><br></pre></td></tr></table></figure></div>
+<p>然后加入一行</p>
+<div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim.o.clipboard = &quot;unnamedplus&quot;</span><br></pre></td></tr></table></figure></div>
+<p>然后发现之后用y复制时，在浏览器里面也可以粘贴这个内容了<br>同时在别的地方ctrl+c复制，在vim里也可以用p粘贴</p>
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>标题:</strong> deepin搭建go开发环境（git、go、neovim、nvchad、nerd)</li>
+        <li><strong>作者:</strong> urlyy</li>
+        <li><strong>创建于
+                :</strong> 2023-05-08 22:17:03</li>
+        
+            <li>
+                <strong>更新于
+                    :</strong> 2025-12-21 18:39:57
+            </li>
+        
+        <li>
+            <strong>链接:</strong> https://urlyy.github.io/2023/05/08/deepin搭建nvim的go开发环境/
+        </li>
+        <li>
+            <strong>
+                版权声明:
+            </strong>
+            
+
+            
+                本文章采用 <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a> 进行许可。
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+		<ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/neovim/">#neovim</a>&nbsp;
+			</li>
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/go/">#go</a>&nbsp;
+			</li>
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/deeepin/">#deeepin</a>&nbsp;
+			</li>
+			
+		</ul>
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="prev" rel="prev" href="/2023/05/10/%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%E8%AE%B0%E5%BD%95/">
+					<span class="left arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-left"></i>
+					</span>
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">解决方案记录</span>
+						<span class="post-nav-item">上一篇</span>
+					</span>
+				</a>
+			</div>
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2023/03/03/pq%E5%88%9D%E4%BA%86%E8%A7%A3/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">pq初了解</span>
+						<span class="post-nav-item">下一篇</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        评论
+    </div>
+    
+
+        
+            
+    <div id="giscus-container"></div>
+    <script data-swup-reload-script defer>
+        async function loadGiscus() {
+            const giscusConfig = {
+                'src': 'https://giscus.app/client.js',
+                'data-repo': 'urlyy/urlyy_blog_comments',
+                'data-repo-id': 'R_kgDONo8nwQ',
+                'data-category': 'Announcements',
+                'data-category-id': 'DIC_kwDONo8nwc4Cl7pw',
+                'data-mapping': 'title',
+                'data-strict': '0',
+                'data-reactions-enabled': '1',
+                'data-emit-metadata': '1',
+                'data-theme': 'preferred_color_scheme',
+                'data-lang': 'zh-CN',
+                'data-input-position': 'top',
+                'data-loading': 'lazy',
+                'crossorigin': 'anonymous',
+                'async': true
+            }
+            const giscusScript = document.createElement('script');
+            for (const key in giscusConfig) {
+                giscusScript.setAttribute(key, giscusConfig[key]);
+            }
+            document.getElementById('giscus-container').appendChild(giscusScript);
+        }
+        if ('true') {
+            let loadGiscusTimeout = setTimeout(() => {
+                loadGiscus();
+                clearTimeout(loadGiscusTimeout);
+            }, 1000);
+        } else {
+            document.addEventListener('DOMContentLoaded', loadGiscus);
+        }
+    </script>
+
+
+        
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">目录</div>
+		<div class="page-title">deepin搭建go开发环境（git、go、neovim、nvchad、nerd)</div>
+		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%85deepin%E8%99%9A%E6%8B%9F%E6%9C%BA"><span class="nav-text">安装deepin虚拟机</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%85git"><span class="nav-text">安装git</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%85golang"><span class="nav-text">安装golang</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%85neovim"><span class="nav-text">安装neovim</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E7%BC%96%E8%AF%91vim9"><span class="nav-text">一、编译vim9</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E7%BC%96%E8%AF%91neovim"><span class="nav-text">二、编译neovim</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%85go%E7%9A%84lsp"><span class="nav-text">安装go的lsp</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%85Nerd%E5%AD%97%E4%BD%93"><span class="nav-text">安装Nerd字体</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#nvim-tree"><span class="nav-text">nvim-tree</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B6%E4%BB%96"><span class="nav-text">其他</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE%E5%9C%A8vim%E4%B8%AD%E5%8F%AF%E4%BB%A5%E5%A4%8D%E5%88%B6%E5%88%B0%E7%B3%BB%E7%BB%9F%E5%89%AA%E8%B4%B4%E6%9D%BF"><span class="nav-text">设置在vim中可以复制到系统剪贴板</span></a></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2021</span>
+              -
+            
+            2025&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">urlyy</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        共撰写了 78 篇文章
+                    </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">访问人数</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">总访问量</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">由 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a> 驱动</span>
+            <span class="text-sm lg:block">主题&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.5</a></span>
+        </div>
+        
+        
+            <div>
+                博客已运行 <span class="odometer" id="runtime_days" ></span> 天 <span class="odometer" id="runtime_hours"></span> 小时 <span class="odometer" id="runtime_minutes"></span> 分钟 <span class="odometer" id="runtime_seconds"></span> 秒
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="fa-regular fa-arrow-up"></i>
+		</li>
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+	<div class="search-pop-overlay">
+	<div class="popup search-popup">
+		<div class="search-header">
+			<span class="search-input-field-pre">
+				<i class="fa-solid fa-keyboard"></i>
+			</span>
+			<div class="search-input-container">
+				<input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="站内搜索您需要的内容..." spellcheck="false" type="search" class="search-input">
+			</div>
+			<span class="popup-btn-close">
+				<i class="fa-solid fa-times"></i>
+			</span>
+		</div>
+		<div id="search-result">
+			<div id="no-result">
+				<i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>
+			</div>
+		</div>
+	</div>
+</div>
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+	
+<script src="/js/build/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/build/utils.js" type="module"></script>
+
+<script src="/js/build/main.js" type="module"></script>
+
+<script src="/js/build/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/build/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/build/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/build/layouts/categoryList.js" type="module"></script>
+
+
+
+    
+<script src="/js/build/tools/localSearch.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/layouts/lazyload.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/runtime.js"></script>
+
+    
+<script src="/js/build/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+  
+<script src="/js/build/plugins/typed.js" type="module"></script>
+
+
+
+
+    
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@9.3.0/dist/mermaid.min.js"></script>
+    
+    
+<script src="/js/build/plugins/mermaid.js"></script>
+
+
+
+
+
+
+    
+<script src="/js/build/libs/anime.min.js"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/tocToggle.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/layouts/toc.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/plugins/tabs.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+<script src="/js/build/layouts/essays.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+
+	
+</body>
+
+</html>

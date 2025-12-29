@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="urlyy">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set data attribute for CSS variables
+                root.setAttribute("data-theme", theme);
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes once DOM is ready
+            if (document.readyState !== "loading") {
+                document.body.classList.add(theme + "-mode");
+            } else {
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add(theme + "-mode");
+                    document.body.classList.remove((theme === DARK ? LIGHT : DARK) + "-mode");
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Critical CSS to prevent flash -->
+    <style>
+        :root[data-theme="dark"] {
+            --background-color: #202124;
+            --background-color-transparent: rgba(32, 33, 36, 0.6);
+            --second-background-color: #2d2e32;
+            --third-background-color: #34353a;
+            --third-background-color-transparent: rgba(32, 33, 36, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #ffffff;
+            --second-text-color: #eeeeee;
+            --third-text-color: #bebec6;
+            --fourth-text-color: #999999;
+            --default-text-color: #bebec6;
+            --invert-text-color: #373D3F;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(255, 255, 255, 0.08);
+            --shadow-color-2: rgba(255, 255, 255, 0.05);
+        }
+        
+        :root[data-theme="light"] {
+            --background-color: #fff;
+            --background-color-transparent: rgba(255, 255, 255, 0.6);
+            --second-background-color: #f8f8f8;
+            --third-background-color: #f2f2f2;
+            --third-background-color-transparent: rgba(241, 241, 241, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #16171a;
+            --second-text-color: #2f3037;
+            --third-text-color: #5e5e5e;
+            --fourth-text-color: #eeeeee;
+            --default-text-color: #373D3F;
+            --invert-text-color: #bebec6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(0, 0, 0, 0.08);
+            --shadow-color-2: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+        
+        /* Apply body classes as soon as DOM is ready */
+        :root[data-theme="dark"] body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+    </style>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://urlyy.github.io/2023/02/19/6-5840-mr-lab1记录/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta name="description" content="6.5840分布式(前6.824)—Lab1 MapReduce 学习记录 MapReduce其次论文讨论了大量减少网络通信的优化技巧，因为带宽是瓶颈。 Lab任务 实现一个分布式mr，其中包括一个coordinate和多个worker，每个worker通过RPC与coordinate通信 在mr&#x2F;coordinator.go, mr&#x2F;worker.go, mr&#x2F;rpc.go补充内容 worker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="6.5840-lab1-mr记录">
+<meta property="og:url" content="http://urlyy.github.io/2023/02/19/6-5840-mr-lab1%E8%AE%B0%E5%BD%95/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="6.5840分布式(前6.824)—Lab1 MapReduce 学习记录 MapReduce其次论文讨论了大量减少网络通信的优化技巧，因为带宽是瓶颈。 Lab任务 实现一个分布式mr，其中包括一个coordinate和多个worker，每个worker通过RPC与coordinate通信 在mr&#x2F;coordinator.go, mr&#x2F;worker.go, mr&#x2F;rpc.go补充内容 worker">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://urlyy.github.io/article_images/6-5840-mr-lab1%E8%AE%B0%E5%BD%95/5580121b55734d77a9efd0c254bd0b91.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/6-5840-mr-lab1%E8%AE%B0%E5%BD%95/218690a6d64b416b8c88f6f6059bf104.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/6-5840-mr-lab1%E8%AE%B0%E5%BD%95/dfcc9bf780e74c7fab8b7b5a21f3f0ad.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/6-5840-mr-lab1%E8%AE%B0%E5%BD%95/7cae0da1be4d43519562c2244b46e57a.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/6-5840-mr-lab1%E8%AE%B0%E5%BD%95/157031262fe1476d86872a387411bbc3.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/6-5840-mr-lab1%E8%AE%B0%E5%BD%95/9d3baf614ce1497abcee2bec800dd973.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/6-5840-mr-lab1%E8%AE%B0%E5%BD%95/1b5ef687ee304aad9c5000b2c18ff517.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/6-5840-mr-lab1%E8%AE%B0%E5%BD%95/f0546f639b6a4d5fae3f59e9e28500c8.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/6-5840-mr-lab1%E8%AE%B0%E5%BD%95/image-20230728004926670.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/6-5840-mr-lab1%E8%AE%B0%E5%BD%95/image-20230728004852814.png">
+<meta property="article:published_time" content="2023-02-18T17:18:22.000Z">
+<meta property="article:modified_time" content="2025-12-21T10:39:57.265Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="分布式计算">
+<meta property="article:tag" content="Go">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://urlyy.github.io/article_images/6-5840-mr-lab1%E8%AE%B0%E5%BD%95/5580121b55734d77a9efd0c254bd0b91.png">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/avatar.jpg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.jpg">
+    <meta name="theme-color" content="#5c701a">
+    <link rel="shortcut icon" href="/images/avatar.jpg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            6.5840-lab1-mr记录 | urlyy的小窝
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+        <link href="" rel="stylesheet">
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"urlyy.github.io","root":"/","language":"zh-CN","path":"search.json"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":false,"auto":false,"list":[""]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":true},"copyright":true,"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#5c701a","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":true,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":false},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"side_tools":{"gear_rotation":true,"auto_expand":false},"open_graph":true,"google_analytics":{"enable":false,"id":null},"busuanzi_counter":{"enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"pjax":true},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/bg/1.jpg","dark":"/images/bg/1.jpg"},"title":"urlyy的小窝","subtitle":{"text":["Loading..."],"hitokoto":{"enable":true,"show_author":false,"api":"https://v1.hitokoto.cn?c=a&c=b&c=d&c=k"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"style":"default","links":{"github":"https://github.com/urlyy?tab=repositories","instagram":null,"zhihu":null,"twitter":null,"email":"2213732736@qq.com"},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":true,"version":"9.3.0"}},"version":"2.8.5","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Categories":{"icon":"fa-regular fa-folder","path":"/categories/"},"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Github":{"path":"https://github.com/urlyy","icon":"fa-brands fa-github"},"个人介绍":{"path":"/personal/profile.html","icon":"fa-regular fa-user"}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"cloud"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":null},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2021/9/7 16:55:00"};
+    window.lang_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 个月前","year":"%s 年前"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                urlyy的小窝
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    首页
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/categories/"
+                                        >
+                                    <i class="fa-regular fa-folder fa-fw"></i>
+                                    分类
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/archives"
+                                        >
+                                    <i class="fa-regular fa-archive fa-fw"></i>
+                                    归档
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   target="_blank" rel="noopener" href="https://github.com/urlyy"
+                                        >
+                                    <i class="fa-brands fa-github fa-fw"></i>
+                                    GITHUB
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/personal/profile.html"
+                                        >
+                                    <i class="fa-regular fa-user fa-fw"></i>
+                                    个人介绍
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                首页
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/categories/"
+                        >
+                            <span>
+                                分类
+                            </span>
+                            
+                                <i class="fa-regular fa-folder fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/archives"
+                        >
+                            <span>
+                                归档
+                            </span>
+                            
+                                <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           target="_blank" rel="noopener" href="https://github.com/urlyy"
+                        >
+                            <span>
+                                GITHUB
+                            </span>
+                            
+                                <i class="fa-brands fa-github fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/personal/profile.html"
+                        >
+                            <span>
+                                个人介绍
+                            </span>
+                            
+                                <i class="fa-regular fa-user fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">25</div>
+        <div class="label text-third-text-color text-sm">标签</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">29</div>
+        <div class="label text-third-text-color text-sm">分类</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">78</div>
+        <div class="label text-third-text-color text-sm">文章</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">6.5840-lab1-mr记录</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/avatar.jpg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">urlyy</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2023-02-19 01:18:22</span>
+        <span class="mobile">2023-02-19 01:18:22</span>
+        <span class="hover-info">创建</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2025-12-21 18:39:57</span>
+            <span class="mobile">2025-12-21 18:39:57</span>
+            <span class="hover-info">更新</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/6-584/">6.584</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa-regular fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%A1%E7%AE%97/">分布式计算</a>&nbsp;
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/Go/">Go</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<p>6.5840分布式(前6.824)—Lab1 MapReduce 学习记录</p>
+<h1 id="MapReduce"><a href="#MapReduce" class="headerlink" title="MapReduce"></a>MapReduce</h1><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/6-5840-mr-lab1%E8%AE%B0%E5%BD%95/5580121b55734d77a9efd0c254bd0b91.png"
+                      alt="在这里插入图片描述"
+                ><br>其次论文讨论了大量减少网络通信的优化技巧，因为带宽是瓶颈。</p>
+<h1 id="Lab任务"><a href="#Lab任务" class="headerlink" title="Lab任务"></a>Lab任务</h1><ul>
+<li>实现一个分布式mr，其中包括一个coordinate和多个worker，每个worker通过RPC与coordinate通信</li>
+<li>在<code>mr/coordinator.go</code>,<code> mr/worker.go</code>,<code> mr/rpc.go</code>补充内容</li>
+<li>worker负责从coordinator中读入内容，然后进行加工写入worker本地</li>
+<li>coordinator负责发送任务给worker，同时如果coordinator发现一个worker无法在规定时间(10s)内完成任务，就将任务分配给其他worker</li>
+<li>给出了<code>main/mrcoordinator.go</code> 和 <code>main/mrworker.go</code>两个样例，不要修改他们。</li>
+<li>运行<code>go build -buildmode=plugin ../mrapps/wc.go</code>来将这个go文件打包成插件<code>wc.so</code>供Map使用。然后运行<code>go run mrcoordinator.go pg-*.txt</code>建立并启动coordinator，并将要处理的文本文件名传给coordinator。然后运行<code>go run mrworker.go wc.so</code>，读取之前生成的插件中含有的map和reduce函数，将其传给worker，让他们调用。</li>
+<li>然后给了一个测试方法，即<code>bash  ~/6.5840/src/main/test-mr.sh</code></li>
+</ul>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/6-5840-mr-lab1%E8%AE%B0%E5%BD%95/218690a6d64b416b8c88f6f6059bf104.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h1 id="lab的一些要求"><a href="#lab的一些要求" class="headerlink" title="lab的一些要求"></a>lab的一些要求</h1><ul>
+<li>map将输入文件分成多组中间文件，供多个reduce使用，同时要传递<code>nReduce</code>这个变量来创建coordinator</li>
+<li>reduce的输出文件名格式为<code>mr-out-X</code>,其中X为该reduce任务的编号</li>
+<li>每个reduce文件里面的每一行，格式为<code>&quot;%v %v&quot; </code>导出的一行，分别对应key、value，方式为&#96;fmt.Fprintf(ofile, “%v %v\n”, intermediate[i].Key, output)</li>
+<li>worker的map要输出到当前目录，以方便reduce读取</li>
+<li>对于<code>mr/coordinator.go</code>中的Done方法要返回true，才表示这次mapreduce结束了，<code>mrcoordinator.go</code>会终止</li>
+<li>mapreduce结束，coordinator会终止，worker也要终止，有很多种设计方法，包括当worker联系不到coordinator时就自行终止。</li>
+</ul>
+<h1 id="Lab的一些提示"><a href="#Lab的一些提示" class="headerlink" title="Lab的一些提示"></a>Lab的一些提示</h1><ul>
+<li>建议先修改<code>mr/worker.go&#39;</code>的<code>Worker()</code>来实现worker通过rpc从coordinator请求任务文件，然后修改coordinator的代码来返回给worker任务对应的文件名，然后再实现worker读取文件内容并调用map的操作</li>
+<li>中间文件的命名可以是<code>mr-X-Y</code>，其中X是Map任务的编号，Y是Reduce任务的编号，所以每个mapper都会产生reducer个文件的中间文件</li>
+<li>虽然reduce的输出是一行一行的kv，但是map要给reduce的输出不一定是这样，可以采用读写json的方式来让map的输出有效地被reduce读入  <div class="code-container" data-rel="Go"><figure class="iseeu highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//写</span></span><br><span class="line">  enc := json.NewEncoder(file)</span><br><span class="line">  <span class="keyword">for</span> _, kv := ... &#123;</span><br><span class="line">    err := enc.Encode(&amp;kv)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="comment">//读</span></span><br><span class="line">  dec := json.NewDecoder(file)</span><br><span class="line">  <span class="keyword">for</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> kv KeyValue</span><br><span class="line">    <span class="keyword">if</span> err := dec.Decode(&amp;kv); err != <span class="literal">nil</span> &#123;</span><br><span class="line">      <span class="keyword">break</span></span><br><span class="line">    &#125;</span><br><span class="line">    kva = <span class="built_in">append</span>(kva, kv)</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></div></li>
+<li>worker可以使用ihash函数来选择map的输出让哪个reduce接收</li>
+<li><code>mrsequential.go</code>里的读入、写入、排序操作可以自行借用</li>
+<li>coordinator要注意并发问题</li>
+<li>使用<code>go run -race. test-mr.sh</code>来检测并发问题</li>
+<li>reducer必须在所有的mapper结束之后才能开始操作，所以必须请求coordinator，对于这类轮询可以采用nio的模式，用一个handler loop来接收请求，灵活使用<code>time.Sleep()</code> 或<code>sync.Cond</code>,一把大锁保平安</li>
+<li>coordinator不能识别worker是正常、崩掉还是处理过慢，这次lab里允许worker通过每10s的发送心跳检测来告知coordinator自己没挂，可以多加一个字段以合并请求操作和心跳操作，比如isHeart的布尔类型;或者coordinator对每一个分配出去的任务设一个定时器，时间到没做完就算worker出问题了</li>
+<li>Go的rpc发送结构体时，只能发送字段名开头大写的字段，子结构体也一样</li>
+<li>rpc调用call返回信息时，reply对象所有的字段都是默认值即可，不要有非默认的赋值，不然可能会出问题，就像下面这样，空构造即可  <div class="code-container" data-rel="Go"><figure class="iseeu highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">reply := SomeType&#123;&#125;</span><br><span class="line">call(..., &amp;reply)</span><br></pre></td></tr></table></figure></div></li>
+<li>一些测试的东西，懒得翻译了<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/6-5840-mr-lab1%E8%AE%B0%E5%BD%95/dfcc9bf780e74c7fab8b7b5a21f3f0ad.png"
+                      alt="在这里插入图片描述"
+                ></li>
+</ul>
+<h1 id="完成过程"><a href="#完成过程" class="headerlink" title="完成过程"></a>完成过程</h1><h2 id="配置环境"><a href="#配置环境" class="headerlink" title="配置环境"></a>配置环境</h2><ol>
+<li>Go（参考我写的<a href="https://urlyy.github.io/2023/06/07/deepin%E6%90%AD%E5%BB%BAnvim%E7%9A%84go%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/">deepin搭建go开发环境（git、go、neovim、NvChad、Nerd Font）</a>，只要看go部分就行了）<br>deepin和ubuntu都是用apt<br>注意<font color="red"><strong>我的go版本是1.20.4</strong></font>，所以部分代码可能不能在较低版本的Go上编译成功</li>
+<li>Goland（因为我vsc总是报权限不足，nvim也用的繁琐，果然还得是正宗IDE靠谱）<br>链接：<a class="link"   target="_blank" rel="noopener" href="https://pan.baidu.com/s/1BWEFf8zeLnud98fy5hOTiQ?pwd=qwer" >Jetbrains全家桶破解文件<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>配一下Goland运行程序的方式<br> 参考了下别人配的Goland教程，可以减少很多的测试时间，而且也是第一次学着搭配命令行参数配置运行程序<br> <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/6-5840-mr-lab1%E8%AE%B0%E5%BD%95/7cae0da1be4d43519562c2244b46e57a.png"
+                      alt="在这里插入图片描述"
+                ><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/6-5840-mr-lab1%E8%AE%B0%E5%BD%95/157031262fe1476d86872a387411bbc3.png"
+                      alt="在这里插入图片描述"
+                >  <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">go build -buildmode=plugin ../mrapps/wc.go</span><br><span class="line">rm -f mr-out*</span><br><span class="line">rm -f mr-*.json</span><br></pre></td></tr></table></figure></div></li>
+</ol>
+<p>  注意Working directory很关键，因为很多程序是基于相对路径来的，你设置错运行目录了，他可能就找不到其他文件了<br>  <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/6-5840-mr-lab1%E8%AE%B0%E5%BD%95/9d3baf614ce1497abcee2bec800dd973.png"
+                      alt="在这里插入图片描述"
+                ><br>  虽然课程作业里面  用命令行可以以<code>pg-*.txt</code>作为入参，但是Goland不惯着你，只能老老实实把每个参数敲上去<br>  不知道为什么有的博主在<code>Go tool arguments</code>那里写了<code>-i</code>，<font color="red"><strong>我的go版本是1.20.4</strong></font>，好像没这个参数了</p>
+  <div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pg-being_ernest.txt pg-dorian_gray.txt pg-frankenstein.txt pg-grimm.txt pg-huckleberry_finn.txt pg-metamorphosis.txt pg-sherlock_holmes.txt pg-tom_sawyer.txt</span><br></pre></td></tr></table></figure></div>
+<p>  同时注意这个Before launch这里，就可以执行那个删除之前生成的文件和编译插件的作用<br>  <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/6-5840-mr-lab1%E8%AE%B0%E5%BD%95/1b5ef687ee304aad9c5000b2c18ff517.png"
+                      alt="在这里插入图片描述"
+                ><br>  <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/6-5840-mr-lab1%E8%AE%B0%E5%BD%95/f0546f639b6a4d5fae3f59e9e28500c8.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<p>  下面这个是test的</p>
+<p>  <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/6-5840-mr-lab1%E8%AE%B0%E5%BD%95/image-20230728004926670.png"
+                      alt="image-20230728004926670"
+                ></p>
+<p>  注意打开下面这个可以开启竞态检查</p>
+<p>  <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/6-5840-mr-lab1%E8%AE%B0%E5%BD%95/image-20230728004852814.png"
+                      alt="image-20230728004852814"
+                ></p>
+<h2 id="具体实现步骤"><a href="#具体实现步骤" class="headerlink" title="具体实现步骤"></a>具体实现步骤</h2><ol>
+<li>搞清楚哪些代码是我们需要的，哪些是要改和补充的。<br>实际上我们只需要看<code>main/mrcoordinator.go</code>、<code>main/mrsequential.go</code>、<code>main/mrworker.go</code>，好了上面这三个相当于启动类，mrsequential是一个没有用rpc的单机mr例子，可以给我们参考和代码借鉴。然后就是<code>mr/coordinate.go</code>、<code>mr/rpc.go</code>、<code>mr/worker.go</code>，这三个才是我们真正要大量写代码的地方。当然可以自己加一些go文件，比如我加了一个<code>common.go</code>写了一些枚举状态常量，反正只要通过测试就好，然后测试脚本是<code>main/test-mr.sh</code></li>
+<li>定义好一些状态枚举值<br>这个根据具体实现来吧，而且其实也不急，写到后面自然会加上的，主要就是当前是Map还是Reduce阶段的状态枚举、任务是哪种类型的状态枚举</li>
+<li>知道怎么使用RPC，他那有例子，还挺方便的，传一个参数对象的引用和一个返回值对象的引用</li>
+<li>知道要把初始传入coordinator的所有文件各自转成Map任务，是的他们每个文件就是一个Map任务。</li>
+<li>知道封装Task，反正ID和文件名和Type是需要的。</li>
+<li>知道对于这种发放任务的场景，要支持并发，又类似队列一个一个发放，这就可以联想到Go的chan，待发送的任务都保存在chan里面，而且发放任务的方法里最好加个锁保险</li>
+<li>知道worker根据任务类型，用switch进行不同的操作。注意因为要等Map全搞完才能搞Reduce，所以需要多一个Wait状态，即worker空闲，但也要减少它的询问次数，即这种情况下Sleep。</li>
+<li>要知道Map就是分词，然后要把每个词根据<code>key的hash值 % nReduce</code>归类，hash值由ihash函数得来，别忘了一开始就传入的<code>nReduce</code>。要会借鉴<code>mrsequential.go</code>和课程的提示，他给了将这些kv值转成json格式的代码。注意map这边只需要将输出写入本地，Reduce那边是根据文件名的格式(其实可以正则？)获取到这些输出文件的</li>
+<li>Reduce就是对这一系列reduceID是这个Worker的文件进行处理，把kv全部拿出来，排序，再用他给出的代码(双指针统计相同key的数目)，然后再按他的要求写入最终的结果文件</li>
+<li>注意！每个reduce各自有个输出就行了，不需要最后再Reduce成一个</li>
+<li>再补充一下，理解一下Coordinator是一个公司高管，Worker是召之即来、挥之即去的短工，所以这些ID啊、阶段啊、还没完成的Map或Reduce任务数啊，都是由Coordinator掌管，其他人所谓的MapperID、ReducerID，都是Coordinator临时赋给他们的，不是他们天生固定的。</li>
+<li>注意Worker处理完后还要再发rpc告知coordinator，他已经做完了，Coordinator算着这个阶段还差多少任务没干，干完了就前往下一阶段，注意Reduce阶段的开头，coordinator要把所有的mapper生成的文件转为Reduce阶段的任务。</li>
+<li>基本做完上述就能只剩最后一个测试trace不通过了，他会随机关掉Worker，看coordinator能不能继续分配任务并最终完成这次MR。有人是worker发心跳给coordinator来证明自己活着。我是对每个发出的任务监控，如果超出10秒钟（作业里讲了10秒）就认定这个worker有问题，然后把这个任务再放到待发放队列里，让有能力的worker来拉取，反正ReduceID不变，即便那个原来的Worker在断网情况下正常完成任务，这两个worker的结果也顶多相互覆盖，结果还是一样的。我的监控机制是把发出的任务再换个队列存，记录各自的发放时间，然后每秒去检查，如果当前时间-发放时间&gt;10，说明有问题，就将它再放入chan中，但这么写就还要改好几个地方，别忘了，比如发放时要再存一次，做完之后要删掉存的这一份。</li>
+<li>一些小细节就不说了，我也忘了，比如对终止时的处理啥的</li>
+</ol>
+<h1 id="源码如下（已通过race，作为一个Go新手敲的，很多地方的使用不是很优雅）"><a href="#源码如下（已通过race，作为一个Go新手敲的，很多地方的使用不是很优雅）" class="headerlink" title="源码如下（已通过race，作为一个Go新手敲的，很多地方的使用不是很优雅）"></a>源码如下（已通过race，作为一个Go新手敲的，很多地方的使用不是很优雅）</h1><p><code>mr/common.go</code>  状态枚举</p>
+<div class="code-container" data-rel="Go"><figure class="iseeu highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> mr</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	MapTask    = <span class="literal">iota</span></span><br><span class="line">	ReduceTask = <span class="literal">iota</span></span><br><span class="line">	WaitTask   = <span class="literal">iota</span></span><br><span class="line">	ExitTask   = <span class="literal">iota</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	MapPhase    = <span class="literal">iota</span></span><br><span class="line">	ReducePhase = <span class="literal">iota</span></span><br><span class="line">	EndPhase    = <span class="literal">iota</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure></div>
+<p><code>mr/rpc.go</code></p>
+<div class="code-container" data-rel="Go"><figure class="iseeu highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> mr</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line">	<span class="string">&quot;strconv&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Task <span class="keyword">struct</span> &#123;</span><br><span class="line">	ID          <span class="type">int</span></span><br><span class="line">	BelongPhase <span class="type">int</span></span><br><span class="line">	FileNames   []<span class="type">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">MakeTask</span><span class="params">(ID <span class="type">int</span>, ty <span class="type">int</span>, fileNames []<span class="type">string</span>)</span></span> *Task &#123;</span><br><span class="line">	task := Task&#123;</span><br><span class="line">		ID,</span><br><span class="line">		ty,</span><br><span class="line">		fileNames,</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> &amp;task</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> CallArgs <span class="keyword">struct</span> &#123;</span><br><span class="line">	BelongPhase <span class="type">int</span></span><br><span class="line">	TaskID      <span class="type">int</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> CallReply <span class="keyword">struct</span> &#123;</span><br><span class="line">	Task       *Task</span><br><span class="line">	TaskType   <span class="type">int</span></span><br><span class="line">	ReducerNum <span class="type">int</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">coordinatorSock</span><span class="params">()</span></span> <span class="type">string</span> &#123;</span><br><span class="line">	s := <span class="string">&quot;/var/tmp/5840-mr-&quot;</span></span><br><span class="line">	s += strconv.Itoa(os.Getuid())</span><br><span class="line">	<span class="keyword">return</span> s</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p><code>mr/coordinator.go</code></p>
+<div class="code-container" data-rel="Go"><figure class="iseeu highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> mr</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;net&quot;</span></span><br><span class="line">	<span class="string">&quot;net/http&quot;</span></span><br><span class="line">	<span class="string">&quot;net/rpc&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line">	<span class="string">&quot;strconv&quot;</span></span><br><span class="line">	<span class="string">&quot;strings&quot;</span></span><br><span class="line">	<span class="string">&quot;sync&quot;</span></span><br><span class="line">	<span class="string">&quot;time&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Coordinator <span class="keyword">struct</span> &#123;</span><br><span class="line">	<span class="comment">// Your definitions here.</span></span><br><span class="line">	TaskChan          <span class="keyword">chan</span> *Task</span><br><span class="line">	CurPhase          <span class="type">int</span></span><br><span class="line">	ReducerNum        <span class="type">int</span></span><br><span class="line">	mu                *sync.Mutex</span><br><span class="line">	MapTaskNumTODO    <span class="type">int</span></span><br><span class="line">	ReduceTaskNumTODO <span class="type">int</span></span><br><span class="line">	Task2Check        <span class="keyword">map</span>[<span class="type">int</span>]*CheckItem</span><br><span class="line">	checkTimer        *time.Ticker</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> CheckItem <span class="keyword">struct</span> &#123;</span><br><span class="line">	task      *Task</span><br><span class="line">	startTime time.Time</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Your code here -- RPC handlers for the worker to call.</span></span><br><span class="line"><span class="comment">// 根据当前阶段分发任务</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Coordinator)</span></span> Assign(args *CallArgs, reply *CallReply) <span class="type">error</span> &#123;</span><br><span class="line">	<span class="comment">//一把大锁防止竞争</span></span><br><span class="line">	c.mu.Lock()</span><br><span class="line">	<span class="keyword">defer</span> c.mu.Unlock()</span><br><span class="line">	<span class="keyword">switch</span> c.CurPhase &#123;</span><br><span class="line">	<span class="keyword">case</span> MapPhase:</span><br><span class="line">		<span class="keyword">if</span> <span class="built_in">len</span>(c.TaskChan) &gt; <span class="number">0</span> &#123;</span><br><span class="line">			reply.ReducerNum = c.ReducerNum</span><br><span class="line">			reply.Task = &lt;-c.TaskChan</span><br><span class="line">			ci := CheckItem&#123;reply.Task, time.Now()&#125;</span><br><span class="line">			c.Task2Check[reply.Task.ID] = &amp;ci</span><br><span class="line">			reply.TaskType = MapTask</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			reply.TaskType = WaitTask</span><br><span class="line">		&#125;</span><br><span class="line">	<span class="keyword">case</span> ReducePhase:</span><br><span class="line">		<span class="keyword">if</span> <span class="built_in">len</span>(c.TaskChan) &gt; <span class="number">0</span> &#123;</span><br><span class="line">			reply.Task = &lt;-c.TaskChan</span><br><span class="line">			ci := CheckItem&#123;reply.Task, time.Now()&#125;</span><br><span class="line">			c.Task2Check[reply.Task.ID] = &amp;ci</span><br><span class="line">			reply.TaskType = ReduceTask</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			reply.TaskType = WaitTask</span><br><span class="line">		&#125;</span><br><span class="line">	<span class="keyword">case</span> EndPhase:</span><br><span class="line">		reply.TaskType = ExitTask</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Coordinator)</span></span> check() &#123;</span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		<span class="keyword">for</span> &#123;</span><br><span class="line">			<span class="keyword">select</span> &#123;</span><br><span class="line">			<span class="keyword">case</span> &lt;-c.checkTimer.C:</span><br><span class="line">				<span class="keyword">var</span> expireTaskIDs []<span class="type">int</span></span><br><span class="line">				<span class="keyword">var</span> expireTasks []*Task</span><br><span class="line">				now := time.Now()</span><br><span class="line">				c.mu.Lock()</span><br><span class="line">				<span class="keyword">for</span> taskID, taskItem := <span class="keyword">range</span> c.Task2Check &#123;</span><br><span class="line">					<span class="comment">//fmt.Printf(&quot;%f\n&quot;, now.Sub(taskItem.startTime).Seconds())</span></span><br><span class="line">					<span class="keyword">if</span> now.Sub(taskItem.startTime).Seconds() &gt; <span class="number">10</span> &#123;</span><br><span class="line">						expireTasks = <span class="built_in">append</span>(expireTasks, taskItem.task)</span><br><span class="line">						expireTaskIDs = <span class="built_in">append</span>(expireTaskIDs, taskID)</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">				<span class="keyword">for</span> idx, taskID := <span class="keyword">range</span> expireTaskIDs &#123;</span><br><span class="line">					<span class="built_in">delete</span>(c.Task2Check, taskID)</span><br><span class="line">					c.TaskChan &lt;- expireTasks[idx]</span><br><span class="line">				&#125;</span><br><span class="line">				c.mu.Unlock()</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 任务结束的通知，像个回调</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Coordinator)</span></span> TaskDone(args *CallArgs, reply *CallReply) <span class="type">error</span> &#123;</span><br><span class="line">	<span class="comment">//fmt.Println(args.BelongPhase)</span></span><br><span class="line">	<span class="comment">//fmt.Println(args.TaskID, args.BelongPhase)</span></span><br><span class="line">	c.mu.Lock()</span><br><span class="line">	<span class="keyword">if</span> args.BelongPhase != c.CurPhase &#123;</span><br><span class="line">		c.mu.Unlock()</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">switch</span> c.CurPhase &#123;</span><br><span class="line">	<span class="keyword">case</span> MapPhase:</span><br><span class="line">		c.MapTaskNumTODO--</span><br><span class="line">		<span class="built_in">delete</span>(c.Task2Check, args.TaskID)</span><br><span class="line">		<span class="keyword">if</span> c.MapTaskNumTODO == <span class="number">0</span> &#123;</span><br><span class="line">			<span class="comment">//开始构建Reduce任务</span></span><br><span class="line">			c.CurPhase = ReducePhase</span><br><span class="line">			c.makeAllReduceTask()</span><br><span class="line">			<span class="comment">//fmt.Println(&quot;进入reduce&quot;)</span></span><br><span class="line">		&#125;</span><br><span class="line">	<span class="keyword">case</span> ReducePhase:</span><br><span class="line">		c.ReduceTaskNumTODO--</span><br><span class="line">		<span class="built_in">delete</span>(c.Task2Check, args.TaskID)</span><br><span class="line">		<span class="keyword">if</span> c.ReduceTaskNumTODO == <span class="number">0</span> &#123;</span><br><span class="line">			c.CurPhase = EndPhase</span><br><span class="line">			c.checkTimer.Stop()</span><br><span class="line">		&#125;</span><br><span class="line">	<span class="keyword">case</span> EndPhase:</span><br><span class="line">		fmt.Println(<span class="string">&quot;不收了&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	c.mu.Unlock()</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// start a thread that listens for RPCs from worker.go</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Coordinator)</span></span> server() &#123;</span><br><span class="line">	rpc.Register(c)</span><br><span class="line">	rpc.HandleHTTP()</span><br><span class="line">	<span class="comment">//l, e := net.Listen(&quot;tcp&quot;, &quot;:1234&quot;)</span></span><br><span class="line">	sockname := coordinatorSock()</span><br><span class="line">	os.Remove(sockname)</span><br><span class="line">	l, e := net.Listen(<span class="string">&quot;unix&quot;</span>, sockname)</span><br><span class="line">	<span class="keyword">if</span> e != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(<span class="string">&quot;listen error:&quot;</span>, e)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">go</span> http.Serve(l, <span class="literal">nil</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// main/mrcoordinator.go calls Done() periodically to find out</span></span><br><span class="line"><span class="comment">// if the entire job has finished.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Coordinator)</span></span> Done() <span class="type">bool</span> &#123;</span><br><span class="line">	<span class="comment">// Your code here.</span></span><br><span class="line">	c.mu.Lock()</span><br><span class="line">	<span class="keyword">defer</span> c.mu.Unlock()</span><br><span class="line">	<span class="keyword">return</span> c.CurPhase == EndPhase</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 初始生成所有的map任务</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Coordinator)</span></span> makeAllMapTask(files []<span class="type">string</span>) &#123;</span><br><span class="line">	<span class="keyword">for</span> idx, file := <span class="keyword">range</span> files &#123;</span><br><span class="line">		filenames := []<span class="type">string</span>&#123;file&#125;</span><br><span class="line">		t := MakeTask(idx, MapPhase, filenames)</span><br><span class="line">		c.TaskChan &lt;- t</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 进入第二阶段的开始时，生成所有的reduce任务</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Coordinator)</span></span> makeAllReduceTask() &#123;</span><br><span class="line">	path, _ := os.Getwd()</span><br><span class="line">	files, _ := os.ReadDir(path)</span><br><span class="line">	<span class="comment">//遍历ReducerNum遍</span></span><br><span class="line">	<span class="keyword">for</span> reduceTaskID := <span class="number">0</span>; reduceTaskID &lt; c.ReducerNum; reduceTaskID++ &#123;</span><br><span class="line">		<span class="keyword">var</span> filenames []<span class="type">string</span></span><br><span class="line">		<span class="keyword">for</span> _, file := <span class="keyword">range</span> files &#123;</span><br><span class="line">			<span class="comment">// 匹配对应的reduce文件</span></span><br><span class="line">			<span class="keyword">if</span> strings.HasPrefix(file.Name(), <span class="string">&quot;mr-&quot;</span>) &amp;&amp; strings.HasSuffix(file.Name(), strconv.Itoa(reduceTaskID)+<span class="string">&quot;.json&quot;</span>) &#123;</span><br><span class="line">				filenames = <span class="built_in">append</span>(filenames, file.Name())</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		reduceTask := MakeTask(reduceTaskID, ReducePhase, filenames)</span><br><span class="line">		c.TaskChan &lt;- reduceTask</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// create a Coordinator.</span></span><br><span class="line"><span class="comment">// main/mrcoordinator.go calls this function.</span></span><br><span class="line"><span class="comment">// nReduce is the number of reduce tasks to use.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">MakeCoordinator</span><span class="params">(files []<span class="type">string</span>, nReduce <span class="type">int</span>)</span></span> *Coordinator &#123;</span><br><span class="line">	c := Coordinator&#123;</span><br><span class="line">		TaskChan:          <span class="built_in">make</span>(<span class="keyword">chan</span> *Task, <span class="number">10</span>),</span><br><span class="line">		CurPhase:          MapPhase,</span><br><span class="line">		ReducerNum:        nReduce,</span><br><span class="line">		mu:                <span class="built_in">new</span>(sync.Mutex),</span><br><span class="line">		MapTaskNumTODO:    <span class="built_in">len</span>(files),</span><br><span class="line">		ReduceTaskNumTODO: nReduce,</span><br><span class="line">		Task2Check:        <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="type">int</span>]*CheckItem),</span><br><span class="line">		checkTimer:        time.NewTicker(<span class="number">1</span> * time.Second), <span class="comment">// 创建一个每隔1秒触发一次的定时器</span></span><br><span class="line">	&#125;</span><br><span class="line">	c.makeAllMapTask(files)</span><br><span class="line">	<span class="comment">//开始定时检查任务</span></span><br><span class="line">	c.check()</span><br><span class="line">	<span class="comment">// Your code here.</span></span><br><span class="line">	c.server()</span><br><span class="line">	<span class="keyword">return</span> &amp;c</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p><code>mr/worker.go</code></p>
+<div class="code-container" data-rel="Go"><figure class="iseeu highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> mr</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;encoding/json&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;hash/fnv&quot;</span></span><br><span class="line">	<span class="string">&quot;io&quot;</span></span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;net/rpc&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line">	<span class="string">&quot;sort&quot;</span></span><br><span class="line">	<span class="string">&quot;strconv&quot;</span></span><br><span class="line">	<span class="string">&quot;time&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Map functions return a slice of KeyValue.</span></span><br><span class="line"><span class="keyword">type</span> KeyValue <span class="keyword">struct</span> &#123;</span><br><span class="line">	Key   <span class="type">string</span></span><br><span class="line">	Value <span class="type">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// use ihash(key) % NReduce to choose the reduce</span></span><br><span class="line"><span class="comment">// task number for each KeyValue emitted by Map.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ihash</span><span class="params">(key <span class="type">string</span>)</span></span> <span class="type">int</span> &#123;</span><br><span class="line">	h := fnv.New32a()</span><br><span class="line">	h.Write([]<span class="type">byte</span>(key))</span><br><span class="line">	<span class="keyword">return</span> <span class="type">int</span>(h.Sum32() &amp; <span class="number">0x7fffffff</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// for sorting by key.</span></span><br><span class="line"><span class="keyword">type</span> ByKey []KeyValue</span><br><span class="line"></span><br><span class="line"><span class="comment">// for sorting by key.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(a ByKey)</span></span> Len() <span class="type">int</span>           &#123; <span class="keyword">return</span> <span class="built_in">len</span>(a) &#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(a ByKey)</span></span> Swap(i, j <span class="type">int</span>)      &#123; a[i], a[j] = a[j], a[i] &#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(a ByKey)</span></span> Less(i, j <span class="type">int</span>) <span class="type">bool</span> &#123; <span class="keyword">return</span> a[i].Key &lt; a[j].Key &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Map任务只涉及一个File</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">doMap</span><span class="params">(mapf <span class="keyword">func</span>(<span class="type">string</span>, <span class="type">string</span>)</span></span> []KeyValue, task *Task, reducerNum <span class="type">int</span>) &#123;</span><br><span class="line">	<span class="comment">//读取文件内容</span></span><br><span class="line">	intermediate := []KeyValue&#123;&#125;</span><br><span class="line">	file, err := os.Open(task.FileNames[<span class="number">0</span>])</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;cannot open %v&quot;</span>, task.FileNames[<span class="number">0</span>])</span><br><span class="line">	&#125;</span><br><span class="line">	content, err := io.ReadAll(file)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;cannot read %v&quot;</span>, task.FileNames[<span class="number">0</span>])</span><br><span class="line">	&#125;</span><br><span class="line">	file.Close()</span><br><span class="line">	<span class="comment">//分词</span></span><br><span class="line">	kva := mapf(task.FileNames[<span class="number">0</span>], <span class="type">string</span>(content))</span><br><span class="line">	intermediate = <span class="built_in">append</span>(intermediate, kva...)</span><br><span class="line">	sort.Sort(ByKey(intermediate))</span><br><span class="line">	<span class="comment">//第一维是按key分的桶，第二维是桶内的数组</span></span><br><span class="line">	hashedKV := <span class="built_in">make</span>([][]KeyValue, reducerNum)</span><br><span class="line">	<span class="keyword">for</span> _, kv := <span class="keyword">range</span> intermediate &#123;</span><br><span class="line">		hashKey := ihash(kv.Key) % reducerNum</span><br><span class="line">		hashedKV[hashKey] = <span class="built_in">append</span>(hashedKV[hashKey], kv)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//生成这个Map能生成的所有的reduce任务</span></span><br><span class="line">	<span class="keyword">for</span> hashKey, kvs := <span class="keyword">range</span> hashedKV &#123;</span><br><span class="line">		output := <span class="string">&quot;mr-&quot;</span> + strconv.Itoa(task.ID) + <span class="string">&quot;-&quot;</span> + strconv.Itoa(hashKey) + <span class="string">&quot;.json&quot;</span></span><br><span class="line">		ofile, err := os.Create(output)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			log.Fatalf(<span class="string">&quot;cannot create %v&quot;</span>, output)</span><br><span class="line">		&#125;</span><br><span class="line">		enc := json.NewEncoder(ofile)</span><br><span class="line">		<span class="keyword">for</span> _, kv := <span class="keyword">range</span> kvs &#123;</span><br><span class="line">			enc.Encode(kv)</span><br><span class="line">		&#125;</span><br><span class="line">		ofile.Close()</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Reduce任务涉及多个File</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">doReduce</span><span class="params">(reducef <span class="keyword">func</span>(<span class="type">string</span>, []<span class="type">string</span>)</span></span> <span class="type">string</span>, task *Task) &#123;</span><br><span class="line">	<span class="comment">//1.取出这个reduce任务负责的所有的kv，然后按key排序</span></span><br><span class="line">	<span class="keyword">var</span> kvs []KeyValue</span><br><span class="line">	<span class="keyword">for</span> _, filename := <span class="keyword">range</span> task.FileNames &#123;</span><br><span class="line">		file, _ := os.Open(filename)</span><br><span class="line">		dec := json.NewDecoder(file)</span><br><span class="line">		<span class="keyword">for</span> &#123;</span><br><span class="line">			<span class="keyword">var</span> kv KeyValue</span><br><span class="line">			<span class="comment">//一报错就跳出循环</span></span><br><span class="line">			<span class="keyword">if</span> err := dec.Decode(&amp;kv); err != <span class="literal">nil</span> &#123;</span><br><span class="line">				<span class="keyword">break</span></span><br><span class="line">			&#125;</span><br><span class="line">			kvs = <span class="built_in">append</span>(kvs, kv)</span><br><span class="line">		&#125;</span><br><span class="line">		file.Close()</span><br><span class="line">	&#125;</span><br><span class="line">	sort.Sort(ByKey(kvs))</span><br><span class="line">	oname := <span class="string">&quot;mr-out-&quot;</span> + strconv.Itoa(task.ID)</span><br><span class="line">	ofile, _ := os.Create(oname)</span><br><span class="line">	<span class="comment">//2.双指针 统计每个key的个数</span></span><br><span class="line">	i := <span class="number">0</span></span><br><span class="line">	<span class="keyword">for</span> i &lt; <span class="built_in">len</span>(kvs) &#123;</span><br><span class="line">		j := i + <span class="number">1</span></span><br><span class="line">		<span class="keyword">for</span> j &lt; <span class="built_in">len</span>(kvs) &amp;&amp; kvs[j].Key == kvs[i].Key &#123;</span><br><span class="line">			j++</span><br><span class="line">		&#125;</span><br><span class="line">		values := []<span class="type">string</span>&#123;&#125;</span><br><span class="line">		<span class="keyword">for</span> k := i; k &lt; j; k++ &#123;</span><br><span class="line">			values = <span class="built_in">append</span>(values, kvs[k].Value)</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//将统计结果写入文件</span></span><br><span class="line">		output := reducef(kvs[i].Key, values)</span><br><span class="line">		fmt.Fprintf(ofile, <span class="string">&quot;%v %v\n&quot;</span>, kvs[i].Key, output)</span><br><span class="line">		<span class="comment">//继续下一个key</span></span><br><span class="line">		i = j</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// main/mrworker.go calls this function.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Worker</span><span class="params">(mapf <span class="keyword">func</span>(<span class="type">string</span>, <span class="type">string</span>)</span></span> []KeyValue,</span><br><span class="line">	reducef <span class="function"><span class="keyword">func</span><span class="params">(<span class="type">string</span>, []<span class="type">string</span>)</span></span> <span class="type">string</span>) &#123;</span><br><span class="line">	<span class="comment">// Your worker implementation here.</span></span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		reply := AskTask()</span><br><span class="line">		<span class="keyword">switch</span> reply.TaskType &#123;</span><br><span class="line">		<span class="keyword">case</span> WaitTask:</span><br><span class="line">			time.Sleep(<span class="number">1</span> * time.Second)</span><br><span class="line">		<span class="keyword">case</span> MapTask:</span><br><span class="line">			doMap(mapf, reply.Task, reply.ReducerNum)</span><br><span class="line">			callDone(MapPhase, reply.Task.ID)</span><br><span class="line">		<span class="keyword">case</span> ReduceTask:</span><br><span class="line">			doReduce(reducef, reply.Task)</span><br><span class="line">			callDone(ReducePhase, reply.Task.ID)</span><br><span class="line">		<span class="keyword">case</span> ExitTask:</span><br><span class="line">			os.Exit(<span class="number">66</span>)</span><br><span class="line">		<span class="keyword">default</span>:</span><br><span class="line">			<span class="keyword">break</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">AskTask</span><span class="params">()</span></span> CallReply &#123;</span><br><span class="line">	args := CallArgs&#123;&#125;</span><br><span class="line">	reply := CallReply&#123;&#125;</span><br><span class="line">	call(<span class="string">&quot;Coordinator.Assign&quot;</span>, &amp;args, &amp;reply)</span><br><span class="line">	<span class="keyword">return</span> reply</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">callDone</span><span class="params">(belongPhase <span class="type">int</span>, taskID <span class="type">int</span>)</span></span> CallReply &#123;</span><br><span class="line">	args := CallArgs&#123;belongPhase, taskID&#125;</span><br><span class="line">	reply := CallReply&#123;&#125;</span><br><span class="line">	ok := call(<span class="string">&quot;Coordinator.TaskDone&quot;</span>, &amp;args, &amp;reply)</span><br><span class="line">	<span class="keyword">if</span> !ok &#123;</span><br><span class="line">		fmt.Printf(<span class="string">&quot;coordinator把我抛弃了\n&quot;</span>)</span><br><span class="line">		os.Exit(<span class="number">66</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> reply</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// send an RPC request to the coordinator, wait for the response.</span></span><br><span class="line"><span class="comment">// usually returns true.</span></span><br><span class="line"><span class="comment">// returns false if something goes wrong.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">call</span><span class="params">(rpcname <span class="type">string</span>, args <span class="keyword">interface</span>&#123;&#125;, reply <span class="keyword">interface</span>&#123;&#125;)</span></span> <span class="type">bool</span> &#123;</span><br><span class="line">	<span class="comment">// c, err := rpc.DialHTTP(&quot;tcp&quot;, &quot;127.0.0.1&quot;+&quot;:1234&quot;)</span></span><br><span class="line">	sockname := coordinatorSock()</span><br><span class="line">	c, err := rpc.DialHTTP(<span class="string">&quot;unix&quot;</span>, sockname)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(<span class="string">&quot;dialing:&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> c.Close()</span><br><span class="line"></span><br><span class="line">	err = c.Call(rpcname, args, reply)</span><br><span class="line">	<span class="keyword">if</span> err == <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	fmt.Println(err)</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>标题:</strong> 6.5840-lab1-mr记录</li>
+        <li><strong>作者:</strong> urlyy</li>
+        <li><strong>创建于
+                :</strong> 2023-02-19 01:18:22</li>
+        
+            <li>
+                <strong>更新于
+                    :</strong> 2025-12-21 18:39:57
+            </li>
+        
+        <li>
+            <strong>链接:</strong> https://urlyy.github.io/2023/02/19/6-5840-mr-lab1记录/
+        </li>
+        <li>
+            <strong>
+                版权声明:
+            </strong>
+            
+
+            
+                本文章采用 <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a> 进行许可。
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+		<ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%A1%E7%AE%97/">#分布式计算</a>&nbsp;
+			</li>
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/Go/">#Go</a>&nbsp;
+			</li>
+			
+		</ul>
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="prev" rel="prev" href="/2023/02/25/6-5840-raft-lab2%E8%AE%B0%E5%BD%95/">
+					<span class="left arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-left"></i>
+					</span>
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">6.5840-lab2-raft记录</span>
+						<span class="post-nav-item">上一篇</span>
+					</span>
+				</a>
+			</div>
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2023/01/23/casbin%E6%9D%83%E9%99%90%E5%92%8C%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E7%90%86%E8%A7%A3/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">casbin权限和配置文件的理解</span>
+						<span class="post-nav-item">下一篇</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        评论
+    </div>
+    
+
+        
+            
+    <div id="giscus-container"></div>
+    <script data-swup-reload-script defer>
+        async function loadGiscus() {
+            const giscusConfig = {
+                'src': 'https://giscus.app/client.js',
+                'data-repo': 'urlyy/urlyy_blog_comments',
+                'data-repo-id': 'R_kgDONo8nwQ',
+                'data-category': 'Announcements',
+                'data-category-id': 'DIC_kwDONo8nwc4Cl7pw',
+                'data-mapping': 'title',
+                'data-strict': '0',
+                'data-reactions-enabled': '1',
+                'data-emit-metadata': '1',
+                'data-theme': 'preferred_color_scheme',
+                'data-lang': 'zh-CN',
+                'data-input-position': 'top',
+                'data-loading': 'lazy',
+                'crossorigin': 'anonymous',
+                'async': true
+            }
+            const giscusScript = document.createElement('script');
+            for (const key in giscusConfig) {
+                giscusScript.setAttribute(key, giscusConfig[key]);
+            }
+            document.getElementById('giscus-container').appendChild(giscusScript);
+        }
+        if ('true') {
+            let loadGiscusTimeout = setTimeout(() => {
+                loadGiscus();
+                clearTimeout(loadGiscusTimeout);
+            }, 1000);
+        } else {
+            document.addEventListener('DOMContentLoaded', loadGiscus);
+        }
+    </script>
+
+
+        
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">目录</div>
+		<div class="page-title">6.5840-lab1-mr记录</div>
+		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#MapReduce"><span class="nav-text">MapReduce</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Lab%E4%BB%BB%E5%8A%A1"><span class="nav-text">Lab任务</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#lab%E7%9A%84%E4%B8%80%E4%BA%9B%E8%A6%81%E6%B1%82"><span class="nav-text">lab的一些要求</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Lab%E7%9A%84%E4%B8%80%E4%BA%9B%E6%8F%90%E7%A4%BA"><span class="nav-text">Lab的一些提示</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%8C%E6%88%90%E8%BF%87%E7%A8%8B"><span class="nav-text">完成过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E7%8E%AF%E5%A2%83"><span class="nav-text">配置环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0%E6%AD%A5%E9%AA%A4"><span class="nav-text">具体实现步骤</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%BA%90%E7%A0%81%E5%A6%82%E4%B8%8B%EF%BC%88%E5%B7%B2%E9%80%9A%E8%BF%87race%EF%BC%8C%E4%BD%9C%E4%B8%BA%E4%B8%80%E4%B8%AAGo%E6%96%B0%E6%89%8B%E6%95%B2%E7%9A%84%EF%BC%8C%E5%BE%88%E5%A4%9A%E5%9C%B0%E6%96%B9%E7%9A%84%E4%BD%BF%E7%94%A8%E4%B8%8D%E6%98%AF%E5%BE%88%E4%BC%98%E9%9B%85%EF%BC%89"><span class="nav-text">源码如下（已通过race，作为一个Go新手敲的，很多地方的使用不是很优雅）</span></a></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2021</span>
+              -
+            
+            2025&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">urlyy</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        共撰写了 78 篇文章
+                    </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">访问人数</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">总访问量</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">由 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a> 驱动</span>
+            <span class="text-sm lg:block">主题&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.5</a></span>
+        </div>
+        
+        
+            <div>
+                博客已运行 <span class="odometer" id="runtime_days" ></span> 天 <span class="odometer" id="runtime_hours"></span> 小时 <span class="odometer" id="runtime_minutes"></span> 分钟 <span class="odometer" id="runtime_seconds"></span> 秒
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="fa-regular fa-arrow-up"></i>
+		</li>
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+	<div class="search-pop-overlay">
+	<div class="popup search-popup">
+		<div class="search-header">
+			<span class="search-input-field-pre">
+				<i class="fa-solid fa-keyboard"></i>
+			</span>
+			<div class="search-input-container">
+				<input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="站内搜索您需要的内容..." spellcheck="false" type="search" class="search-input">
+			</div>
+			<span class="popup-btn-close">
+				<i class="fa-solid fa-times"></i>
+			</span>
+		</div>
+		<div id="search-result">
+			<div id="no-result">
+				<i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>
+			</div>
+		</div>
+	</div>
+</div>
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+	
+<script src="/js/build/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/build/utils.js" type="module"></script>
+
+<script src="/js/build/main.js" type="module"></script>
+
+<script src="/js/build/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/build/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/build/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/build/layouts/categoryList.js" type="module"></script>
+
+
+
+    
+<script src="/js/build/tools/localSearch.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/layouts/lazyload.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/runtime.js"></script>
+
+    
+<script src="/js/build/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+  
+<script src="/js/build/plugins/typed.js" type="module"></script>
+
+
+
+
+    
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@9.3.0/dist/mermaid.min.js"></script>
+    
+    
+<script src="/js/build/plugins/mermaid.js"></script>
+
+
+
+
+
+
+    
+<script src="/js/build/libs/anime.min.js"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/tocToggle.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/layouts/toc.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/plugins/tabs.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+<script src="/js/build/layouts/essays.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+
+	
+</body>
+
+</html>

@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="urlyy">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set data attribute for CSS variables
+                root.setAttribute("data-theme", theme);
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes once DOM is ready
+            if (document.readyState !== "loading") {
+                document.body.classList.add(theme + "-mode");
+            } else {
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add(theme + "-mode");
+                    document.body.classList.remove((theme === DARK ? LIGHT : DARK) + "-mode");
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Critical CSS to prevent flash -->
+    <style>
+        :root[data-theme="dark"] {
+            --background-color: #202124;
+            --background-color-transparent: rgba(32, 33, 36, 0.6);
+            --second-background-color: #2d2e32;
+            --third-background-color: #34353a;
+            --third-background-color-transparent: rgba(32, 33, 36, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #ffffff;
+            --second-text-color: #eeeeee;
+            --third-text-color: #bebec6;
+            --fourth-text-color: #999999;
+            --default-text-color: #bebec6;
+            --invert-text-color: #373D3F;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(255, 255, 255, 0.08);
+            --shadow-color-2: rgba(255, 255, 255, 0.05);
+        }
+        
+        :root[data-theme="light"] {
+            --background-color: #fff;
+            --background-color-transparent: rgba(255, 255, 255, 0.6);
+            --second-background-color: #f8f8f8;
+            --third-background-color: #f2f2f2;
+            --third-background-color-transparent: rgba(241, 241, 241, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #16171a;
+            --second-text-color: #2f3037;
+            --third-text-color: #5e5e5e;
+            --fourth-text-color: #eeeeee;
+            --default-text-color: #373D3F;
+            --invert-text-color: #bebec6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(0, 0, 0, 0.08);
+            --shadow-color-2: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+        
+        /* Apply body classes as soon as DOM is ready */
+        :root[data-theme="dark"] body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+    </style>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://urlyy.github.io/2022/02/05/avl树练习/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta name="description" content="简陋的Java实现的AVL树">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AVL树实现练习">
+<meta property="og:url" content="http://urlyy.github.io/2022/02/05/AVL%E6%A0%91%E7%BB%83%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="简陋的Java实现的AVL树">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://urlyy.github.io/article_images/AVL%E6%A0%91%E7%BB%83%E4%B9%A0/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_20,color_FFFFFF,t_70,g_se,x_16.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/AVL%E6%A0%91%E7%BB%83%E4%B9%A0/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_20,color_FFFFFF,t_70,g_se,x_16-1687151231280-317.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/AVL%E6%A0%91%E7%BB%83%E4%B9%A0/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_20,color_FFFFFF,t_70,g_se,x_16-1687151231280-318.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/AVL%E6%A0%91%E7%BB%83%E4%B9%A0/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_20,color_FFFFFF,t_70,g_se,x_16-1687151231280-319.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/AVL%E6%A0%91%E7%BB%83%E4%B9%A0/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_20,color_FFFFFF,t_70,g_se,x_16-1687151231280-320.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/AVL%E6%A0%91%E7%BB%83%E4%B9%A0/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_20,color_FFFFFF,t_70,g_se,x_16-1687151231280-321.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/AVL%E6%A0%91%E7%BB%83%E4%B9%A0/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_20,color_FFFFFF,t_70,g_se,x_16-1687151231280-322.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/AVL%E6%A0%91%E7%BB%83%E4%B9%A0/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_18,color_FFFFFF,t_70,g_se,x_16#pic_center.jpeg">
+<meta property="og:image" content="http://urlyy.github.io/article_images/AVL%E6%A0%91%E7%BB%83%E4%B9%A0/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_10,color_FFFFFF,t_70,g_se,x_16#pic_center.jpeg">
+<meta property="article:published_time" content="2022-02-05T04:41:44.000Z">
+<meta property="article:modified_time" content="2025-12-21T10:39:57.266Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="树">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://urlyy.github.io/article_images/AVL%E6%A0%91%E7%BB%83%E4%B9%A0/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_20,color_FFFFFF,t_70,g_se,x_16.png">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/avatar.jpg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.jpg">
+    <meta name="theme-color" content="#5c701a">
+    <link rel="shortcut icon" href="/images/avatar.jpg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            AVL树实现练习 | urlyy的小窝
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+        <link href="" rel="stylesheet">
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"urlyy.github.io","root":"/","language":"zh-CN","path":"search.json"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":false,"auto":false,"list":[""]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":true},"copyright":true,"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#5c701a","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":true,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":false},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"side_tools":{"gear_rotation":true,"auto_expand":false},"open_graph":true,"google_analytics":{"enable":false,"id":null},"busuanzi_counter":{"enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"pjax":true},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/bg/1.jpg","dark":"/images/bg/1.jpg"},"title":"urlyy的小窝","subtitle":{"text":["Loading..."],"hitokoto":{"enable":true,"show_author":false,"api":"https://v1.hitokoto.cn?c=a&c=b&c=d&c=k"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"style":"default","links":{"github":"https://github.com/urlyy?tab=repositories","instagram":null,"zhihu":null,"twitter":null,"email":"2213732736@qq.com"},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":true,"version":"9.3.0"}},"version":"2.8.5","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Categories":{"icon":"fa-regular fa-folder","path":"/categories/"},"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Github":{"path":"https://github.com/urlyy","icon":"fa-brands fa-github"},"个人介绍":{"path":"/personal/profile.html","icon":"fa-regular fa-user"}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"cloud"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":null},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2021/9/7 16:55:00"};
+    window.lang_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 个月前","year":"%s 年前"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                urlyy的小窝
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    首页
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/categories/"
+                                        >
+                                    <i class="fa-regular fa-folder fa-fw"></i>
+                                    分类
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/archives"
+                                        >
+                                    <i class="fa-regular fa-archive fa-fw"></i>
+                                    归档
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   target="_blank" rel="noopener" href="https://github.com/urlyy"
+                                        >
+                                    <i class="fa-brands fa-github fa-fw"></i>
+                                    GITHUB
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/personal/profile.html"
+                                        >
+                                    <i class="fa-regular fa-user fa-fw"></i>
+                                    个人介绍
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                首页
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/categories/"
+                        >
+                            <span>
+                                分类
+                            </span>
+                            
+                                <i class="fa-regular fa-folder fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/archives"
+                        >
+                            <span>
+                                归档
+                            </span>
+                            
+                                <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           target="_blank" rel="noopener" href="https://github.com/urlyy"
+                        >
+                            <span>
+                                GITHUB
+                            </span>
+                            
+                                <i class="fa-brands fa-github fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/personal/profile.html"
+                        >
+                            <span>
+                                个人介绍
+                            </span>
+                            
+                                <i class="fa-regular fa-user fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">25</div>
+        <div class="label text-third-text-color text-sm">标签</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">29</div>
+        <div class="label text-third-text-color text-sm">分类</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">78</div>
+        <div class="label text-third-text-color text-sm">文章</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">AVL树实现练习</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/avatar.jpg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">urlyy</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2022-02-05 12:41:44</span>
+        <span class="mobile">2022-02-05 12:41:44</span>
+        <span class="hover-info">创建</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2025-12-21 18:39:57</span>
+            <span class="mobile">2025-12-21 18:39:57</span>
+            <span class="hover-info">更新</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构</a>&nbsp;
+                        </li>
+                    
+                    
+                
+                    
+                        
+                            <li>></li>
+                        
+                        <li>
+                            <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E7%BB%83%E4%B9%A0/">练习</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa-regular fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/%E6%A0%91/">树</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<p>debug了好久才写出来的平衡树，代码里有注释可以方便理解<br>可能有代码冗余或者有误的地方，欢迎指出错误<br><strong>（好像因为是看了别人的博客，所以混淆了结点高度这个概念，我先解释一下我代码里的Height&#x3D;当前结点到叶子结点的经过的边+1）</strong><br>很抱歉影响了你的观看体验！<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/AVL%E6%A0%91%E7%BB%83%E4%B9%A0/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_20,color_FFFFFF,t_70,g_se,x_16.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/AVL%E6%A0%91%E7%BB%83%E4%B9%A0/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_20,color_FFFFFF,t_70,g_se,x_16-1687151231280-317.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<p>推荐一个网站（数据结构操作可视化）<br>(我这里给出的是平衡树界面)<br><a class="link"   target="_blank" rel="noopener" href="https://www.cs.usfca.edu/~galles/visualization/AVLtree.html" >AVL Tree Visualzation<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a><br>(我debug就是看着可视化的树查错的)</p>
+<p>还是讲下一些关键操作吧：<br>1、左旋(基操)<br>左旋不会改变中序遍历<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/AVL%E6%A0%91%E7%BB%83%E4%B9%A0/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_20,color_FFFFFF,t_70,g_se,x_16-1687151231280-318.png"
+                      alt="在这里插入图片描述"
+                ><br>2、右旋(基操)<br>右旋不会改变中序遍历<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/AVL%E6%A0%91%E7%BB%83%E4%B9%A0/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_20,color_FFFFFF,t_70,g_se,x_16-1687151231280-319.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<p>3、LL(左左)<br>用下图举例的话，就是插入操作为在结点1的左孩子的左孩子处插入结点3，这样会使得平衡度&#x3D;&#x3D; 2<br>就是对结点1进行一个<strong>右旋</strong><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/AVL%E6%A0%91%E7%BB%83%E4%B9%A0/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_20,color_FFFFFF,t_70,g_se,x_16-1687151231280-320.png"
+                      alt="在这里插入图片描述"
+                ><br>4、RR(右右，在结点1的右孩子的右孩子处插入结点3，这样会使得平衡度&#x3D;&#x3D;-2)<br>就是对结点1进行一个<strong>左旋</strong><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/AVL%E6%A0%91%E7%BB%83%E4%B9%A0/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_20,color_FFFFFF,t_70,g_se,x_16-1687151231280-321.png"
+                      alt="在这里插入图片描述"
+                ><br>5、LR（左右，在结点1的左孩子的右孩子处插入结点3，这样会使得平衡度&#x3D;&#x3D;-2）<br>就是先对<strong>结点2右旋</strong>，再对<strong>结点1左旋</strong><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/AVL%E6%A0%91%E7%BB%83%E4%B9%A0/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_20,color_FFFFFF,t_70,g_se,x_16-1687151231280-322.png"
+                      alt="在这里插入图片描述"
+                ><br>6、RL(开摆！你们自己对照着LR比划去罢)<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/AVL%E6%A0%91%E7%BB%83%E4%B9%A0/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_18,color_FFFFFF,t_70,g_se,x_16#pic_center.jpeg"
+                      alt="在这里插入图片描述"
+                ></p>
+<p>7、计算平衡度<br>首先得到当前结点的左右孩子的高度(高度的更新是在回溯的时候进行的，所以可以保证子结点的高度已经是正确的了)<br>然后就是return leftHeight-rightHeight了</p>
+<p>8、找到左子树的最大值<br>删除一个左右子结点都存在的结点时，需要用左子树的最大结点或右子树的最小结点来替代当前结点(我的代码里用的是左子树的最大结点)<br>其实左子树的最大结点就是左子树的最右下角的结点</p>
+<p>下面开始放代码(欢迎喷我代码的问题)<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/AVL%E6%A0%91%E7%BB%83%E4%B9%A0/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5pyAIOS4iiDlt50=,size_10,color_FFFFFF,t_70,g_se,x_16#pic_center.jpeg"
+                      alt="在这里插入图片描述"
+                ></p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br><span class="line">392</span><br><span class="line">393</span><br><span class="line">394</span><br><span class="line">395</span><br><span class="line">396</span><br><span class="line">397</span><br><span class="line">398</span><br><span class="line">399</span><br><span class="line">400</span><br><span class="line">401</span><br><span class="line">402</span><br><span class="line">403</span><br><span class="line">404</span><br><span class="line">405</span><br><span class="line">406</span><br><span class="line">407</span><br><span class="line">408</span><br><span class="line">409</span><br><span class="line">410</span><br><span class="line">411</span><br><span class="line">412</span><br><span class="line">413</span><br><span class="line">414</span><br><span class="line">415</span><br><span class="line">416</span><br><span class="line">417</span><br><span class="line">418</span><br><span class="line">419</span><br><span class="line">420</span><br><span class="line">421</span><br><span class="line">422</span><br><span class="line">423</span><br><span class="line">424</span><br><span class="line">425</span><br><span class="line">426</span><br><span class="line">427</span><br><span class="line">428</span><br><span class="line">429</span><br><span class="line">430</span><br><span class="line">431</span><br><span class="line">432</span><br><span class="line">433</span><br><span class="line">434</span><br><span class="line">435</span><br><span class="line">436</span><br><span class="line">437</span><br><span class="line">438</span><br><span class="line">439</span><br><span class="line">440</span><br><span class="line">441</span><br><span class="line">442</span><br><span class="line">443</span><br><span class="line">444</span><br><span class="line">445</span><br><span class="line">446</span><br><span class="line">447</span><br><span class="line">448</span><br><span class="line">449</span><br><span class="line">450</span><br><span class="line">451</span><br><span class="line">452</span><br><span class="line">453</span><br><span class="line">454</span><br><span class="line">455</span><br><span class="line">456</span><br><span class="line">457</span><br><span class="line">458</span><br><span class="line">459</span><br><span class="line">460</span><br><span class="line">461</span><br><span class="line">462</span><br><span class="line">463</span><br><span class="line">464</span><br><span class="line">465</span><br><span class="line">466</span><br><span class="line">467</span><br><span class="line">468</span><br><span class="line">469</span><br><span class="line">470</span><br><span class="line">471</span><br><span class="line">472</span><br><span class="line">473</span><br><span class="line">474</span><br><span class="line">475</span><br><span class="line">476</span><br><span class="line">477</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.LinkedList;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> 20级三班刘宇阳</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@create</span> 2022/2/3</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 平衡樹</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &lt;K&gt; key的类型 元素必须可比较</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &lt;V&gt; value的类型</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">AVLTree</span>&lt;K <span class="keyword">extends</span> <span class="title class_">Comparable</span>&lt;K&gt;,V&gt; &#123;</span><br><span class="line">    <span class="comment">//树结点类</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">class</span> <span class="title class_">Node</span>&#123;</span><br><span class="line">        <span class="comment">//键</span></span><br><span class="line">        <span class="keyword">private</span> K key;</span><br><span class="line">        <span class="comment">//值</span></span><br><span class="line">        <span class="keyword">private</span> V value;</span><br><span class="line">        <span class="comment">//高度</span></span><br><span class="line">        <span class="keyword">private</span> Integer height;</span><br><span class="line">        <span class="comment">//左右父</span></span><br><span class="line">        <span class="keyword">private</span> Node left,right,parent;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="title function_">Node</span><span class="params">(K key,V value)</span> &#123;</span><br><span class="line">            <span class="built_in">this</span>.key=key;</span><br><span class="line">            <span class="built_in">this</span>.value = value;</span><br><span class="line">            height=<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 获得平衡度</span></span><br><span class="line"><span class="comment">         * <span class="doctag">@return</span> 平衡度</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="keyword">private</span> <span class="type">int</span> <span class="title function_">getBalanceFactor</span><span class="params">()</span>&#123;</span><br><span class="line">            <span class="type">int</span> leftHeight=left==<span class="literal">null</span>?<span class="number">0</span>:left.getHeight();</span><br><span class="line">            <span class="type">int</span> rightHeight=right==<span class="literal">null</span>?<span class="number">0</span>:right.getHeight();</span><br><span class="line">            <span class="keyword">return</span> leftHeight-rightHeight;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="type">int</span> <span class="title function_">getHeight</span><span class="params">()</span>&#123;</span><br><span class="line">            <span class="keyword">return</span> height;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">setHeight</span><span class="params">(Integer height)</span>&#123;</span><br><span class="line">            <span class="built_in">this</span>.height=height;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 更新该结点的高度</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">updateHeight</span><span class="params">()</span>&#123;</span><br><span class="line">            <span class="type">int</span> leftHeight=left==<span class="literal">null</span>?<span class="number">0</span>:left.getHeight();</span><br><span class="line">            <span class="type">int</span> rightHeight=right==<span class="literal">null</span>?<span class="number">0</span>:right.getHeight();</span><br><span class="line">            height=<span class="number">1</span>+Math.max(leftHeight,rightHeight);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> K <span class="title function_">getKey</span><span class="params">()</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> key;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">setKey</span><span class="params">(K key)</span> &#123;</span><br><span class="line">            <span class="built_in">this</span>.key = key;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> V <span class="title function_">getValue</span><span class="params">()</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> value;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">setValue</span><span class="params">(V value)</span> &#123;</span><br><span class="line">            <span class="built_in">this</span>.value = value;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">setKeyAndValue</span><span class="params">(K key,V value)</span>&#123;</span><br><span class="line">            setKey(key);</span><br><span class="line">            setValue(value);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> Node <span class="title function_">getLeft</span><span class="params">()</span> &#123; <span class="keyword">return</span> left; &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">setLeft</span><span class="params">(Node left)</span> &#123; <span class="built_in">this</span>.left = left; &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> Node <span class="title function_">getRight</span><span class="params">()</span> &#123; <span class="keyword">return</span> right; &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">setRight</span><span class="params">(Node right)</span> &#123; <span class="built_in">this</span>.right = right; &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> Node <span class="title function_">getParent</span><span class="params">()</span> &#123; <span class="keyword">return</span> parent; &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">setParent</span><span class="params">(Node parent)</span> &#123; <span class="built_in">this</span>.parent = parent; &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> String <span class="title function_">toString</span><span class="params">()</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">&quot;Node&#123;&quot;</span> +</span><br><span class="line">                    <span class="string">&quot;key=&quot;</span> + key +</span><br><span class="line">                    <span class="string">&quot;, value=&quot;</span> + value +</span><br><span class="line">                    <span class="string">&#x27;&#125;&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//结点个数</span></span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> size;</span><br><span class="line">    <span class="comment">//根结点</span></span><br><span class="line">    <span class="keyword">private</span> Node root;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">AVLTree</span><span class="params">()</span>&#123;</span><br><span class="line">        clear();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     *    1              2</span></span><br><span class="line"><span class="comment">     *     \            / \</span></span><br><span class="line"><span class="comment">     *      2     =&gt;   1   3</span></span><br><span class="line"><span class="comment">     *       \</span></span><br><span class="line"><span class="comment">     *        3</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> node1 需要调整的该子树的根结点</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 新的根结点</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> Node <span class="title function_">leftRotate</span><span class="params">(Node node1)</span>&#123;</span><br><span class="line">        Node node2=node1.getRight();</span><br><span class="line">        node1.setRight(node2.getLeft());</span><br><span class="line">        node1.setParent(node2);</span><br><span class="line">        <span class="keyword">if</span>(node1.getRight()!=<span class="literal">null</span>)&#123;</span><br><span class="line">            node1.getRight().setParent(node1);</span><br><span class="line">        &#125;</span><br><span class="line">        node2.setLeft(node1);</span><br><span class="line">        node1.updateHeight();</span><br><span class="line">        node2.updateHeight();</span><br><span class="line">        <span class="keyword">return</span> node2;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     *      1       2</span></span><br><span class="line"><span class="comment">     *     /  =&gt;   / \</span></span><br><span class="line"><span class="comment">     *    2       3   1</span></span><br><span class="line"><span class="comment">     *   /</span></span><br><span class="line"><span class="comment">     *  3</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> node1 需要调整的该子树的根结点</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 新的根结点</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> Node <span class="title function_">rightRotate</span><span class="params">(Node node1)</span>&#123;</span><br><span class="line">        Node node2=node1.getLeft();</span><br><span class="line">        node1.setLeft(node2.getRight());</span><br><span class="line">        node1.setParent(node2);</span><br><span class="line">        <span class="keyword">if</span>(node1.getLeft()!=<span class="literal">null</span>)&#123;</span><br><span class="line">            node1.getLeft().setParent(node1);</span><br><span class="line">        &#125;</span><br><span class="line">        node2.setRight(node1);</span><br><span class="line">        node1.updateHeight();</span><br><span class="line">        node2.updateHeight();</span><br><span class="line">        <span class="keyword">return</span> node2;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 作为put的递归工具方法</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> root 当前的根结点</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> key</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> value</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> Node <span class="title function_">addNode</span><span class="params">(Node root,K key,V value)</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(root==<span class="literal">null</span>)&#123;</span><br><span class="line">            <span class="comment">//直接返回结点，让父节点更新子结点，同时不走下面的reBalance</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Node</span>(key,value);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="type">int</span> cmpRes=key.compareTo(root.getKey());</span><br><span class="line">        <span class="comment">//小于，看左子树</span></span><br><span class="line">        <span class="keyword">if</span>(cmpRes&lt;<span class="number">0</span>)&#123;</span><br><span class="line">            <span class="comment">//这里需要更新左子结点</span></span><br><span class="line">            Node leftChild=addNode(root.getLeft(),key,value);</span><br><span class="line">            root.setLeft(leftChild);</span><br><span class="line">            leftChild.setParent(root);</span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span>(cmpRes&gt;<span class="number">0</span>)&#123;<span class="comment">//大于，看右子树</span></span><br><span class="line">            <span class="comment">//这里需要更新右子结点</span></span><br><span class="line">            Node rightChild=addNode(root.getRight(),key,value);</span><br><span class="line">            root.setRight(rightChild);</span><br><span class="line">            rightChild.setParent(root);</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="comment">//key值相等就认为是更新</span></span><br><span class="line">            root.setValue(value);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> reBalance(root);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Node <span class="title function_">reBalance</span><span class="params">(Node root)</span>&#123;</span><br><span class="line">        <span class="type">int</span> bf=root.getBalanceFactor();</span><br><span class="line">        <span class="comment">//左子树高</span></span><br><span class="line">        <span class="keyword">if</span>(bf&gt;<span class="number">1</span>)&#123;</span><br><span class="line">            Node leftChild=root.getLeft();</span><br><span class="line">            <span class="type">int</span> childBF=leftChild.getBalanceFactor();</span><br><span class="line">            <span class="comment">/**LL型</span></span><br><span class="line"><span class="comment">             *        1              2</span></span><br><span class="line"><span class="comment">             *       /              / \</span></span><br><span class="line"><span class="comment">             *      2              3   1</span></span><br><span class="line"><span class="comment">             *     /        =&gt;</span></span><br><span class="line"><span class="comment">             *    3</span></span><br><span class="line"><span class="comment">             **/</span></span><br><span class="line">            <span class="keyword">if</span>(childBF&gt;<span class="number">0</span>)&#123;</span><br><span class="line">                <span class="comment">//右旋</span></span><br><span class="line">                root=rightRotate(root);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">/** LR型</span></span><br><span class="line"><span class="comment">             *</span></span><br><span class="line"><span class="comment">             *       1          1        3</span></span><br><span class="line"><span class="comment">             *      /          /        / \</span></span><br><span class="line"><span class="comment">             *     2    =&gt;    3   =&gt;   2   1</span></span><br><span class="line"><span class="comment">             *      \        /</span></span><br><span class="line"><span class="comment">             *       3      2</span></span><br><span class="line"><span class="comment">             */</span></span><br><span class="line">            <span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="comment">//先左旋再右旋</span></span><br><span class="line">                <span class="comment">//注意左旋是以2为根结点</span></span><br><span class="line">                root.setLeft(leftRotate(root.getLeft()));</span><br><span class="line">                root=rightRotate(root);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span>(bf&lt;-<span class="number">1</span>)&#123;<span class="comment">//右子树高</span></span><br><span class="line">            Node rightChild=root.getRight();</span><br><span class="line">            <span class="type">int</span> childBF=rightChild.getBalanceFactor();</span><br><span class="line">            <span class="comment">/**RL型</span></span><br><span class="line"><span class="comment">             *</span></span><br><span class="line"><span class="comment">             *    1         1             3</span></span><br><span class="line"><span class="comment">             *     \         \           / \</span></span><br><span class="line"><span class="comment">             *      2  =&gt;     3   =&gt;    1   2</span></span><br><span class="line"><span class="comment">             *     /           \</span></span><br><span class="line"><span class="comment">             *    3             2</span></span><br><span class="line"><span class="comment">             */</span></span><br><span class="line">            <span class="keyword">if</span>(childBF&gt;<span class="number">0</span>)&#123;</span><br><span class="line">                <span class="comment">//注意右旋是以2为根结点</span></span><br><span class="line">                root.setRight(rightRotate(root.getRight()));</span><br><span class="line">                root=leftRotate(root);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">/**RR型</span></span><br><span class="line"><span class="comment">             *     1              2</span></span><br><span class="line"><span class="comment">             *      \            / \</span></span><br><span class="line"><span class="comment">             *       2    =&gt;    1   3</span></span><br><span class="line"><span class="comment">             *        \</span></span><br><span class="line"><span class="comment">             *         3</span></span><br><span class="line"><span class="comment">             */</span></span><br><span class="line">            <span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="comment">//左旋</span></span><br><span class="line">                root=leftRotate(root);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//这里可以在回溯时更新路径上的所有结点的高度(已平衡的结点会直接来这里更新高度)</span></span><br><span class="line">        root.updateHeight();</span><br><span class="line">        <span class="keyword">return</span> root;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 根据key值寻找结点</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> root 当前根节点</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> key 当前键</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 目标结点</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> Node <span class="title function_">findNode</span><span class="params">(Node root,K key)</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(root==<span class="literal">null</span>)&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="type">int</span> cmpRes=key.compareTo(root.getKey());</span><br><span class="line">        <span class="keyword">if</span>(cmpRes&lt;<span class="number">0</span>)&#123;</span><br><span class="line">            <span class="keyword">return</span> findNode(root.getLeft(),key);</span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span>(cmpRes&gt;<span class="number">0</span>)&#123;</span><br><span class="line">            <span class="keyword">return</span> findNode(root.getRight(),key);</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="keyword">return</span> root;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 查找要被删除结点的左子树的最大节点</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> root 当前根节点</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> deletedNode 要被删除的结点</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> Node <span class="title function_">replaceNode</span><span class="params">(Node root,Node deletedNode)</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(root.getRight()==<span class="literal">null</span>)&#123;</span><br><span class="line">            deletedNode.setKeyAndValue(root.getKey(),root.getValue());</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        root.setRight(replaceNode(root.getRight(),deletedNode));</span><br><span class="line">        root.updateHeight();</span><br><span class="line">        <span class="keyword">return</span> reBalance(root);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 删除结点</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> root 当前根节点</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> key 目标键</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 当前子树的新根节点(可能会更新也可能不会),用来给父节点更新子树</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> Node <span class="title function_">deleteNode</span><span class="params">(Node root,K key)</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(root==<span class="literal">null</span>)&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="type">int</span> cmpRes=key.compareTo(root.getKey());</span><br><span class="line">        <span class="keyword">if</span>(cmpRes&lt;<span class="number">0</span>)&#123;</span><br><span class="line">            <span class="comment">//找左子树</span></span><br><span class="line">            Node leftChild=deleteNode(root.getLeft(), key);</span><br><span class="line">            root.setLeft(leftChild);</span><br><span class="line">            <span class="keyword">if</span>(leftChild!=<span class="literal">null</span>)&#123;</span><br><span class="line">                <span class="comment">//</span></span><br><span class="line">                leftChild.setParent(root);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span>(cmpRes&gt;<span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">//找右子树</span></span><br><span class="line">            Node rightChild=deleteNode(root.getRight(), key);</span><br><span class="line">            root.setRight(rightChild);</span><br><span class="line">            <span class="keyword">if</span>(rightChild!=<span class="literal">null</span>)&#123;</span><br><span class="line">                rightChild.setParent(root);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="comment">//找到要删除的结点了</span></span><br><span class="line">            <span class="keyword">if</span>(root.getLeft()==<span class="literal">null</span>&amp;&amp;root.getRight()==<span class="literal">null</span>)&#123;<span class="comment">//叶子结点</span></span><br><span class="line">                <span class="keyword">if</span>(root.getParent()==<span class="literal">null</span>)&#123;</span><br><span class="line">                    setRoot(<span class="literal">null</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">            &#125;<span class="keyword">else</span> <span class="keyword">if</span>(root.getLeft()==<span class="literal">null</span>)&#123;<span class="comment">//左子树为空，右子树不为空</span></span><br><span class="line">                root.getRight().setParent(root.getParent());</span><br><span class="line">                <span class="keyword">if</span>(root.getParent()==<span class="literal">null</span>)&#123;</span><br><span class="line">                    setRoot(root.getRight());</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">return</span> root.getRight();</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span>(root.getRight()==<span class="literal">null</span>)&#123;<span class="comment">//右子树为空，左子树不为空</span></span><br><span class="line">                root.getLeft().setParent(root.getParent());</span><br><span class="line">                <span class="keyword">if</span>(root.getParent()==<span class="literal">null</span>)&#123;</span><br><span class="line">                    setRoot(root.getLeft());</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">return</span> root.getLeft();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span>&#123;<span class="comment">//有两个儿子结点</span></span><br><span class="line">                Node leftChild=root.getLeft();</span><br><span class="line">                <span class="keyword">if</span>(leftChild.getRight()==<span class="literal">null</span>)&#123;</span><br><span class="line">                    <span class="comment">//要被删除的结点用左儿子结点替换，同时他的右儿子要作为他左儿子的右儿子</span></span><br><span class="line">                    leftChild.right=root.getRight();</span><br><span class="line">                    root=leftChild;</span><br><span class="line">                &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                    <span class="comment">//用左子树的最大节点覆盖被删除的结点（可视为删除），并更新左孩子</span></span><br><span class="line">                    Node newLeft=replaceNode(leftChild,root);</span><br><span class="line">                    root.setLeft(newLeft);</span><br><span class="line">                    <span class="keyword">if</span>(newLeft!=<span class="literal">null</span>)&#123;</span><br><span class="line">                        newLeft.setParent(root);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        root.updateHeight();</span><br><span class="line">        <span class="keyword">return</span> reBalance(root);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 放入元素</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> key 键</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> value 值</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">put</span><span class="params">(K key,V value)</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(root==<span class="literal">null</span>)&#123; setRoot(<span class="keyword">new</span> <span class="title class_">Node</span>(key,value)); &#125;</span><br><span class="line">        <span class="keyword">else</span>&#123;</span><br><span class="line">            setRoot(addNode(root,key,value));</span><br><span class="line">            <span class="comment">//因为这些操作不涉及根结点的处理，所以需要单独写一个根结点的父节点置空</span></span><br><span class="line">            getRoot().setParent(<span class="literal">null</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        size++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 获取键对应的值</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> key</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 对应结点的值</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> V <span class="title function_">get</span><span class="params">(K key)</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(key==<span class="literal">null</span>)&#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">NullPointerException</span>(<span class="string">&quot;key cannot be null&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        Node node=findNode(root,key);</span><br><span class="line">        <span class="keyword">if</span>(node==<span class="literal">null</span>)&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> node.getValue();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 根据键删除对应结点</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> key 键</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">remove</span><span class="params">(K key)</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(key==<span class="literal">null</span>)&#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">NullPointerException</span>(<span class="string">&quot;key cannot be null&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        setRoot(deleteNode(root,key));</span><br><span class="line">        <span class="keyword">if</span>(getRoot()!=<span class="literal">null</span>)&#123;</span><br><span class="line">            getRoot().setParent(<span class="literal">null</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        size--;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 重置树(可用于初始化)</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">clear</span><span class="params">()</span>&#123;</span><br><span class="line">        size=<span class="number">0</span>;</span><br><span class="line">        root=<span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">isEmpty</span><span class="params">()</span>&#123; <span class="keyword">return</span> size==<span class="number">0</span>; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">size</span><span class="params">()</span> &#123; <span class="keyword">return</span> size; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">setSize</span><span class="params">(<span class="type">int</span> size)</span> &#123; <span class="built_in">this</span>.size = size; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Node <span class="title function_">getRoot</span><span class="params">()</span> &#123; <span class="keyword">return</span> root; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">setRoot</span><span class="params">(Node root)</span> &#123; <span class="built_in">this</span>.root = root; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> StringBuilder <span class="title function_">preOrderTraverse</span><span class="params">(Node root,StringBuilder sb)</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(root==<span class="literal">null</span>)&#123;</span><br><span class="line">            <span class="comment">//null结点为#</span></span><br><span class="line">            sb.append(<span class="string">&quot;# &quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> sb;</span><br><span class="line">        &#125;</span><br><span class="line">        sb.append(root.getKey()).append(<span class="string">&quot; &quot;</span>);</span><br><span class="line">        sb=preOrderTraverse(root.getLeft(),sb);</span><br><span class="line">        sb=preOrderTraverse(root.getRight(),sb);</span><br><span class="line">        <span class="keyword">return</span> sb;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">toString</span><span class="params">()</span>&#123;</span><br><span class="line">        StringBuilder sb=<span class="keyword">new</span> <span class="title class_">StringBuilder</span>();</span><br><span class="line">        sb.append(<span class="string">&quot;preOrderTraverseSequenceOfKey is [&quot;</span>);</span><br><span class="line">        sb=preOrderTraverse(root,sb);</span><br><span class="line">        sb.deleteCharAt(sb.length()-<span class="number">1</span>);</span><br><span class="line">        sb.append(<span class="string">&quot;]&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> sb.toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">AVLTreeDemo</span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        AVLTree&lt;Integer,Integer&gt; tree=<span class="keyword">new</span> <span class="title class_">AVLTree</span>&lt;&gt;();</span><br><span class="line">        LinkedList&lt;Integer&gt; list=<span class="keyword">new</span> <span class="title class_">LinkedList</span>&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=<span class="number">10</span>;i++)&#123;</span><br><span class="line">            list.add(i);</span><br><span class="line">        &#125;</span><br><span class="line">        list.add(<span class="number">0</span>);</span><br><span class="line"><span class="comment">//        System.out.println(list);</span></span><br><span class="line">        System.out.println(<span class="string">&quot;----------put测试----------&quot;</span>);</span><br><span class="line">        System.out.println(<span class="string">&quot;输出的是前序遍历的key序列：&quot;</span>);</span><br><span class="line">        <span class="keyword">for</span>(Integer it:list)&#123;</span><br><span class="line">            tree.put(it,it);</span><br><span class="line">            System.out.println(tree);</span><br><span class="line">        &#125;</span><br><span class="line">        tree.remove(<span class="number">2</span>);</span><br><span class="line">        System.out.println(tree);</span><br><span class="line"><span class="comment">//        System.out.println(&quot;------------get测试--------------&quot;);</span></span><br><span class="line"><span class="comment">//        System.out.println(tree.get(2));</span></span><br><span class="line"><span class="comment">//        System.out.println(&quot;------------delete测试--------------&quot;);</span></span><br><span class="line"><span class="comment">//        tree.remove(2);</span></span><br><span class="line"><span class="comment">//        System.out.println(tree);</span></span><br><span class="line"><span class="comment">//        tree.remove(1);</span></span><br><span class="line"><span class="comment">//        System.out.println(tree);</span></span><br><span class="line"><span class="comment">//        tree.remove(-1);</span></span><br><span class="line"><span class="comment">//        System.out.println(tree);</span></span><br><span class="line"><span class="comment">//        tree.remove(0);</span></span><br><span class="line"><span class="comment">//        System.out.println(tree);</span></span><br><span class="line"><span class="comment">//        tree.put(11,11);</span></span><br><span class="line"><span class="comment">//        System.out.println(tree);</span></span><br><span class="line"><span class="comment">//        tree.remove(8);</span></span><br><span class="line"><span class="comment">//        System.out.println(tree);</span></span><br><span class="line"><span class="comment">//        tree.remove(9);</span></span><br><span class="line"><span class="comment">//        tree.remove(11);</span></span><br><span class="line"><span class="comment">//        System.out.println(tree);</span></span><br><span class="line"><span class="comment">//        tree.remove(3);</span></span><br><span class="line"><span class="comment">//        System.out.println(tree);</span></span><br><span class="line"><span class="comment">//        tree.remove(6);</span></span><br><span class="line"><span class="comment">//        tree.remove(4);</span></span><br><span class="line"><span class="comment">//        System.out.println(tree);</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>标题:</strong> AVL树实现练习</li>
+        <li><strong>作者:</strong> urlyy</li>
+        <li><strong>创建于
+                :</strong> 2022-02-05 12:41:44</li>
+        
+            <li>
+                <strong>更新于
+                    :</strong> 2025-12-21 18:39:57
+            </li>
+        
+        <li>
+            <strong>链接:</strong> https://urlyy.github.io/2022/02/05/AVL树练习/
+        </li>
+        <li>
+            <strong>
+                版权声明:
+            </strong>
+            
+
+            
+                本文章采用 <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a> 进行许可。
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+		<ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/%E6%A0%91/">#树</a>&nbsp;
+			</li>
+			
+		</ul>
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="prev" rel="prev" href="/2022/02/19/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E4%B9%8B%E7%BE%8E%E7%AC%94%E8%AE%B0%E4%B9%8B%E4%BD%8D%E5%9B%BE%E3%80%81%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8/">
+					<span class="left arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-left"></i>
+					</span>
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">数据结构与算法之美笔记之位图、布隆过滤器</span>
+						<span class="post-nav-item">上一篇</span>
+					</span>
+				</a>
+			</div>
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2022/02/02/%E8%B7%B3%E8%A1%A8%E7%BB%83%E4%B9%A0/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">跳表练习</span>
+						<span class="post-nav-item">下一篇</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        评论
+    </div>
+    
+
+        
+            
+    <div id="giscus-container"></div>
+    <script data-swup-reload-script defer>
+        async function loadGiscus() {
+            const giscusConfig = {
+                'src': 'https://giscus.app/client.js',
+                'data-repo': 'urlyy/urlyy_blog_comments',
+                'data-repo-id': 'R_kgDONo8nwQ',
+                'data-category': 'Announcements',
+                'data-category-id': 'DIC_kwDONo8nwc4Cl7pw',
+                'data-mapping': 'title',
+                'data-strict': '0',
+                'data-reactions-enabled': '1',
+                'data-emit-metadata': '1',
+                'data-theme': 'preferred_color_scheme',
+                'data-lang': 'zh-CN',
+                'data-input-position': 'top',
+                'data-loading': 'lazy',
+                'crossorigin': 'anonymous',
+                'async': true
+            }
+            const giscusScript = document.createElement('script');
+            for (const key in giscusConfig) {
+                giscusScript.setAttribute(key, giscusConfig[key]);
+            }
+            document.getElementById('giscus-container').appendChild(giscusScript);
+        }
+        if ('true') {
+            let loadGiscusTimeout = setTimeout(() => {
+                loadGiscus();
+                clearTimeout(loadGiscusTimeout);
+            }, 1000);
+        } else {
+            document.addEventListener('DOMContentLoaded', loadGiscus);
+        }
+    </script>
+
+
+        
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">目录</div>
+		<div class="page-title">AVL树实现练习</div>
+		
+
+	</div>
+</div>
+	</div>
+	
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2021</span>
+              -
+            
+            2025&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">urlyy</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        共撰写了 78 篇文章
+                    </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">访问人数</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">总访问量</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">由 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a> 驱动</span>
+            <span class="text-sm lg:block">主题&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.5</a></span>
+        </div>
+        
+        
+            <div>
+                博客已运行 <span class="odometer" id="runtime_days" ></span> 天 <span class="odometer" id="runtime_hours"></span> 小时 <span class="odometer" id="runtime_minutes"></span> 分钟 <span class="odometer" id="runtime_seconds"></span> 秒
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="fa-regular fa-arrow-up"></i>
+		</li>
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+	<div class="search-pop-overlay">
+	<div class="popup search-popup">
+		<div class="search-header">
+			<span class="search-input-field-pre">
+				<i class="fa-solid fa-keyboard"></i>
+			</span>
+			<div class="search-input-container">
+				<input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="站内搜索您需要的内容..." spellcheck="false" type="search" class="search-input">
+			</div>
+			<span class="popup-btn-close">
+				<i class="fa-solid fa-times"></i>
+			</span>
+		</div>
+		<div id="search-result">
+			<div id="no-result">
+				<i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>
+			</div>
+		</div>
+	</div>
+</div>
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+	
+<script src="/js/build/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/build/utils.js" type="module"></script>
+
+<script src="/js/build/main.js" type="module"></script>
+
+<script src="/js/build/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/build/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/build/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/build/layouts/categoryList.js" type="module"></script>
+
+
+
+    
+<script src="/js/build/tools/localSearch.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/layouts/lazyload.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/runtime.js"></script>
+
+    
+<script src="/js/build/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+  
+<script src="/js/build/plugins/typed.js" type="module"></script>
+
+
+
+
+    
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@9.3.0/dist/mermaid.min.js"></script>
+    
+    
+<script src="/js/build/plugins/mermaid.js"></script>
+
+
+
+
+
+
+    
+<script src="/js/build/libs/anime.min.js"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/tocToggle.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/layouts/toc.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/plugins/tabs.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+<script src="/js/build/layouts/essays.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+
+	
+</body>
+
+</html>

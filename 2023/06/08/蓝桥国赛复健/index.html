@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="urlyy">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set data attribute for CSS variables
+                root.setAttribute("data-theme", theme);
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes once DOM is ready
+            if (document.readyState !== "loading") {
+                document.body.classList.add(theme + "-mode");
+            } else {
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add(theme + "-mode");
+                    document.body.classList.remove((theme === DARK ? LIGHT : DARK) + "-mode");
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Critical CSS to prevent flash -->
+    <style>
+        :root[data-theme="dark"] {
+            --background-color: #202124;
+            --background-color-transparent: rgba(32, 33, 36, 0.6);
+            --second-background-color: #2d2e32;
+            --third-background-color: #34353a;
+            --third-background-color-transparent: rgba(32, 33, 36, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #ffffff;
+            --second-text-color: #eeeeee;
+            --third-text-color: #bebec6;
+            --fourth-text-color: #999999;
+            --default-text-color: #bebec6;
+            --invert-text-color: #373D3F;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(255, 255, 255, 0.08);
+            --shadow-color-2: rgba(255, 255, 255, 0.05);
+        }
+        
+        :root[data-theme="light"] {
+            --background-color: #fff;
+            --background-color-transparent: rgba(255, 255, 255, 0.6);
+            --second-background-color: #f8f8f8;
+            --third-background-color: #f2f2f2;
+            --third-background-color-transparent: rgba(241, 241, 241, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #16171a;
+            --second-text-color: #2f3037;
+            --third-text-color: #5e5e5e;
+            --fourth-text-color: #eeeeee;
+            --default-text-color: #373D3F;
+            --invert-text-color: #bebec6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(0, 0, 0, 0.08);
+            --shadow-color-2: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+        
+        /* Apply body classes as soon as DOM is ready */
+        :root[data-theme="dark"] body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+    </style>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://urlyy.github.io/2023/06/08/蓝桥国赛复健/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta name="description" content="蓝桥杯国赛复健自学">
+<meta property="og:type" content="article">
+<meta property="og:title" content="蓝桥国赛复健">
+<meta property="og:url" content="http://urlyy.github.io/2023/06/08/%E8%93%9D%E6%A1%A5%E5%9B%BD%E8%B5%9B%E5%A4%8D%E5%81%A5/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="蓝桥杯国赛复健自学">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E8%93%9D%E6%A1%A5%E5%9B%BD%E8%B5%9B%E5%A4%8D%E5%81%A5/17826872b3a14a5889c86f62a892a84f.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E8%93%9D%E6%A1%A5%E5%9B%BD%E8%B5%9B%E5%A4%8D%E5%81%A5/0ff21404cfb341b69a2d31677de1840f.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E8%93%9D%E6%A1%A5%E5%9B%BD%E8%B5%9B%E5%A4%8D%E5%81%A5/1ffc8d6a35ff461a8be3a7849b07956f.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/%E8%93%9D%E6%A1%A5%E5%9B%BD%E8%B5%9B%E5%A4%8D%E5%81%A5/b95854fcff244ee2be296a1325145339.png">
+<meta property="article:published_time" content="2023-06-08T05:51:08.000Z">
+<meta property="article:modified_time" content="2025-12-21T10:39:57.291Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="Node">
+<meta property="article:tag" content="HTML">
+<meta property="article:tag" content="CSS">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="Vue">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://urlyy.github.io/article_images/%E8%93%9D%E6%A1%A5%E5%9B%BD%E8%B5%9B%E5%A4%8D%E5%81%A5/17826872b3a14a5889c86f62a892a84f.png">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/avatar.jpg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.jpg">
+    <meta name="theme-color" content="#5c701a">
+    <link rel="shortcut icon" href="/images/avatar.jpg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            蓝桥国赛复健 | urlyy的小窝
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+        <link href="" rel="stylesheet">
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"urlyy.github.io","root":"/","language":"zh-CN","path":"search.json"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":false,"auto":false,"list":[""]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":true},"copyright":true,"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#5c701a","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":true,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":false},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"side_tools":{"gear_rotation":true,"auto_expand":false},"open_graph":true,"google_analytics":{"enable":false,"id":null},"busuanzi_counter":{"enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"pjax":true},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/bg/1.jpg","dark":"/images/bg/1.jpg"},"title":"urlyy的小窝","subtitle":{"text":["Loading..."],"hitokoto":{"enable":true,"show_author":false,"api":"https://v1.hitokoto.cn?c=a&c=b&c=d&c=k"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"style":"default","links":{"github":"https://github.com/urlyy?tab=repositories","instagram":null,"zhihu":null,"twitter":null,"email":"2213732736@qq.com"},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":true,"version":"9.3.0"}},"version":"2.8.5","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Categories":{"icon":"fa-regular fa-folder","path":"/categories/"},"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Github":{"path":"https://github.com/urlyy","icon":"fa-brands fa-github"},"个人介绍":{"path":"/personal/profile.html","icon":"fa-regular fa-user"}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"cloud"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":null},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2021/9/7 16:55:00"};
+    window.lang_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 个月前","year":"%s 年前"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                urlyy的小窝
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    首页
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/categories/"
+                                        >
+                                    <i class="fa-regular fa-folder fa-fw"></i>
+                                    分类
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/archives"
+                                        >
+                                    <i class="fa-regular fa-archive fa-fw"></i>
+                                    归档
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   target="_blank" rel="noopener" href="https://github.com/urlyy"
+                                        >
+                                    <i class="fa-brands fa-github fa-fw"></i>
+                                    GITHUB
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/personal/profile.html"
+                                        >
+                                    <i class="fa-regular fa-user fa-fw"></i>
+                                    个人介绍
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                首页
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/categories/"
+                        >
+                            <span>
+                                分类
+                            </span>
+                            
+                                <i class="fa-regular fa-folder fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/archives"
+                        >
+                            <span>
+                                归档
+                            </span>
+                            
+                                <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           target="_blank" rel="noopener" href="https://github.com/urlyy"
+                        >
+                            <span>
+                                GITHUB
+                            </span>
+                            
+                                <i class="fa-brands fa-github fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/personal/profile.html"
+                        >
+                            <span>
+                                个人介绍
+                            </span>
+                            
+                                <i class="fa-regular fa-user fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">25</div>
+        <div class="label text-third-text-color text-sm">标签</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">29</div>
+        <div class="label text-third-text-color text-sm">分类</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">78</div>
+        <div class="label text-third-text-color text-sm">文章</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">蓝桥国赛复健</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/avatar.jpg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">urlyy</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2023-06-08 13:51:08</span>
+        <span class="mobile">2023-06-08 13:51:08</span>
+        <span class="hover-info">创建</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2025-12-21 18:39:57</span>
+            <span class="mobile">2025-12-21 18:39:57</span>
+            <span class="hover-info">更新</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/%E5%89%8D%E7%AB%AF/">前端</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa-regular fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/Node/">Node</a>&nbsp;
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/HTML/">HTML</a>&nbsp;
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/CSS/">CSS</a>&nbsp;
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/JavaScript/">JavaScript</a>&nbsp;
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/Vue/">Vue</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<div class="tabs" id="tab-first-unique-name"><ul class="nav-tabs"><li class="tab active"><a class="#first-unique-name-1">Node.js</a></li><li class="tab"><a class="#first-unique-name-2">正则匹配</a></li><li class="tab"><a class="#first-unique-name-3">echarts</a></li><li class="tab"><a class="#first-unique-name-4">Promise</a></li><li class="tab"><a class="#first-unique-name-5">正则表达式</a></li><li class="tab"><a class="#first-unique-name-6">CSS</a></li><li class="tab"><a class="#first-unique-name-7">jquery</a></li><li class="tab"><a class="#first-unique-name-8">JS</a></li><li class="tab"><a class="#first-unique-name-9">技巧</a></li></ul><div class="tab-content"><div class="tab-pane active" id="first-unique-name-1"><h1 id="Node-js"><a href="#Node-js" class="headerlink" title="Node.js"></a>Node.js</h1><div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">testServer</span> = (<span class="params"></span>)=&gt;&#123;</span><br><span class="line">    <span class="keyword">const</span> http = <span class="built_in">require</span>(<span class="string">&#x27;http&#x27;</span>);</span><br><span class="line">    <span class="keyword">const</span> url = <span class="built_in">require</span>(<span class="string">&#x27;url&#x27;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> server = http.<span class="title function_">createServer</span>()</span><br><span class="line">    server.<span class="title function_">on</span>(<span class="string">&#x27;request&#x27;</span>,<span class="function">(<span class="params">req,res</span>)=&gt;</span>&#123;</span><br><span class="line">        <span class="comment">//获取请求数据</span></span><br><span class="line">        <span class="comment">// console.log(req.method,req.headers,req.url);</span></span><br><span class="line">        <span class="comment">//获取请求数据</span></span><br><span class="line">        <span class="keyword">var</span> arg = url.<span class="title function_">parse</span>(req.<span class="property">url</span>,<span class="literal">true</span>);	</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(arg);</span><br><span class="line">        <span class="comment">//返回一个数组</span></span><br><span class="line">        <span class="keyword">let</span> data = [&#123;&#125;];</span><br><span class="line">        res.<span class="title function_">end</span>(<span class="title class_">JSON</span>.<span class="title function_">stringify</span>(data));</span><br><span class="line">    &#125;)</span><br><span class="line"></span><br><span class="line">    server.<span class="title function_">listen</span>(<span class="string">&#x27;8080&#x27;</span>,<span class="function">()=&gt;</span>&#123;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;启动&quot;</span>);</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">fsTest</span> = (<span class="params"></span>)=&gt;&#123;</span><br><span class="line">    <span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>);</span><br><span class="line">    fs.<span class="title function_">readFile</span>(path,<span class="string">&#x27;utf-8&#x27;</span>,<span class="function">(<span class="params">err,data</span>)=&gt;</span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (error) <span class="keyword">throw</span> error;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(data);</span><br><span class="line">    &#125;)</span><br><span class="line">    fs.<span class="title function_">writeFile</span>(path, text, <span class="function">(<span class="params">err</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (err) <span class="keyword">throw</span> err;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;写入成功！&quot;</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="comment">//追加</span></span><br><span class="line">    fs.<span class="title function_">writeFile</span>(path, text, &#123; <span class="attr">flag</span>: <span class="string">&quot;a&quot;</span>, <span class="attr">encoding</span>: <span class="string">&quot;utf-8&quot;</span> &#125;,<span class="function">(<span class="params">err</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (err) <span class="keyword">throw</span> err;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;写入成功！&quot;</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="comment">//删除</span></span><br><span class="line">    fs.<span class="title function_">unlink</span>(path, <span class="function">(<span class="params">err</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (err) <span class="keyword">throw</span> err;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;删除成功！&quot;</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">osTest</span> = (<span class="params"></span>)=&gt;&#123;</span><br><span class="line">    <span class="keyword">const</span> os = <span class="built_in">require</span>(<span class="string">&quot;os&quot;</span>);</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(os.<span class="title function_">platform</span>())</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">pathTest</span>  = (<span class="params"></span>)=&gt;&#123;</span><br><span class="line">    <span class="comment">//路径拼接</span></span><br><span class="line">    <span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">&#x27;path&#x27;</span>);</span><br><span class="line">    <span class="keyword">const</span> dir = <span class="string">&#x27;myDir&#x27;</span>;</span><br><span class="line">    <span class="keyword">const</span> file = <span class="string">&#x27;myFile.txt&#x27;</span>;</span><br><span class="line">    <span class="keyword">const</span> fullPath = path.<span class="title function_">join</span>(dir, file);</span><br><span class="line">    <span class="comment">//获取文件名</span></span><br><span class="line">    <span class="keyword">const</span> filename = path.<span class="title function_">basename</span>(fullPath);</span><br><span class="line">    <span class="comment">//去除后缀的文件名</span></span><br><span class="line">    <span class="keyword">const</span> filename2 = path.<span class="title function_">basename</span>(fullPath, <span class="string">&#x27;.txt&#x27;</span>);</span><br><span class="line">    <span class="comment">//获取目录路径</span></span><br><span class="line">    <span class="keyword">const</span> dirPath = path.<span class="title function_">dirname</span>(fullPath);</span><br><span class="line">    <span class="comment">//获取扩展名</span></span><br><span class="line">    <span class="keyword">const</span> ext = path.<span class="title function_">extname</span>(fullPath);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//标准化路径，即去除.和..</span></span><br><span class="line">    <span class="keyword">const</span> nonNormalizedPath = <span class="string">&#x27;/home/user/myDir/../../myOtherDir/myFile.txt&#x27;</span>;</span><br><span class="line">    <span class="keyword">const</span> normalizedPath = path.<span class="title function_">normalize</span>(nonNormalizedPath);</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(normalizedPath);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div></div><div class="tab-pane" id="first-unique-name-2"><h1 id="正则匹配"><a href="#正则匹配" class="headerlink" title="正则匹配"></a>正则匹配</h1><div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">testFun</span> = (<span class="params"></span>)=&gt;&#123;</span><br><span class="line">    <span class="keyword">let</span> pattern = <span class="regexp">/hello/</span>;</span><br><span class="line">    <span class="keyword">let</span> result = pattern.<span class="title function_">test</span>(<span class="string">&quot;hello world&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(result); <span class="comment">// 输出: true</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">matchTest</span> = (<span class="params"></span>) =&gt;&#123;</span><br><span class="line">    <span class="keyword">let</span> pattern = <span class="regexp">/world/g</span>;</span><br><span class="line">    <span class="keyword">let</span> result = <span class="string">&quot;hello world world&quot;</span>.<span class="title function_">matchAll</span>(pattern);</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">let</span> item <span class="keyword">of</span> result)&#123;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(item)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//只能找第一个</span></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">searchTest</span> = (<span class="params"></span>) =&gt;&#123;</span><br><span class="line">    <span class="keyword">let</span> pattern = <span class="regexp">/world/</span>;</span><br><span class="line">    <span class="keyword">let</span> result = <span class="string">&quot;hello world world&quot;</span>.<span class="title function_">search</span>(pattern);</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(result); <span class="comment">// 输出: 6</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//加g可以匹配所有的</span></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">replaceTest</span> = (<span class="params"></span>)=&gt;&#123;</span><br><span class="line">    <span class="keyword">let</span> pattern = <span class="regexp">/world/g</span>;</span><br><span class="line">    <span class="keyword">let</span> result = <span class="string">&quot;hello world world&quot;</span>.<span class="title function_">replace</span>(pattern, <span class="string">&quot;Universe&quot;</span>);</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(result); <span class="comment">// 输出: &quot;hello Universe Universe&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> res = <span class="variable language_">this</span>.<span class="property">data</span>.<span class="title function_">map</span>(<span class="function"><span class="params">item</span>=&gt;</span>&#123;</span><br><span class="line">    <span class="comment">// 将匹配到的子字符串替换为带有高亮样式的HTML标签</span></span><br><span class="line">    <span class="keyword">return</span> text.<span class="title function_">replaceAll</span>(regex,<span class="string">`&lt;span style=&quot;background-color: yellow;&quot;&gt;<span class="subst">$&#123;regex&#125;</span>&lt;/span&gt;`</span>;</span><br><span class="line">);</span><br></pre></td></tr></table></figure></div></div><div class="tab-pane" id="first-unique-name-3"><h1 id="echarts"><a href="#echarts" class="headerlink" title="echarts"></a>echarts</h1><ul>
+<li>xaxis<ul>
+<li>data</li>
+</ul>
+</li>
+<li>yaxis<ul>
+<li>data</li>
+</ul>
+</li>
+<li>series[0]<ul>
+<li>data</li>
+</ul>
+</li>
+</ul>
+<div class="code-container" data-rel="Html"><figure class="iseeu highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">&quot;en&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;UTF-8&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">&quot;X-UA-Compatible&quot;</span> <span class="attr">content</span>=<span class="string">&quot;IE=edge&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">&quot;viewport&quot;</span> <span class="attr">content</span>=<span class="string">&quot;width=device-width, initial-scale=1.0&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">&quot; https://cdn.staticfile.org/echarts/4.3.0/echarts.min.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">title</span>&gt;</span>Document<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="language-css"></span></span><br><span class="line"><span class="language-css">    <span class="selector-tag">div</span>&#123;</span></span><br><span class="line"><span class="language-css">      <span class="attribute">width</span>: <span class="number">500px</span>;</span></span><br><span class="line"><span class="language-css">      <span class="attribute">height</span>: <span class="number">500px</span>;</span></span><br><span class="line"><span class="language-css">    &#125;</span></span><br><span class="line"><span class="language-css">  </span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;main&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">  <span class="keyword">const</span> chartDom = <span class="variable language_">document</span>.<span class="title function_">getElementById</span>(<span class="string">&quot;main&quot;</span>);</span></span><br><span class="line"><span class="language-javascript">  <span class="keyword">const</span> myChart = echarts.<span class="title function_">init</span>(chartDom);</span></span><br><span class="line"><span class="language-javascript">  <span class="keyword">let</span> option = &#123;</span></span><br><span class="line"><span class="language-javascript">      <span class="attr">xAxis</span>: &#123;</span></span><br><span class="line"><span class="language-javascript">        <span class="attr">type</span>: <span class="string">&#x27;category&#x27;</span>,</span></span><br><span class="line"><span class="language-javascript">        <span class="attr">data</span>: [<span class="string">&#x27;Mon&#x27;</span>, <span class="string">&#x27;Tue&#x27;</span>, <span class="string">&#x27;Wed&#x27;</span>, <span class="string">&#x27;Thu&#x27;</span>, <span class="string">&#x27;Fri&#x27;</span>, <span class="string">&#x27;Sat&#x27;</span>, <span class="string">&#x27;Sun&#x27;</span>]</span></span><br><span class="line"><span class="language-javascript">      &#125;,</span></span><br><span class="line"><span class="language-javascript">      <span class="attr">yAxis</span>: &#123;</span></span><br><span class="line"><span class="language-javascript">        <span class="attr">type</span>: <span class="string">&#x27;value&#x27;</span>,</span></span><br><span class="line"><span class="language-javascript">      &#125;,</span></span><br><span class="line"><span class="language-javascript">      <span class="attr">series</span>: [</span></span><br><span class="line"><span class="language-javascript">        &#123;</span></span><br><span class="line"><span class="language-javascript">          <span class="attr">data</span>: [<span class="number">150</span>, <span class="number">230</span>, <span class="number">224</span>, <span class="number">218</span>, <span class="number">135</span>, <span class="number">147</span>, <span class="number">260</span>],</span></span><br><span class="line"><span class="language-javascript">          <span class="attr">type</span>: <span class="string">&#x27;line&#x27;</span></span></span><br><span class="line"><span class="language-javascript">        &#125;</span></span><br><span class="line"><span class="language-javascript">      ]</span></span><br><span class="line"><span class="language-javascript">    &#125;;</span></span><br><span class="line"><span class="language-javascript">  myChart.<span class="title function_">setOption</span>(option);</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure></div></div><div class="tab-pane" id="first-unique-name-4"><h1 id="Promise"><a href="#Promise" class="headerlink" title="Promise"></a>Promise</h1><div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> flag = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">p1</span> = (<span class="params"></span>)=&gt;&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Promise</span>(<span class="function">(<span class="params">resolve,reject</span>)=&gt;</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(!flag)&#123;</span><br><span class="line">            <span class="title function_">resolve</span>(<span class="string">&quot;success&quot;</span>);</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="title function_">reject</span>(<span class="string">&quot;sb&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">p2</span> = (<span class="params"></span>)=&gt;&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Promise</span>(<span class="function">(<span class="params">resolve,reject</span>)=&gt;</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(flag)&#123;</span><br><span class="line">            <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">                <span class="title function_">resolve</span>(<span class="string">&quot;success&quot;</span>);</span><br><span class="line">            &#125;, <span class="number">5000</span>);</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="title function_">reject</span>(<span class="string">&quot;sb&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">p1</span>()</span><br><span class="line">.<span class="title function_">then</span>(<span class="function">(<span class="params">res</span>)=&gt;</span>&#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(res);</span><br><span class="line">&#125;)</span><br><span class="line">.<span class="title function_">catch</span>(<span class="function"><span class="params">err</span>=&gt;</span>&#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(err);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="title class_">Promise</span>.<span class="title function_">all</span>([<span class="title function_">p1</span>(),<span class="title function_">p2</span>()])</span><br><span class="line">.<span class="title function_">then</span>(<span class="function"><span class="params">res</span>=&gt;</span>&#123;</span><br><span class="line">    <span class="comment">//有一个失败就不会进来</span></span><br><span class="line">    <span class="comment">//否则是全部的成功结果</span></span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(res);</span><br><span class="line">&#125;)</span><br><span class="line">.<span class="title function_">catch</span>(<span class="function"><span class="params">err</span>=&gt;</span>&#123;</span><br><span class="line">    <span class="comment">//只打印第一个错误</span></span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;错误是&quot;</span>,err);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">//race只等一个，无论对错都输出</span></span><br></pre></td></tr></table></figure></div></div><div class="tab-pane" id="first-unique-name-5"><h1 id="正则表达式"><a href="#正则表达式" class="headerlink" title="正则表达式"></a>正则表达式</h1><table>
+<thead>
+<tr>
+<th>表达式</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>[a-z]</td>
+<td>查找任何从小写 a 到小写 z 的字符</td>
+</tr>
+<tr>
+<td>[A-Z]</td>
+<td>查找任何从大写 A 到大写 Z 的字符</td>
+</tr>
+<tr>
+<td>[0-9]</td>
+<td>查找任何从 0 至 9 的数字</td>
+</tr>
+<tr>
+<td>[abc]</td>
+<td>查找括号内的任意一个字符</td>
+</tr>
+<tr>
+<td>[^abc]</td>
+<td>查找除了括号内的任意字符</td>
+</tr>
+</tbody></table>
+<h2 id="常用的元字符（特殊字符）"><a href="#常用的元字符（特殊字符）" class="headerlink" title="常用的元字符（特殊字符）"></a>常用的元字符（特殊字符）</h2><table>
+<thead>
+<tr>
+<th>字符</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>\w</td>
+<td>匹配数字、字母、下划线</td>
+</tr>
+<tr>
+<td>\W</td>
+<td>匹配非数字、字母、下划线</td>
+</tr>
+<tr>
+<td>\d</td>
+<td>匹配数字</td>
+</tr>
+<tr>
+<td>\D</td>
+<td>匹配非数字</td>
+</tr>
+<tr>
+<td>\s</td>
+<td>匹配空白字符（空格、换行）</td>
+</tr>
+<tr>
+<td>\S</td>
+<td>匹配非空白字符</td>
+</tr>
+<tr>
+<td>\n</td>
+<td>匹配换行符</td>
+</tr>
+</tbody></table>
+<h2 id="常用的限定符"><a href="#常用的限定符" class="headerlink" title="常用的限定符"></a>常用的限定符</h2><table>
+<thead>
+<tr>
+<th>字符</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>*</td>
+<td>匹配前面的子表达式零次或多次</td>
+</tr>
+<tr>
+<td>+</td>
+<td>匹配前面的子表达式一次或多次</td>
+</tr>
+<tr>
+<td>?</td>
+<td>匹配前面的子表达式零次或一次</td>
+</tr>
+<tr>
+<td>{n}</td>
+<td>匹配确定的 n 次</td>
+</tr>
+<tr>
+<td>{n,}</td>
+<td>至少匹配 n 次</td>
+</tr>
+<tr>
+<td>{n,m}</td>
+<td>最少匹配 n 次且最多匹配 m 次</td>
+</tr>
+</tbody></table>
+<h2 id="常用的修饰符"><a href="#常用的修饰符" class="headerlink" title="常用的修饰符"></a>常用的修饰符</h2><table>
+<thead>
+<tr>
+<th>修饰符</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>i</td>
+<td>执行对大小写不敏感的匹配。</td>
+</tr>
+<tr>
+<td>g</td>
+<td>执行全局匹配（查找所有匹配而非在找到第一个匹配后停止）。</td>
+</tr>
+<tr>
+<td>m</td>
+<td>执行多行匹配。</td>
+</tr>
+</tbody></table>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><table>
+<thead>
+<tr>
+<th>修饰符</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>^</td>
+<td>以…开始</td>
+</tr>
+<tr>
+<td>$</td>
+<td>以…结束</td>
+</tr>
+</tbody></table></div><div class="tab-pane" id="first-unique-name-6"><h1 id="CSS"><a href="#CSS" class="headerlink" title="CSS"></a>CSS</h1><p>选择器<br>div[id !&#x3D;’item2’]<br>body[class ^&#x3D;’c’]<br>body[class $&#x3D;’c’]</p>
+<p>:first	选取指定元素的第一个该元素。<br>:last	选取指定元素的最后一个该元素。<br>:odd	选取指定元素序号为奇数的所有该元素。<br>:even	选取指定元素序号为偶数的所有该元素。<br>:eq(n)	选取指定元素的第 n 个该元素。<br>:lt(n)	选择指定元素中小于 n 的所有该元素。<br>:gt(n)	选取指定元素中大于 n 的所有该元素。</p>
+<p>:visible	选取所有可见元素。<br>:hidden	    选取所有不可见元素。</p>
+<p>:contains(text)	对包含指定 text 文本的元素进行操作。<br>:has(selector)	对包含指定选择器的元素进行操作。<br>:parent	对含有文本或者子元素的元素进行操作。<br>:empty	对空元素进行操作。</p>
+<p>:input	选取所有 input 元素。<br>:button	选取所有 input 类型为 button 的元素。<br>:submit	选取所有 input 类型为 submit 的元素。<br>:reset	选取所有 input 类型为 reset 的元素。<br>:text	选取所有 input 类型为 text 的元素。<br>:textarea	选取所有多行文本框。<br>:password	选取所有 input 类型为 password 的元素。<br>:radio	选取所有 input 类型为 radio 的元素。<br>:checkbox	选取所有 input 类型为 checkbox 的元素。<br>:image	选取所有图片域。<br>:file	选取所有 input 类型为 file 的元素。</p>
+<p>:checked	选取所有被选中的表单元素。<br>:selected	选取被选中的表单元素项。<br>:enabled	选取所有可用的表单元素。<br>:disabled	选取所有不可用的表单元素。<br>:read-only	选取只读权限的表单元素。<br>:focus	选取所有获得焦点的表单元素。</p>
+<p>:focus	给获取焦点的元素设置样式。<br>::selection	给页面中被选中的文本内容设置样式。<br>:checked	给被选中的单选框或者复选框设置样式。<br>:enabled	给可用的表单设置样式。<br>:disabled	给不可用的表单设置样式。<br>:read-only	给只读表单设置样式。<br>:read-write	给可读写的表单元素设置样式。<br>:valid	验证有效。<br>:invalid	验证无效。</p>
+<p>text-shadow: x-offset y-offset blur color;<br>text-shadow: 4px 4px 3px rgb(0, 255, 179);</p>
+<p>text-overflow: clip|ellipsis;<br>clip	修剪文本。<br>ellipsis	显示省略符号来代表被修剪的文本。</p>
+<p>box-shadow: h-shadow v-shadow blur spread color inset;<br>box-shadow: 10px 10px 5px #26ad8c;</p>
+<p>transform<br>transform: rotate(60deg);<br>transform: translateX(20px);<br>transform: scaleX(2);</p>
+<p>transition: transform 1s ease-in-out;</p>
+<p>transition: 指定属性 持续时间 速度曲线 开始时间;<br>transition-property: 属性值; &#x2F;<em>指定属性名</em>&#x2F;<br>transition-duration: 属性值; &#x2F;<em>完成过渡这一过程的时间</em>&#x2F;<br>transition-timing-function: 属性值; &#x2F;<em>速度曲线</em>&#x2F;<br>transition-delay: 属性值; &#x2F;<em>过渡的开始时间</em>&#x2F;</p>
+<p>@keyframes 动画名<br>{<br>    0% {样式属性：属性值;}<br>    25% {样式属性：属性值;}<br>    50% {样式属性：属性值;}<br>    100% {样式属性：属性值;}<br>}</p>
+<p>animation: 动画名 完成动画的周期 是否重复;<br>animation-name	规定 @keyframes 动画的名称。<br>animation-duration	规定动画完成一个周期所花费的秒或毫秒。默认是 0。<br>animation-timing-function	规定动画的速度曲线。默认是 “ease”。<br>animation-fill-mode	规定当动画不播放时（当动画完成时，或当动画有一个延迟未开始播放时），要应用到元素的样式。<br>animation-delay	规定动画何时开始。默认是 0。<br>animation-iteration-count	规定动画被播放的次数。默认是 1。<br>animation-direction	规定动画是否在下一周期逆向地播放。默认是 “normal”。</p>
+<p>infinite</p>
+<p>flex-wrap: nowrap|wrap|wrap-reverse|initial|inherit;</p>
+<p>align-items: flex-start | flex-end | center | baseline | stretch;<br>&#x2F;&#x2F;多行<br>align-content: flex-start | flex-end | center | space-between | space-around |<br>  stretch;</p>
+<p> @media screen and (min-width: 800px) {<br>    body {<br>        background-color: green;<br>    }<br>}</p>
+<p>all	适用于所有设备<br>print	用于打印机和打印预览<br>screen	用于电脑屏幕，平板电脑，智能手机等<br>speech	用于屏幕阅读器等发声设备</p>
+<p>max-width	定义输出设备中的页面最大可见区域宽度<br>max-height	定义输出设备中的页面最大可见区域高度<br>min-width	定义输出设备中的页面最小可见区域宽度<br>min-height	定义输出设备中的页面最小可见区域高度<br>orientation	视口（viewport）的旋转方向。portrait ：表示 viewport 处于纵向，即高度大于等于宽度 ； landscape ：表示 viewport 处于横向，即宽度大于高度</p>
+<link rel="stylesheet" media="mediatype and|not|only (media feature)" href="mystyle.css">
+
+
+
+<p>.son{<br>    position:absolute;<br>    left:50%;<br>    top:50%;<br>    transform:translate(-50%,-50%);<br>}<br>.father{<br>    display:relative;<br>}</p>
+<p>.nav{<br>    display:flex;<br>    justify-content:space-between;<br>}<br>.nav &gt; .left{}<br>.nav &gt; .right{}</p></div><div class="tab-pane" id="first-unique-name-7"><h1 id="Jquery"><a href="#Jquery" class="headerlink" title="Jquery"></a>Jquery</h1><p>子级插入方法，包括 prepend()、prependTo()、append()、appendTo()。<br>同级插入方法，包括 before()、insertBefore()、after()、insertAfter()。</p>
+<p>remove()<br>empty()</p>
+<p>$(A).replaceWith(B);<br>&#x2F;&#x2F; 将 A 替换为 B<br>$(B).replaceAll(A);</p>
+<p>$().each(function (index, element) {});</p>
+<p>$().ery对象.attr(“属性名”); &#x2F;&#x2F; 获取属性<br>jQuery对象.attr(“属性名”, “属性值”); &#x2F;&#x2F; 修改属性</p>
+<p>$().removeAttr(“属性名”);</p>
+<p>$().css(“属性名”, “属性值”);</p>
+<p>$().addClass(“类名”);</p>
+<p>$().html(“内容”);</p>
+<p>$().text(“内容”);<br>$().val(“内容”);</p>
+<p>$().show();<br>$().show();</p>
+<p>$().fadeIn(speed, easing, callback);<br>$().fadeOut(speed, easing, callback);</p>
+<p>$(“li”).parent()<br>$().prev();<br>$().preAll();</p>
+<p>$().next();<br>$().nextAll();</p>
+<p>$().siblings();<br>$().children();</p>
+<p>$().find(selector);</p>
+<p>$().hasClass(“类名”);</p>
+<p>$().eq(n);</p>
+<p>$().is(selector);<br>$().not(selector|function)</p>
+<p>&#x2F;&#x2F;已知某个li，获取他在li中的下标，并对他的下一个进行操作<br>let target_li &#x3D; …<br>let idx &#x3D; $(‘li’).index(target_li);<br>$(‘li’).eq(idx+1).do();</p></div><div class="tab-pane" id="first-unique-name-8"><h1 id="JS"><a href="#JS" class="headerlink" title="JS"></a>JS</h1><p>&#x2F;&#x2F;字符串api<br>includes(s)<br>startsWith(s)<br>endsWith(s)<br>replaceAll(old,new)</p>
+<p>let arr &#x3D; Array.of(7, 8, 9);<br>var arr &#x3D; Array.from(arrLike);</p>
+<p>&#x2F;&#x2F;数组api<br>arr.find(function (value, index) {<br>  console.log(value &gt; 2);<br>  console.log(index);<br>  return value &gt; 2;<br>});<br>let result &#x3D; arr.findIndex(function (value, index) {<br>  return value &#x3D;&#x3D; “兔子”;<br>});<br>fill()<br>arr.entries()<br>arr.keys()<br>arr.values()</p>
+<p>&#x2F;&#x2F;Object<br>Object.is(a,b)</p>
+<p>&#x2F;&#x2F;Promise<br>return new Promise(function (resolve, reject) {<br>    if(){resolve(a)}<br>    else reject(b)<br>  });</p>
+<p>Promise.all([p1(5), p1(6), p1(7)]).then(<br>  function (v) {<br>    console.log(v);<br>  },<br>  function (e) {<br>    console.log(e);<br>  }<br>);</p>
+<p>Promise.race([loadData(), timeOut()]).then(<br>  function (d) {<br>    console.log(d);<br>  },<br>  function (e) {<br>    console.log(e);<br>  }<br>);</p>
+<p>&#x2F;&#x2F;所有的Promise结束之后打印<br>function p(v) {<br>  return new Promise(function (resolve) {<br>    setTimeout(function () {<br>      &#x2F;&#x2F; 在 p 函数执行时，将函数的实参值 v ，作为执行成功回调函数的返回值。<br>      resolve(v);<br>    }, 2000);<br>  });<br>}<br>async function fn() {<br>  await Promise.all([p(“a”), p(“b”), p(“c”)]);<br>  console.log(“隐藏加载动画！”);<br>}<br>fn();</p>
+<p>&#x2F;&#x2F;proxy<br>var proxy &#x3D; new Proxy(dog, {<br>  get(target, propKey) {<br>    &#x2F;&#x2F; 遍历目标对象的属性键值<br>    if (propKey in target) {<br>      return target[propKey]; &#x2F;&#x2F; 返回相应的属性值<br>    } else {<br>      throw new ReferenceError(propKey + “ 属性不存在”);<br>    }<br>  },<br>});</p>
+<p>js获取日期<br>let now &#x3D; new Data();<br>now.setTime(now.getTime()+1000<em>60</em>60<em>24</em>i);<br>getDate()	返回一个月的某一天。<br>getDay()	返回一周中的某一天。<br>getFullYear()	返回年份。<br>getHours()	返回小时。<br>getMonth()	返回月份。<br>getTime()	返回毫秒数。<br>setFullYear()	设置年份。<br>setDate()	设置一个月中的某一天。<br>setMonth()	设置月份。</p>
+<p>Math.abs(x)	返回一个数的绝对值。<br>Math.pow(x, y)	返回一个数的 y 次幂。<br>Math.random()	返回一个 0 到 1 之间的伪随机数。<br>Math.sqrt(x)	返回一个数的平方根。<br>Math.round()	返回四舍五入后的整数。<br>Math.exp(x)	返回欧拉常数的参数次方。</p>
+<p>arr.slice(s,e)和splice<br>shift push<br>arr1.concat(arr2)</p>
+<p>.toLowerCase();<br>.toUpperCase();</p>
+<p>s.charAt(下标值);<br>s.substring();</p>
+<p>s.replace(old,new</p>
+<p>var arr &#x3D; str.split(“,”);</p>
+<p>parent.appendChild(child);</p>
+<p>&#x2F;&#x2F;判断对象为空<br>function isEmptyObject(obj) {<br>  for (let o in obj) {<br>    return false;<br>  }<br>  return true;<br>}</p>
+<p>&#x2F;&#x2F;从idx开始删除1个元素<br>arr.splice(idx,1)</p></div><div class="tab-pane" id="first-unique-name-9"><h1 id="技巧"><a href="#技巧" class="headerlink" title="技巧"></a>技巧</h1><h2 id="box-sizing"><a href="#box-sizing" class="headerlink" title="box-sizing"></a>box-sizing</h2><div class="code-container" data-rel="Css"><figure class="iseeu highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">box-sizing</span>: content-box || border-box;</span><br></pre></td></tr></table></figure></div>
+<p>这里推荐使用的是<code>border-box</code></p>
+<p>如下图content-box(默认是这个)，可以发现内容的宽高是按着给定的100来的，但是实际盒子的长宽还要加上$2<em>padding+2</em>border+2*margin$，可能和需求就不一致了</p>
+<div class="code-container" data-rel="Css"><figure class="iseeu highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">width</span>: <span class="number">100px</span>;</span><br><span class="line"><span class="attribute">border</span>: <span class="number">5px</span> solid black;</span><br><span class="line"><span class="attribute">padding</span>:<span class="number">11px</span>;</span><br><span class="line"><span class="attribute">margin</span>: <span class="number">1px</span>;</span><br><span class="line"><span class="attribute">background-color</span>: blue;</span><br><span class="line"><span class="attribute">height</span>: <span class="number">100px</span>;</span><br></pre></td></tr></table></figure></div>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/%E8%93%9D%E6%A1%A5%E5%9B%BD%E8%B5%9B%E5%A4%8D%E5%81%A5/17826872b3a14a5889c86f62a892a84f.png"
+                      alt="在这里插入图片描述"
+                ><br><font style="color:red">重点是这个！</font>如下图border-box(只加了那一行)，可以发现整个盒子的宽高是$100+margin$，内容的宽高是按照$100-2<em>padding-2</em>border$来的，会好一点</p>
+<div class="code-container" data-rel="Css"><figure class="iseeu highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">width</span>: <span class="number">100px</span>;</span><br><span class="line"><span class="attribute">border</span>: <span class="number">5px</span> solid black;</span><br><span class="line"><span class="attribute">padding</span>:<span class="number">11px</span>;</span><br><span class="line"><span class="attribute">margin</span>: <span class="number">1px</span>;</span><br><span class="line"><span class="attribute">background-color</span>: red;</span><br><span class="line"><span class="attribute">height</span>: <span class="number">100px</span>;</span><br><span class="line"><span class="attribute">box-sizing</span>: border-box;</span><br></pre></td></tr></table></figure></div>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/%E8%93%9D%E6%A1%A5%E5%9B%BD%E8%B5%9B%E5%A4%8D%E5%81%A5/0ff21404cfb341b69a2d31677de1840f.png"
+                      alt="在这里插入图片描述"
+                ><br>明显用了border-box的小一些<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/%E8%93%9D%E6%A1%A5%E5%9B%BD%E8%B5%9B%E5%A4%8D%E5%81%A5/1ffc8d6a35ff461a8be3a7849b07956f.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h2 id="水平居中"><a href="#水平居中" class="headerlink" title="水平居中"></a>水平居中</h2><div class="code-container" data-rel="Css"><figure class="iseeu highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.demo1</span>&#123;</span><br><span class="line">	<span class="attribute">width</span>:<span class="number">1024px</span>;</span><br><span class="line">	<span class="attribute">margin</span>:<span class="number">0</span> auto;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.demo2-father</span>&#123;</span><br><span class="line">	<span class="attribute">display</span>:flex;</span><br><span class="line">	<span class="attribute">justify-content</span>:center;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.demo2</span>&#123;&#125;</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="导航栏一边居左一边居右"><a href="#导航栏一边居左一边居右" class="headerlink" title="导航栏一边居左一边居右"></a>导航栏一边居左一边居右</h2><div class="code-container" data-rel="Css"><figure class="iseeu highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.nav</span>&#123;</span><br><span class="line">	<span class="attribute">display</span>:flex;</span><br><span class="line">	<span class="attribute">justify-content</span>:space-between;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.nav</span> &gt; <span class="selector-class">.left</span>&#123;&#125;</span><br><span class="line"><span class="selector-class">.nav</span> &gt; <span class="selector-class">.right</span>&#123;&#125;</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="垂直居中"><a href="#垂直居中" class="headerlink" title="垂直居中"></a>垂直居中</h2><div class="code-container" data-rel="Css"><figure class="iseeu highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.demo1-father</span>&#123;</span><br><span class="line">	<span class="attribute">display</span>:flex;</span><br><span class="line">	<span class="attribute">align-items</span>:center;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.demo1</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="selector-class">.demo2</span>&#123;</span><br><span class="line">	<span class="attribute">height</span>:<span class="number">100px</span>;</span><br><span class="line">	<span class="attribute">line-height</span>:<span class="number">100px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h2 id="水平垂直居中"><a href="#水平垂直居中" class="headerlink" title="水平垂直居中"></a>水平垂直居中</h2><div class="code-container" data-rel="Css"><figure class="iseeu highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.son</span>&#123;</span><br><span class="line">	<span class="attribute">position</span>:absolute;</span><br><span class="line">	<span class="attribute">left</span>:<span class="number">50%</span>;</span><br><span class="line">	<span class="attribute">top</span>:<span class="number">50%</span>;</span><br><span class="line">	<span class="attribute">transform</span>:<span class="built_in">translate</span>(-<span class="number">50%</span>,-<span class="number">50%</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-class">.father</span>&#123;</span><br><span class="line">	<span class="attribute">display</span>:relative;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+
+<h2 id="获取数据类型"><a href="#获取数据类型" class="headerlink" title="获取数据类型"></a>获取数据类型</h2><div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">def <span class="title function_">getType</span>(<span class="params"></span>)&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="title class_">Object</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">toString</span></span><br><span class="line">	  .<span class="title function_">call</span>(target)</span><br><span class="line">	  .<span class="title function_">slice</span>(<span class="number">8</span>, -<span class="number">1</span>) <span class="comment">// 这种写法也可以。</span></span><br><span class="line">	  .<span class="title function_">toLocaleLowerCase</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="判断对象是否为空"><a href="#判断对象是否为空" class="headerlink" title="判断对象是否为空"></a>判断对象是否为空</h2><div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">isEmptyObject</span>(<span class="params">obj</span>) &#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> o <span class="keyword">in</span> obj) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="位置伪类的使用"><a href="#位置伪类的使用" class="headerlink" title="位置伪类的使用"></a>位置伪类的使用</h2><p><a class="link"   target="_blank" rel="noopener" href="https://blog.csdn.net/WDNMde_/article/details/116992613?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522167817693816800186532910%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=167817693816800186532910&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-1-116992613-null-null.142%5Ev73%5Epc_search_v2,201%5Ev4%5Eadd_ask,239%5Ev2%5Einsert_chatgpt&utm_term=%E4%BD%8D%E7%BD%AE%E4%BC%AA%E7%B1%BB&spm=1018.2226.3001.4187" >伪类选择器<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h2 id="Jquery"><a href="#Jquery" class="headerlink" title="Jquery"></a>Jquery</h2><div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">item.<span class="title function_">next</span>()</span><br><span class="line">item.<span class="title function_">prev</span>()</span><br><span class="line"></span><br><span class="line"><span class="comment">//已知某个li，获取他在li中的下标，并对他的下一个进行操作</span></span><br><span class="line"><span class="keyword">let</span> target_li = ...</span><br><span class="line"><span class="keyword">let</span> idx = $(<span class="string">&#x27;li&#x27;</span>).<span class="title function_">index</span>(target_li);</span><br><span class="line">$(<span class="string">&#x27;li&#x27;</span>).<span class="title function_">eq</span>(idx+<span class="number">1</span>).<span class="title function_">do</span>();</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+
+<h2 id="JS获取表单元素"><a href="#JS获取表单元素" class="headerlink" title="JS获取表单元素"></a>JS获取表单元素</h2><div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> myForm = <span class="variable language_">document</span>.<span class="title function_">querySelector</span>(<span class="string">&#x27;#myForm&#x27;</span>);</span><br><span class="line"><span class="keyword">let</span> form = <span class="keyword">new</span> <span class="title class_">FormData</span>(myForm);</span><br><span class="line"><span class="comment">//获取input、单选框的值</span></span><br><span class="line"><span class="keyword">let</span> name = form.<span class="title function_">get</span>(<span class="string">&#x27;name&#x27;</span>);</span><br><span class="line"><span class="keyword">let</span> sex = form.<span class="title function_">get</span>(<span class="string">&#x27;sex&#x27;</span>);</span><br><span class="line"><span class="comment">//获取多选框的值</span></span><br><span class="line"><span class="comment">//habbits是选中的元素的下标</span></span><br><span class="line"><span class="keyword">let</span> habbits = form.<span class="title function_">getAll</span>(<span class="string">&#x27;habbit&#x27;</span>);</span><br><span class="line">habbits = habbits.<span class="title function_">map</span>(<span class="function"><span class="params">idx</span>=&gt;</span>&#123;...&#125;)</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="JS设置属性"><a href="#JS设置属性" class="headerlink" title="JS设置属性"></a>JS设置属性</h2><div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> item = ...</span><br><span class="line">item.<span class="property">innerText</span> = <span class="string">&#x27;&#x27;</span></span><br></pre></td></tr></table></figure></div>
+
+<h2 id="JS的map-和filter"><a href="#JS的map-和filter" class="headerlink" title="JS的map()和filter()"></a>JS的map()和filter()</h2><p>map和filter都是基于原数组，产生新数组<br>map趋向于改造数组，重新处理每一个item，可以认为是一个foreach，返回每个新的数组元素<br>filter趋向于筛选数组元素，返回布尔值表示是否要将该元素放入新数组\</p>
+<h2 id="字符串查找"><a href="#字符串查找" class="headerlink" title="字符串查找"></a>字符串查找</h2><div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">arr.<span class="title function_">includes</span>(<span class="keyword">var</span>) <span class="comment">//数组中是否有某值(python的in)</span></span><br></pre></td></tr></table></figure></div>
+<h2 id="补全搜索"><a href="#补全搜索" class="headerlink" title="补全搜索"></a>补全搜索</h2><div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> <span class="variable language_">this</span>.<span class="property">data</span>.<span class="title function_">filter</span>(<span class="function"><span class="params">item</span>=&gt;</span>&#123;</span><br><span class="line">  <span class="keyword">return</span> item.<span class="property">name</span>.<span class="title function_">toUpperCase</span>().<span class="title function_">includes</span>(<span class="variable language_">this</span>.<span class="property">searchQuery</span>.<span class="title function_">toUpperCase</span>());</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="悬停父元素，改变子元素"><a href="#悬停父元素，改变子元素" class="headerlink" title="悬停父元素，改变子元素"></a>悬停父元素，改变子元素</h2><div class="code-container" data-rel="Css"><figure class="iseeu highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-id">#box</span><span class="selector-pseudo">:hover</span> <span class="selector-id">#item</span></span><br></pre></td></tr></table></figure></div>
+
+<h2 id="Axios"><a href="#Axios" class="headerlink" title="Axios"></a>Axios</h2><div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">axios</span>(&#123;</span><br><span class="line">  <span class="attr">method</span>: <span class="string">&#x27;post&#x27;</span>,</span><br><span class="line">  <span class="attr">url</span>: <span class="string">&#x27;/user/12345&#x27;</span>,</span><br><span class="line">  <span class="attr">data</span>: &#123;</span><br><span class="line">    <span class="attr">firstName</span>: <span class="string">&#x27;Fred&#x27;</span>,</span><br><span class="line">    <span class="attr">lastName</span>: <span class="string">&#x27;Flintstone&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line">.<span class="title function_">then</span>(<span class="keyword">function</span> (<span class="params">response</span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(response);</span><br><span class="line">&#125;)</span><br><span class="line">.<span class="title function_">catch</span>(<span class="keyword">function</span> (<span class="params">error</span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(error);</span><br><span class="line">&#125;)</span><br><span class="line">.<span class="title function_">finally</span>(<span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">  <span class="comment">// always executed</span></span><br><span class="line">&#125;);  </span><br></pre></td></tr></table></figure></div>
+<p>get是param，post是data</p>
+<p>读取本地json</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">axios.<span class="title function_">get</span>(<span class="string">&quot;/data.json&quot;</span>)</span><br><span class="line">.<span class="title function_">then</span>(<span class="function">(<span class="params">res</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(res);</span><br><span class="line">&#125;)</span><br><span class="line">.<span class="title function_">catch</span>(<span class="function">(<span class="params">error</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(res);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="title function_">axios</span>(&#123;</span><br><span class="line">  <span class="attr">method</span>:<span class="string">&quot;get&quot;</span>,</span><br><span class="line">  <span class="attr">url</span>:<span class="string">&quot;./goodsList.json&quot;</span></span><br><span class="line">&#125;).<span class="title function_">then</span>(<span class="function"><span class="params">res</span>=&gt;</span>&#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(res);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></div>
+<h2 id="Node服务端"><a href="#Node服务端" class="headerlink" title="Node服务端"></a>Node服务端</h2><p><a class="link"   target="_blank" rel="noopener" href="https://blog.csdn.net/thwr1881/article/details/125946960?ops_request_misc=&request_id=&biz_id=102&utm_term=node%E5%BC%80%E5%8F%91%E6%9C%8D%E5%8A%A1%E7%AB%AF&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduweb~default-0-125946960.142%5Ev73%5Epc_search_v2,201%5Ev4%5Eadd_ask,239%5Ev2%5Einsert_chatgpt&spm=1018.2226.3001.4187" >添加链接描述<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> http = <span class="built_in">require</span>(<span class="string">&#x27;http&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> url = <span class="built_in">require</span>(<span class="string">&#x27;url&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> querystring = <span class="built_in">require</span>(<span class="string">&quot;querystring&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> server = http.<span class="title function_">createServer</span>()</span><br><span class="line">server.<span class="title function_">on</span>(<span class="string">&#x27;request&#x27;</span>,<span class="function">(<span class="params">req,res</span>)=&gt;</span>&#123;</span><br><span class="line">    <span class="comment">//获取请求数据</span></span><br><span class="line">    <span class="comment">// console.log(req.method,req.headers,req.url);</span></span><br><span class="line">    <span class="comment">//获取请求数据</span></span><br><span class="line">    <span class="keyword">var</span> arg = url.<span class="title function_">parse</span>(req.<span class="property">url</span>).<span class="property">query</span>;</span><br><span class="line">	<span class="comment">//将arg参数字符串反序列化为一个对象</span></span><br><span class="line">	<span class="keyword">var</span> params = querystring.<span class="title function_">parse</span>(arg);</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(params);</span><br><span class="line">    <span class="comment">//返回一个数组</span></span><br><span class="line">    <span class="keyword">let</span> data = [&#123;<span class="attr">name</span>:params[<span class="string">&#x27;name&#x27;</span>]&#125;];</span><br><span class="line">    res.<span class="title function_">end</span>(<span class="title class_">JSON</span>.<span class="title function_">stringify</span>(data));</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">server.<span class="title function_">listen</span>(<span class="string">&#x27;8080&#x27;</span>,<span class="function">()=&gt;</span>&#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;启动&quot;</span>);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="Vue2"><a href="#Vue2" class="headerlink" title="Vue2"></a>Vue2</h2><p>可用的CDN</p>
+<div class="code-container" data-rel="Html"><figure class="iseeu highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">&quot;https://cdn.bootcdn.net/ajax/libs/vue/2.6.13/vue.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure></div>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> app = <span class="keyword">new</span> <span class="title class_">Vue</span>(&#123;</span><br><span class="line">	<span class="attr">el</span>:<span class="string">&quot;#app&quot;</span>,</span><br><span class="line">	<span class="attr">data</span>:&#123;</span><br><span class="line">	  <span class="attr">msg</span>:<span class="string">&quot;qwer&quot;</span></span><br><span class="line">	&#125;,</span><br><span class="line">	<span class="attr">computed</span>: &#123;</span><br><span class="line">	  <span class="attr">reverseName</span>: <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">	    <span class="keyword">return</span> <span class="variable language_">this</span>.<span class="property">msg</span>.<span class="title function_">split</span>(<span class="string">&quot;&quot;</span>).<span class="title function_">reverse</span>().<span class="title function_">join</span>(<span class="string">&quot;&quot;</span>);</span><br><span class="line">	  &#125;,</span><br><span class="line">	&#125;,</span><br><span class="line">	<span class="attr">watch</span>: &#123;</span><br><span class="line">	  <span class="attr">msg</span>: <span class="keyword">function</span> (<span class="params">newVal, oldVal</span>) &#123;</span><br><span class="line">	    <span class="title function_">alert</span>(<span class="string">&quot;新值&quot;</span> + newVal + <span class="string">&quot;----&quot;</span> + <span class="string">&quot;旧值&quot;</span> + oldVal);</span><br><span class="line">	  &#125;,</span><br><span class="line">	&#125;,</span><br><span class="line">	 <span class="title function_">created</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="title function_">alert</span>(</span><br><span class="line">          <span class="string">&quot;在实例创建完成后被立即调用,挂载阶段还没开始，$el 属性目前不可见&quot;</span></span><br><span class="line">        );</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="title function_">mounted</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="title function_">alert</span>(<span class="string">&quot;el 被新创建的 vm.$el 替换，并挂载到实例上去之后调用该钩子&quot;</span>);</span><br><span class="line">      &#125;,</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></div>
+<p>变异方法，直接改变数组内容，并自动更新，注意unshift</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">push</span>()</span><br><span class="line"><span class="title function_">pop</span>()</span><br><span class="line"><span class="title function_">shift</span>()</span><br><span class="line"><span class="title function_">unshift</span>()</span><br><span class="line"><span class="title function_">splice</span>()</span><br><span class="line"><span class="title function_">sort</span>()</span><br><span class="line"><span class="title function_">reverse</span>()</span><br></pre></td></tr></table></figure></div>
+<p>Vue2少用watch方法</p>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@dragstart=&quot;ds($event,good)&quot;</span><br></pre></td></tr></table></figure></div>
+<h2 id="CSS变量"><a href="#CSS变量" class="headerlink" title="CSS变量"></a>CSS变量</h2><div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//取色器的change事件，修改css变量</span></span><br><span class="line"><span class="variable language_">document</span>.<span class="title function_">getElementById</span>(<span class="string">&#x27;color1&#x27;</span>).<span class="title function_">addEventListener</span>(<span class="string">&#x27;change&#x27;</span>,<span class="function">(<span class="params">e</span>)=&gt;</span>&#123;</span><br><span class="line">    <span class="keyword">let</span> newValue = e.<span class="property">target</span>.<span class="property">value</span>;</span><br><span class="line">    <span class="variable language_">document</span>.<span class="title function_">querySelector</span>(<span class="string">&#x27;:root&#x27;</span>).<span class="property">style</span>.<span class="title function_">setProperty</span>(<span class="string">&quot;--color1&quot;</span>,newValue);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></div>
+
+<div class="code-container" data-rel="Css"><figure class="iseeu highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-pseudo">:root</span> &#123;</span><br><span class="line">  <span class="attr">--color1</span>: <span class="number">#00dbde</span>;</span><br><span class="line">  <span class="attr">--color2</span>: <span class="number">#fc00ff</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="正则表达式"><a href="#正则表达式" class="headerlink" title="正则表达式"></a>正则表达式</h2><div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> regexp_1 = <span class="regexp">/a/</span>;</span><br><span class="line">regexp_1.<span class="title function_">test</span>(str)</span><br></pre></td></tr></table></figure></div>
+<h2 id="Radio"><a href="#Radio" class="headerlink" title="Radio"></a>Radio</h2><p>radio必须有不同的label才能被单选中</p>
+<h2 id="Vue修改数组"><a href="#Vue修改数组" class="headerlink" title="Vue修改数组"></a>Vue修改数组</h2><div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">this</span>.$set(<span class="variable language_">this</span>.<span class="property">obj</span>.<span class="property">list</span>, <span class="number">1</span>, &#123; <span class="attr">name</span>: <span class="string">&#x27;小红&#x27;</span>,<span class="attr">age</span>: <span class="number">18</span>&#125;)</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="字符串查找-1"><a href="#字符串查找-1" class="headerlink" title="字符串查找"></a>字符串查找</h2><div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">s.indexOf(s);</span><br><span class="line">-1</span><br></pre></td></tr></table></figure></div>
+
+
+<h2 id="vuex"><a href="#vuex" class="headerlink" title="vuex"></a>vuex</h2><p>用了namespace时，<code>namespaced: true</code>,则store.state.user.username，注意user是子模块，或者store.getters[‘user&#x2F;username’]</p>
+<h2 id="JSON"><a href="#JSON" class="headerlink" title="JSON"></a>JSON</h2><p>JSON.stringfy()<br>JSON.parse()</p>
+<h2 id="Array的sort"><a href="#Array的sort" class="headerlink" title="Array的sort"></a>Array的sort</h2><p> 全部自定义，同时返回值要是正负而不是布尔，用a-b<br> <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/%E8%93%9D%E6%A1%A5%E5%9B%BD%E8%B5%9B%E5%A4%8D%E5%81%A5/b95854fcff244ee2be296a1325145339.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h2 id="Grid学习"><a href="#Grid学习" class="headerlink" title="Grid学习"></a>Grid学习</h2><p><a class="link"   target="_blank" rel="noopener" href="https://www.ruanyifeng.com/blog/2019/03/grid-layout-tutorial.html" >Grid教程<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h2 id="Flex学习"><a href="#Flex学习" class="headerlink" title="Flex学习"></a>Flex学习</h2><p><a class="link"   target="_blank" rel="noopener" href="https://www.ruanyifeng.com/blog/2015/07/flex-grammar.html" >Flex学习<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h2 id="eval"><a href="#eval" class="headerlink" title="eval"></a>eval</h2><p>字符串转表达式</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">sum</span> = (<span class="params">a,b</span>)=&gt;&#123; <span class="keyword">return</span> a+b; &#125;</span><br><span class="line"><span class="keyword">let</span> res;</span><br><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line">    res = <span class="built_in">eval</span>(<span class="string">&#x27;sum(10,20)&#x27;</span>);</span><br><span class="line">&#125;<span class="keyword">catch</span>(e)&#123;</span><br><span class="line">    res = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(res);</span><br></pre></td></tr></table></figure></div></div></div></div>
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>标题:</strong> 蓝桥国赛复健</li>
+        <li><strong>作者:</strong> urlyy</li>
+        <li><strong>创建于
+                :</strong> 2023-06-08 13:51:08</li>
+        
+            <li>
+                <strong>更新于
+                    :</strong> 2025-12-21 18:39:57
+            </li>
+        
+        <li>
+            <strong>链接:</strong> https://urlyy.github.io/2023/06/08/蓝桥国赛复健/
+        </li>
+        <li>
+            <strong>
+                版权声明:
+            </strong>
+            
+
+            
+                本文章采用 <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a> 进行许可。
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+		<ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/Node/">#Node</a>&nbsp;
+			</li>
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/HTML/">#HTML</a>&nbsp;
+			</li>
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/CSS/">#CSS</a>&nbsp;
+			</li>
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/JavaScript/">#JavaScript</a>&nbsp;
+			</li>
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/Vue/">#Vue</a>&nbsp;
+			</li>
+			
+		</ul>
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="prev" rel="prev" href="/2023/06/24/%E9%81%97%E4%BC%A0%E7%AE%97%E6%B3%95%E6%B1%82%E8%A7%A301%E8%83%8C%E5%8C%85%E9%97%AE%E9%A2%98%E8%AE%B0%E5%BD%95/">
+					<span class="left arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-left"></i>
+					</span>
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">遗传算法求解01背包问题记录</span>
+						<span class="post-nav-item">上一篇</span>
+					</span>
+				</a>
+			</div>
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2023/05/10/%E5%AE%9E%E7%94%A8%E7%BD%91%E7%AB%99%E8%AE%B0%E5%BD%95/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">网站收藏</span>
+						<span class="post-nav-item">下一篇</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        评论
+    </div>
+    
+
+        
+            
+    <div id="giscus-container"></div>
+    <script data-swup-reload-script defer>
+        async function loadGiscus() {
+            const giscusConfig = {
+                'src': 'https://giscus.app/client.js',
+                'data-repo': 'urlyy/urlyy_blog_comments',
+                'data-repo-id': 'R_kgDONo8nwQ',
+                'data-category': 'Announcements',
+                'data-category-id': 'DIC_kwDONo8nwc4Cl7pw',
+                'data-mapping': 'title',
+                'data-strict': '0',
+                'data-reactions-enabled': '1',
+                'data-emit-metadata': '1',
+                'data-theme': 'preferred_color_scheme',
+                'data-lang': 'zh-CN',
+                'data-input-position': 'top',
+                'data-loading': 'lazy',
+                'crossorigin': 'anonymous',
+                'async': true
+            }
+            const giscusScript = document.createElement('script');
+            for (const key in giscusConfig) {
+                giscusScript.setAttribute(key, giscusConfig[key]);
+            }
+            document.getElementById('giscus-container').appendChild(giscusScript);
+        }
+        if ('true') {
+            let loadGiscusTimeout = setTimeout(() => {
+                loadGiscus();
+                clearTimeout(loadGiscusTimeout);
+            }, 1000);
+        } else {
+            document.addEventListener('DOMContentLoaded', loadGiscus);
+        }
+    </script>
+
+
+        
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">目录</div>
+		<div class="page-title">蓝桥国赛复健</div>
+		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Node-js"><span class="nav-text">Node.js</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%AD%A3%E5%88%99%E5%8C%B9%E9%85%8D"><span class="nav-text">正则匹配</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#echarts"><span class="nav-text">echarts</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Promise"><span class="nav-text">Promise</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-text">正则表达式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E7%9A%84%E5%85%83%E5%AD%97%E7%AC%A6%EF%BC%88%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%EF%BC%89"><span class="nav-text">常用的元字符（特殊字符）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E7%9A%84%E9%99%90%E5%AE%9A%E7%AC%A6"><span class="nav-text">常用的限定符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E7%9A%84%E4%BF%AE%E9%A5%B0%E7%AC%A6"><span class="nav-text">常用的修饰符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96"><span class="nav-text">其他</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CSS"><span class="nav-text">CSS</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Jquery"><span class="nav-text">Jquery</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#JS"><span class="nav-text">JS</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8A%80%E5%B7%A7"><span class="nav-text">技巧</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#box-sizing"><span class="nav-text">box-sizing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B0%B4%E5%B9%B3%E5%B1%85%E4%B8%AD"><span class="nav-text">水平居中</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%BC%E8%88%AA%E6%A0%8F%E4%B8%80%E8%BE%B9%E5%B1%85%E5%B7%A6%E4%B8%80%E8%BE%B9%E5%B1%85%E5%8F%B3"><span class="nav-text">导航栏一边居左一边居右</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9E%82%E7%9B%B4%E5%B1%85%E4%B8%AD"><span class="nav-text">垂直居中</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B0%B4%E5%B9%B3%E5%9E%82%E7%9B%B4%E5%B1%85%E4%B8%AD"><span class="nav-text">水平垂直居中</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="nav-text">获取数据类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A4%E6%96%AD%E5%AF%B9%E8%B1%A1%E6%98%AF%E5%90%A6%E4%B8%BA%E7%A9%BA"><span class="nav-text">判断对象是否为空</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%8D%E7%BD%AE%E4%BC%AA%E7%B1%BB%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-text">位置伪类的使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Jquery"><span class="nav-text">Jquery</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JS%E8%8E%B7%E5%8F%96%E8%A1%A8%E5%8D%95%E5%85%83%E7%B4%A0"><span class="nav-text">JS获取表单元素</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JS%E8%AE%BE%E7%BD%AE%E5%B1%9E%E6%80%A7"><span class="nav-text">JS设置属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JS%E7%9A%84map-%E5%92%8Cfilter"><span class="nav-text">JS的map()和filter()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%9F%A5%E6%89%BE"><span class="nav-text">字符串查找</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A1%A5%E5%85%A8%E6%90%9C%E7%B4%A2"><span class="nav-text">补全搜索</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%82%AC%E5%81%9C%E7%88%B6%E5%85%83%E7%B4%A0%EF%BC%8C%E6%94%B9%E5%8F%98%E5%AD%90%E5%85%83%E7%B4%A0"><span class="nav-text">悬停父元素，改变子元素</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Axios"><span class="nav-text">Axios</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Node%E6%9C%8D%E5%8A%A1%E7%AB%AF"><span class="nav-text">Node服务端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Vue2"><span class="nav-text">Vue2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CSS%E5%8F%98%E9%87%8F"><span class="nav-text">CSS变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-text">正则表达式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Radio"><span class="nav-text">Radio</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Vue%E4%BF%AE%E6%94%B9%E6%95%B0%E7%BB%84"><span class="nav-text">Vue修改数组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%9F%A5%E6%89%BE-1"><span class="nav-text">字符串查找</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vuex"><span class="nav-text">vuex</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JSON"><span class="nav-text">JSON</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Array%E7%9A%84sort"><span class="nav-text">Array的sort</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Grid%E5%AD%A6%E4%B9%A0"><span class="nav-text">Grid学习</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Flex%E5%AD%A6%E4%B9%A0"><span class="nav-text">Flex学习</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#eval"><span class="nav-text">eval</span></a></li></ol></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2021</span>
+              -
+            
+            2025&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">urlyy</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        共撰写了 78 篇文章
+                    </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">访问人数</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">总访问量</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">由 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a> 驱动</span>
+            <span class="text-sm lg:block">主题&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.5</a></span>
+        </div>
+        
+        
+            <div>
+                博客已运行 <span class="odometer" id="runtime_days" ></span> 天 <span class="odometer" id="runtime_hours"></span> 小时 <span class="odometer" id="runtime_minutes"></span> 分钟 <span class="odometer" id="runtime_seconds"></span> 秒
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="fa-regular fa-arrow-up"></i>
+		</li>
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+	<div class="search-pop-overlay">
+	<div class="popup search-popup">
+		<div class="search-header">
+			<span class="search-input-field-pre">
+				<i class="fa-solid fa-keyboard"></i>
+			</span>
+			<div class="search-input-container">
+				<input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="站内搜索您需要的内容..." spellcheck="false" type="search" class="search-input">
+			</div>
+			<span class="popup-btn-close">
+				<i class="fa-solid fa-times"></i>
+			</span>
+		</div>
+		<div id="search-result">
+			<div id="no-result">
+				<i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>
+			</div>
+		</div>
+	</div>
+</div>
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+	
+<script src="/js/build/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/build/utils.js" type="module"></script>
+
+<script src="/js/build/main.js" type="module"></script>
+
+<script src="/js/build/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/build/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/build/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/build/layouts/categoryList.js" type="module"></script>
+
+
+
+    
+<script src="/js/build/tools/localSearch.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/layouts/lazyload.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/runtime.js"></script>
+
+    
+<script src="/js/build/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+  
+<script src="/js/build/plugins/typed.js" type="module"></script>
+
+
+
+
+    
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@9.3.0/dist/mermaid.min.js"></script>
+    
+    
+<script src="/js/build/plugins/mermaid.js"></script>
+
+
+
+
+
+
+    
+<script src="/js/build/libs/anime.min.js"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/tocToggle.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/layouts/toc.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/plugins/tabs.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+<script src="/js/build/layouts/essays.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+
+	
+</body>
+
+</html>

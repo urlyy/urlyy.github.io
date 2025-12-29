@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="urlyy">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set data attribute for CSS variables
+                root.setAttribute("data-theme", theme);
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes once DOM is ready
+            if (document.readyState !== "loading") {
+                document.body.classList.add(theme + "-mode");
+            } else {
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add(theme + "-mode");
+                    document.body.classList.remove((theme === DARK ? LIGHT : DARK) + "-mode");
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Critical CSS to prevent flash -->
+    <style>
+        :root[data-theme="dark"] {
+            --background-color: #202124;
+            --background-color-transparent: rgba(32, 33, 36, 0.6);
+            --second-background-color: #2d2e32;
+            --third-background-color: #34353a;
+            --third-background-color-transparent: rgba(32, 33, 36, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #ffffff;
+            --second-text-color: #eeeeee;
+            --third-text-color: #bebec6;
+            --fourth-text-color: #999999;
+            --default-text-color: #bebec6;
+            --invert-text-color: #373D3F;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(255, 255, 255, 0.08);
+            --shadow-color-2: rgba(255, 255, 255, 0.05);
+        }
+        
+        :root[data-theme="light"] {
+            --background-color: #fff;
+            --background-color-transparent: rgba(255, 255, 255, 0.6);
+            --second-background-color: #f8f8f8;
+            --third-background-color: #f2f2f2;
+            --third-background-color-transparent: rgba(241, 241, 241, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #16171a;
+            --second-text-color: #2f3037;
+            --third-text-color: #5e5e5e;
+            --fourth-text-color: #eeeeee;
+            --default-text-color: #373D3F;
+            --invert-text-color: #bebec6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(0, 0, 0, 0.08);
+            --shadow-color-2: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+        
+        /* Apply body classes as soon as DOM is ready */
+        :root[data-theme="dark"] body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+    </style>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://urlyy.github.io/2022/08/14/scrapy个人循序渐进/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta name="description" content="《Python3网络爬虫开发实战》学习笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="scrapy个人循序渐进">
+<meta property="og:url" content="http://urlyy.github.io/2022/08/14/scrapy%E4%B8%AA%E4%BA%BA%E5%BE%AA%E5%BA%8F%E6%B8%90%E8%BF%9B/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="《Python3网络爬虫开发实战》学习笔记">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://urlyy.github.io/article_images/scrapy%E4%B8%AA%E4%BA%BA%E5%BE%AA%E5%BA%8F%E6%B8%90%E8%BF%9B/fd3e60797a9646c4911da1473c36e030.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e96609ba035c4ca09ec9e73507ec8af0.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/60688fe0bf144fe5816c4391e356fb42.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/898b92a8544f43069f348666d9587094.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/scrapy%E4%B8%AA%E4%BA%BA%E5%BE%AA%E5%BA%8F%E6%B8%90%E8%BF%9B/f417ee12cc9143409ade24f8b7547839.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9c8b9495010947fa965c4b2ed351855a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/05c71fb1ad0b4e9d837245c1e899c884.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7c860d1fbe0c4296806b0de18f02374d.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/155749c38c9548b3bda22b19634b9e90.png">
+<meta property="article:published_time" content="2022-08-14T04:55:02.000Z">
+<meta property="article:modified_time" content="2025-12-21T10:39:57.276Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://urlyy.github.io/article_images/scrapy%E4%B8%AA%E4%BA%BA%E5%BE%AA%E5%BA%8F%E6%B8%90%E8%BF%9B/fd3e60797a9646c4911da1473c36e030.png">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/avatar.jpg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.jpg">
+    <meta name="theme-color" content="#5c701a">
+    <link rel="shortcut icon" href="/images/avatar.jpg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            scrapy个人循序渐进 | urlyy的小窝
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+        <link href="" rel="stylesheet">
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"urlyy.github.io","root":"/","language":"zh-CN","path":"search.json"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":false,"auto":false,"list":[""]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":true},"copyright":true,"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#5c701a","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":true,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":false},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"side_tools":{"gear_rotation":true,"auto_expand":false},"open_graph":true,"google_analytics":{"enable":false,"id":null},"busuanzi_counter":{"enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"pjax":true},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/bg/1.jpg","dark":"/images/bg/1.jpg"},"title":"urlyy的小窝","subtitle":{"text":["Loading..."],"hitokoto":{"enable":true,"show_author":false,"api":"https://v1.hitokoto.cn?c=a&c=b&c=d&c=k"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"style":"default","links":{"github":"https://github.com/urlyy?tab=repositories","instagram":null,"zhihu":null,"twitter":null,"email":"2213732736@qq.com"},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":true,"version":"9.3.0"}},"version":"2.8.5","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Categories":{"icon":"fa-regular fa-folder","path":"/categories/"},"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Github":{"path":"https://github.com/urlyy","icon":"fa-brands fa-github"},"个人介绍":{"path":"/personal/profile.html","icon":"fa-regular fa-user"}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"cloud"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":null},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2021/9/7 16:55:00"};
+    window.lang_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 个月前","year":"%s 年前"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                urlyy的小窝
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    首页
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/categories/"
+                                        >
+                                    <i class="fa-regular fa-folder fa-fw"></i>
+                                    分类
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/archives"
+                                        >
+                                    <i class="fa-regular fa-archive fa-fw"></i>
+                                    归档
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   target="_blank" rel="noopener" href="https://github.com/urlyy"
+                                        >
+                                    <i class="fa-brands fa-github fa-fw"></i>
+                                    GITHUB
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/personal/profile.html"
+                                        >
+                                    <i class="fa-regular fa-user fa-fw"></i>
+                                    个人介绍
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                首页
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/categories/"
+                        >
+                            <span>
+                                分类
+                            </span>
+                            
+                                <i class="fa-regular fa-folder fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/archives"
+                        >
+                            <span>
+                                归档
+                            </span>
+                            
+                                <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           target="_blank" rel="noopener" href="https://github.com/urlyy"
+                        >
+                            <span>
+                                GITHUB
+                            </span>
+                            
+                                <i class="fa-brands fa-github fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/personal/profile.html"
+                        >
+                            <span>
+                                个人介绍
+                            </span>
+                            
+                                <i class="fa-regular fa-user fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">25</div>
+        <div class="label text-third-text-color text-sm">标签</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">29</div>
+        <div class="label text-third-text-color text-sm">分类</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">78</div>
+        <div class="label text-third-text-color text-sm">文章</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">scrapy个人循序渐进</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/avatar.jpg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">urlyy</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2022-08-14 12:55:02</span>
+        <span class="mobile">2022-08-14 12:55:02</span>
+        <span class="hover-info">创建</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2025-12-21 18:39:57</span>
+            <span class="mobile">2025-12-21 18:39:57</span>
+            <span class="hover-info">更新</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/%E7%88%AC%E8%99%AB/">爬虫</a>&nbsp;
+                        </li>
+                    
+                    
+                
+                    
+                        
+                            <li>></li>
+                        
+                        <li>
+                            <a href="/categories/%E7%88%AC%E8%99%AB/%E7%AC%94%E8%AE%B0/">笔记</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<ul>
+<li><a href="#%E5%AD%A6%E4%B9%A0%E5%8A%A8%E6%9C%BA">学习动机</a></li>
+<li><a href="#%E5%88%9B%E5%BB%BA%E9%A1%B9%E7%9B%AE">创建项目</a></li>
+<li><a href="#%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%B0%8Fdemo">第一个小demo</a></li>
+<li><a href="#%E5%9C%A8linux%E7%8E%AF%E5%A2%83%E8%99%9A%E6%8B%9F%E6%9C%BA%E4%B8%8B%E4%BD%BF%E7%94%A8docker%E9%85%8D%E7%BD%AEnosql%E5%92%8Cmq">在Linux环境(虚拟机)下使用Docker配置NoSQL和MQ</a></li>
+<li><a href="#%E8%8E%B7%E5%8F%96%E8%AF%B7%E6%B1%82%E4%B8%AD%E7%9A%84%E6%95%B0%E6%8D%AE">获取请求中的数据</a></li>
+<li><a href="#%E4%B8%8D%E9%81%B5%E5%AE%88robots%E5%8D%8F%E8%AE%AE">不遵守robots协议</a></li>
+<li><a href="#scrapy%E6%95%B4%E5%90%88playwright">scrapy整合Playwright</a><ul>
+<li><a href="#%E5%85%88%E5%86%99%E4%B8%AAdemo">先写个demo</a></li>
+<li><a href="#%E6%8E%A5%E5%85%A5scrapy">接入Scrapy</a></li>
+</ul>
+</li>
+<li><a href="#%E4%BB%A3%E7%90%86%E6%B1%A0">代理池</a></li>
+<li><a href="#%E8%A7%84%E5%88%99%E5%8C%96%E7%88%AC%E8%99%AB">规则化爬虫</a><ul>
+<li><a href="#%E7%9C%9F%E6%AD%A3%E8%A7%84%E5%88%99%E5%8C%96">真正规则化</a></li>
+</ul>
+</li>
+<li><a href="#%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8">数据存储</a></li>
+<li><a href="#%E5%88%86%E5%B8%83%E5%BC%8F%E7%88%AC%E8%99%AB">分布式爬虫</a><ul>
+<li><a href="#scrapy-redis%E8%A7%A3%E6%9E%90">Scrapy-Redis解析</a></li>
+<li><a href="#scpray-redis%E7%9A%84demo">Scpray-Redis的demo</a><ul>
+<li><a href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E5%8E%BB%E9%87%8D%E9%80%BB%E8%BE%91%E4%B8%BA%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8">自定义去重逻辑为布隆过滤器</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#%E7%88%AC%E8%99%AB%E7%AE%A1%E7%90%86%E5%92%8C%E9%83%A8%E7%BD%B2">爬虫管理和部署</a><ul>
+<li><a href="#%E5%9F%BA%E4%BA%8Escrapyd%E5%88%AB%E7%9C%8B%E4%B9%B1%E5%86%99%E7%9A%84%E7%9B%B4%E6%8E%A5%E5%AD%A6docker%E7%9A%84">基于Scrapyd(别看，乱写的，直接学Docker的)</a><ul>
+<li><a href="#scrapyd--client">Scrapyd -Client</a></li>
+<li><a href="#%E5%8F%AF%E8%A7%86%E5%8C%96%E7%AE%A1%E7%90%86gerapy">可视化管理Gerapy</a></li>
+</ul>
+</li>
+<li><a href="#%E5%9F%BA%E4%BA%8Edocker">基于Docker</a><ul>
+<li><a href="#%E4%BD%BF%E7%94%A8docker">使用Docker</a></li>
+<li><a href="#%E4%BD%BF%E7%94%A8docker-compose%E6%9B%B4%E6%96%B9%E4%BE%BF">使用Docker Compose(更方便)</a></li>
+<li><a href="#k8s%E7%9A%84%E4%BD%BF%E7%94%A8">K8S的使用</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="学习动机"><a href="#学习动机" class="headerlink" title="学习动机"></a>学习动机</h1><p>我想写一个爬热点新闻的爬虫项目，最好能满足</p>
+<ol>
+<li>规则化爬虫爬多个网站</li>
+<li>结合docker和docker-copmpose和k8s进行分布式部署</li>
+<li>具有代理池</li>
+<li>充分使用Scrapy框架</li>
+<li>可以结合一些NoSQL进行存储</li>
+<li>作为一个服务方便调用(Flask)</li>
+</ol>
+<h1 id="创建项目"><a href="#创建项目" class="headerlink" title="创建项目"></a><span id="create-project">创建项目</span></h1><p>我是用conda创建的虚拟环境，这个自己去配去<br>创建环境<code>conda create -n envName python=3.10</code><br>进入环境<code>conda activate envName</code><br>安装scrapy<code>pip install scrapy</code><br>创建项目<code>scrapy startproject newsCrawler</code>newsCrawler是我的项目名<br>跟着他的提示<br><code>cd newsCrawler</code><br><code>scrapy genspider example example.com</code>这个example是一个你的Spider类，他会作为example.py在spiders文件夹里，这个类设置的爬取的网站是example.com，这个可以自己再改的，所以无脑用就行</p>
+<h1 id="第一个小demo"><a href="#第一个小demo" class="headerlink" title="第一个小demo"></a><span id="first-demo">第一个小demo</span></h1><p>爬取的是<a class="link"   target="_blank" rel="noopener" href="https://top.baidu.com/board?tab=realtime" >百度热搜<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<ol>
+<li>定义新闻数据实体，在items.py中 <div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scrapy</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">NewsItem</span>(scrapy.Item):</span><br><span class="line">    title = scrapy.Field()</span><br><span class="line">    url = scrapy.Field()</span><br><span class="line">    time = scrapy.Field()</span><br></pre></td></tr></table></figure></div></li>
+<li>修改spiders文件夹内的<code>exampleSpider.py</code>为<code>baiduSpider.py</code>，修改允许爬取的域名和起始URL <div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 部分代码</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">BaiduSpider</span>(scrapy.Spider):</span><br><span class="line">    name = <span class="string">&#x27;baidu&#x27;</span></span><br><span class="line">    allowed_domains = [<span class="string">&#x27;top.baidu.com&#x27;</span>]</span><br><span class="line">    start_urls = [<span class="string">&#x27;https://top.baidu.com/board?tab=realtime&#x27;</span>]</span><br></pre></td></tr></table></figure></div></li>
+<li>分析网站结构，编写解析网站元素得到目标数据的爬虫代码 <div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 这个代码和上面的是一块的，这个parse就是BaiduSpider的类方法</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">parse</span>(<span class="params">self, response</span>):</span><br><span class="line">        news_list = response.xpath(<span class="string">&#x27;//*[@id=&quot;sanRoot&quot;]/main/div[2]/div/div[2]/div[position()&gt;=1]&#x27;</span>)</span><br><span class="line">        <span class="keyword">for</span> news <span class="keyword">in</span> news_list:</span><br><span class="line">            item = NewsItem()</span><br><span class="line">            item[<span class="string">&#x27;url&#x27;</span>] = news.xpath(<span class="string">&#x27;./div[2]/a/@href&#x27;</span>).get()</span><br><span class="line">            item[<span class="string">&#x27;title&#x27;</span>] = news.xpath(<span class="string">&#x27;./div[2]/a/div[1]/text()&#x27;</span>).get()</span><br><span class="line">            <span class="keyword">yield</span> item</span><br></pre></td></tr></table></figure></div></li>
+<li>在<code>settings.py</code>中配置以<code>UTF-8</code>导出，不然中文会以<code>unicode</code>字符显示。(似乎也可以在Spider中写编码或者用Pipeline中编码并导出，但我就是用的命令导出的，所以没考虑那两个)<br> 这个配置随便找一行放上去即可，居左 <div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 导出数据时以UTF-8编码导出</span></span><br><span class="line">FEED_EXPORT_ENCODING=<span class="string">&#x27;UTF-8&#x27;</span></span><br></pre></td></tr></table></figure></div></li>
+<li>编写启动类<br> 其实我们这里是用python执行命令行代码，这样会方便很多<br> 创建一个<code>main.py</code> <div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> scrapy.cmdline <span class="keyword">import</span> execute</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">	<span class="comment"># 同在cmd中输入 scrapy crawl baidu -o baidu_news.json</span></span><br><span class="line">	<span class="comment"># 注意第一个baidu是被执行的spider的name</span></span><br><span class="line">	<span class="comment"># 如果不想打印日志，可以再加个&#x27;--nolog&#x27;</span></span><br><span class="line">    execute([<span class="string">&#x27;scrapy&#x27;</span>, <span class="string">&#x27;crawl&#x27;</span>, <span class="string">&#x27;baidu&#x27;</span>,<span class="string">&#x27;-o&#x27;</span>,<span class="string">&#x27;baidu_news.json&#x27;</span>])</span><br></pre></td></tr></table></figure></div></li>
+</ol>
+<h1 id="在Linux环境-虚拟机-下使用Docker配置NoSQL和MQ"><a href="#在Linux环境-虚拟机-下使用Docker配置NoSQL和MQ" class="headerlink" title="在Linux环境(虚拟机)下使用Docker配置NoSQL和MQ"></a><span id="nosql">在Linux环境(虚拟机)下使用Docker配置NoSQL和MQ</span></h1><p><a class="link"   target="_blank" rel="noopener" href="https://blog.csdn.net/qq_51955445/article/details/126288223?csdn_share_tail=%7B%22type%22:%22blog%22,%22rType%22:%22article%22,%22rId%22:%22126288223%22,%22source%22:%22qq_51955445%22%7D" >Linux下Docker安装几种NoSQL和MQ<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h1 id="获取请求中的数据"><a href="#获取请求中的数据" class="headerlink" title="获取请求中的数据"></a><span id="get-ajax-data">获取请求中的数据</span></h1><p><code>https://news.qq.com/</code><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/scrapy%E4%B8%AA%E4%BA%BA%E5%BE%AA%E5%BA%8F%E6%B8%90%E8%BF%9B/fd3e60797a9646c4911da1473c36e030.png"
+                      alt="在这里插入图片描述"
+                ><br>在控制台中发现数据是从接口中获得的<br>请求网址:<code>https://i.news.qq.com/trpc.qqnews_web.kv_srv.kv_srv_http_proxy/list?sub_srv_id=24hours&amp;srv_id=pc&amp;offset=0&amp;limit=20&amp;strategy=1&amp;ext=&#123;%22pool%22:[%22top%22],%22is_filter%22:7,%22check_type%22:true&#125;</code><br>请求方法:<code>GET</code><br>携带数据:<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img-blog.csdnimg.cn/e96609ba035c4ca09ec9e73507ec8af0.png"
+                      alt="在这里插入图片描述"
+                ><br>貌似没有加密参数，即没有采取反爬，于是不准备模拟浏览器，而是直接爬取请求</p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">from</span> urllib.parse <span class="keyword">import</span> urlencode</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> scrapy</span><br><span class="line"><span class="keyword">from</span> scrapy <span class="keyword">import</span> Request</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> newsCrawler.items <span class="keyword">import</span> NewsItem</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">TencentSpider</span>(scrapy.Spider):</span><br><span class="line">    name = <span class="string">&#x27;tencent&#x27;</span></span><br><span class="line">    allowed_domains = [<span class="string">&#x27;news.qq.com/&#x27;</span>]</span><br><span class="line">    base_url = <span class="string">&#x27;https://i.news.qq.com/trpc.qqnews_web.kv_srv.kv_srv_http_proxy/list&#x27;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">start_requests</span>(<span class="params">self</span>):</span><br><span class="line">        query = &#123;</span><br><span class="line">            <span class="string">&#x27;sub_srv_id&#x27;</span>: <span class="string">&#x27;24hours&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;srv_id&#x27;</span>: <span class="string">&#x27;pc&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;offset&#x27;</span>: <span class="number">0</span>,</span><br><span class="line">            <span class="string">&#x27;limit&#x27;</span>: <span class="number">20</span>,</span><br><span class="line">            <span class="string">&#x27;strategy&#x27;</span>: <span class="number">1</span>,</span><br><span class="line">            <span class="string">&#x27;ext&#x27;</span>: json.dumps(&#123;</span><br><span class="line">                <span class="string">&#x27;pool&#x27;</span>: [<span class="string">&#x27;top&#x27;</span>],</span><br><span class="line">                <span class="string">&#x27;is_filter&#x27;</span>: <span class="number">7</span>,</span><br><span class="line">                <span class="string">&#x27;check_type&#x27;</span>: <span class="literal">True</span></span><br><span class="line">            &#125;)</span><br><span class="line">        &#125;</span><br><span class="line">        str_query = urlencode(query)</span><br><span class="line">        url = <span class="variable language_">self</span>.base_url + <span class="string">&quot;?&quot;</span> + str_query</span><br><span class="line">        <span class="keyword">yield</span> Request(url=url,method=<span class="string">&#x27;GET&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">parse</span>(<span class="params">self, response</span>):</span><br><span class="line">        json_data = json.loads(response.text)</span><br><span class="line">        news_list = json_data.get(<span class="string">&#x27;data&#x27;</span>).get(<span class="string">&#x27;list&#x27;</span>)</span><br><span class="line">        <span class="keyword">for</span> news <span class="keyword">in</span> news_list:</span><br><span class="line">            item = NewsItem()</span><br><span class="line">            item[<span class="string">&#x27;title&#x27;</span>] = news.get(<span class="string">&#x27;title&#x27;</span>)</span><br><span class="line">            item[<span class="string">&#x27;url&#x27;</span>] = news.get(<span class="string">&#x27;url&#x27;</span>)</span><br><span class="line">            <span class="keyword">yield</span> item</span><br></pre></td></tr></table></figure></div>
+<h1 id="不遵守robots协议"><a href="#不遵守robots协议" class="headerlink" title="不遵守robots协议"></a><span id="not-obey-robots">不遵守robots协议</span></h1><p>突然看到一个汇总了各个新闻网链接的网站<br><code>http://www.hao123.com/newswangzhi</code><br>结果爬不动，发现robots协议是这样的：</p>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">User-agent: Baiduspider</span><br><span class="line">Allow: /</span><br><span class="line"></span><br><span class="line">User-agent: Baiduspider-image</span><br><span class="line">Allow: /</span><br><span class="line"></span><br><span class="line">User-agent: Baiduspider-news</span><br><span class="line">Allow: /</span><br><span class="line"></span><br><span class="line">User-agent: Googlebot</span><br><span class="line">Allow: /</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">User-agent: *</span><br><span class="line">Disallow: /</span><br></pre></td></tr></table></figure></div>
+<p>意思就是除了上面这些，其他的都不能爬，所以要禁用robots协议<br>在settings.py中将该参数由True修改为False</p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Obey robots.txt rules</span></span><br><span class="line">ROBOTSTXT_OBEY = <span class="literal">False</span></span><br></pre></td></tr></table></figure></div>
+<p>这个的代码就不放了，没啥含金量</p>
+<blockquote>
+<p>robots协议是让搜索引擎判断这个页面是否允许被抓取的，所以我们自己的爬虫练习还是可以把他关掉的</p>
+</blockquote>
+<h1 id="scrapy整合Playwright"><a href="#scrapy整合Playwright" class="headerlink" title="scrapy整合Playwright"></a><span id="scrapy-playwright">scrapy整合Playwright</span></h1><p><code>https://news.sina.com.cn/roll/#pageid=153&amp;lid=2509&amp;k=&amp;num=50&amp;page=1</code><br>这个新浪的滚动网站<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img-blog.csdnimg.cn/60688fe0bf144fe5816c4391e356fb42.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img-blog.csdnimg.cn/898b92a8544f43069f348666d9587094.png"
+                      alt="在这里插入图片描述"
+                ><br>通过观察发现也是一个用接口获得数据的，其实这个从他每一分钟就异步刷新一次就知道<br>但是下面这三个参数发现是随时间变化的，因为还没到能逆向的程度，所以直接选用模拟浏览器的操作进行爬取，选用的是Playwright<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/./../article_images/scrapy%E4%B8%AA%E4%BA%BA%E5%BE%AA%E5%BA%8F%E6%B8%90%E8%BF%9B/f417ee12cc9143409ade24f8b7547839.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h2 id="先写个demo"><a href="#先写个demo" class="headerlink" title="先写个demo"></a>先写个demo</h2><p>安装Playwright<br>注意第二行是为我们安装浏览器及驱动及配置</p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pip3 install playwright</span><br><span class="line">playwright install</span><br></pre></td></tr></table></figure></div>
+<p>不得不说这个网站也太离谱了，返回结果居然不是一个json，花了半天弄出格式化的json字符串切片<br>下面只是一段测试代码，未接入scrapy</p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> playwright.sync_api <span class="keyword">import</span> sync_playwright</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">on_response</span>(<span class="params">response</span>):</span><br><span class="line">	<span class="comment"># 找到这个接口</span></span><br><span class="line">    <span class="keyword">if</span> <span class="string">&#x27;/api/roll/get&#x27;</span> <span class="keyword">in</span> response.url <span class="keyword">and</span> response.status == <span class="number">200</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&#x27;Statue <span class="subst">&#123;response.status&#125;</span>:<span class="subst">&#123;response.url&#125;</span>&#x27;</span>)</span><br><span class="line">        <span class="comment"># 强行截取格式化的json</span></span><br><span class="line">        json_str = response.text()[<span class="number">46</span>:-<span class="number">14</span>]</span><br><span class="line">        <span class="comment"># 字符串转json，注意字符串是loads，文件时load</span></span><br><span class="line">        json_data = json.loads(json_str)</span><br><span class="line">        news_list = json_data.get(<span class="string">&#x27;result&#x27;</span>).get(<span class="string">&#x27;data&#x27;</span>)</span><br><span class="line">        <span class="keyword">for</span> news <span class="keyword">in</span> news_list:</span><br><span class="line">            url = news.get(<span class="string">&#x27;url&#x27;</span>)</span><br><span class="line">            title = news.get(<span class="string">&#x27;title&#x27;</span>)</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">f&#x27;<span class="subst">&#123;url&#125;</span>  <span class="subst">&#123;title&#125;</span>&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> sync_playwright() <span class="keyword">as</span> p:</span><br><span class="line">    <span class="keyword">for</span> browser_type <span class="keyword">in</span> [p.chromium]:</span><br><span class="line">    	<span class="comment"># 以无头模式打开谷歌浏览器</span></span><br><span class="line">        browser = browser_type.launch(headless=<span class="literal">True</span>)</span><br><span class="line">        page = browser.new_page()</span><br><span class="line">        <span class="comment"># 绑定监听response事件</span></span><br><span class="line">        page.on(<span class="string">&#x27;response&#x27;</span>,on_response)</span><br><span class="line">        page.goto(<span class="string">&#x27;https://news.sina.com.cn/roll/#pageid=153&amp;lid=2509&amp;k=&amp;num=50&amp;page=1&#x27;</span>)</span><br><span class="line">        <span class="comment"># 等待网络请求结束、空闲下来</span></span><br><span class="line">        page.wait_for_load_state(state=<span class="string">&#x27;networkidle&#x27;</span>)</span><br><span class="line">        browser.close()</span><br></pre></td></tr></table></figure></div>
+<h2 id="接入Scrapy"><a href="#接入Scrapy" class="headerlink" title="接入Scrapy"></a>接入Scrapy</h2><p>我们直接导入崔庆才大大的Gerapy Playwright的包，这个包整合了Scrapy和Playwright<br><a class="link"   target="_blank" rel="noopener" href="https://blog.csdn.net/cqcre/article/details/122206661?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522166024036416781432971397%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=166024036416781432971397&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-1-122206661-null-null.142%5Ev40%5Epc_rank_v36,185%5Ev2%5Econtrol&utm_term=scrapy%20playwright&spm=1018.2226.3001.4187" >三行代码，轻松实现 Scrapy 对接新兴爬虫神器 Playwright！<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a><br><a class="link"   target="_blank" rel="noopener" href="https://github.com/Gerapy/GerapyPlaywright" >GIthub项目地址<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a><br>但是会有多个问题</p>
+<ol>
+<li><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img-blog.csdnimg.cn/9c8b9495010947fa965c4b2ed351855a.png"
+                      alt="在这里插入图片描述"
+                ><br><code>This package does not work on Windows</code>，所以不能在windows上运行，会报<code>NotImplementedError</code>,我索性在虚拟机上安装了anaconda并运行项目，步骤如下：</p>
+<ol>
+<li>安装<br><a class="link"   target="_blank" rel="noopener" href="https://www.anaconda.com/products/distribution#Downloads" >官网链接<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a><br>参考博客：<a class="link"   target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_46504244/article/details/121110050?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522166024457716781432945968%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=166024457716781432945968&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~top_positive~default-1-121110050-null-null.142%5Ev40%5Epc_rank_v36,185%5Ev2%5Econtrol&utm_term=centos%E5%AE%89%E8%A3%85anaconda&spm=1018.2226.3001.4187" >centos7 安装Anaconda3 亲测成功<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a><br>注意安装过程中这个路径是anaconda的文件夹路径，这里是我自己手动输入的<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img-blog.csdnimg.cn/05c71fb1ad0b4e9d837245c1e899c884.png"
+                      alt="在这里插入图片描述"
+                ></li>
+<li>导出项目依赖<br><code>pip install pipreqs </code><br><code>pipreqs ./ --encoding utf-8</code></li>
+<li>把项目发到虚拟机上，使用conda创建虚拟环境<a class="link"   target="_blank" rel="noopener" href="https://blog.csdn.net/u010414589/article/details/107441469" >Conda 创建和删除虚拟环境<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> ，进入虚拟环境<code>pip install -r requirements.txt</code>安装依赖，然后在虚拟环境下用命令行运行该Spider，然后进入第二个坑</li>
+</ol>
+</li>
+<li><p><a class="link"   target="_blank" rel="noopener" href="https://blog.csdn.net/Awesome_py/article/details/124406696" >scrapy报错twisted.internet.error.ReactorAlreadyInstalledError: reactor already installed<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>，报错见标题，方法见博客</p>
+</li>
+<li><p><a class="link"   target="_blank" rel="noopener" href="https://github.com/Gerapy/GerapyPlaywright/issues/14" >出现gzip.BadGzipFile: Not a gzipped file (b’&lt;!’) 的解决办法。<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>这个似乎是崔大大没弄好，跟响应头里有gzip有关，观察发现确实这个响应是这样的<br> <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img-blog.csdnimg.cn/7c860d1fbe0c4296806b0de18f02374d.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<p> 仓库Issues里有人给了解决方案：去掉一个中间件，即<br> <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://img-blog.csdnimg.cn/155749c38c9548b3bda22b19634b9e90.png"
+                      alt="在这里插入图片描述"
+                ><br> 然后项目就能起来了</p>
+ <div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scrapy</span><br><span class="line"><span class="keyword">from</span> gerapy_playwright <span class="keyword">import</span> PlaywrightRequest</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> newsCrawler.items <span class="keyword">import</span> NewsItem</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">SinaSpider</span>(scrapy.Spider):</span><br><span class="line">    name = <span class="string">&#x27;sina&#x27;</span></span><br><span class="line">    allowed_domains = [<span class="string">&#x27;news.sina.com.cn&#x27;</span>]</span><br><span class="line">    base_url = <span class="string">&#x27;https://news.sina.com.cn/roll/#pageid=153&amp;lid=2509&amp;k=&amp;num=50&amp;page=1&#x27;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">start_requests</span>(<span class="params">self</span>):</span><br><span class="line">    	<span class="comment"># 大佬的包，解决了爬取页面的问题</span></span><br><span class="line">        <span class="keyword">yield</span> PlaywrightRequest(</span><br><span class="line">            <span class="variable language_">self</span>.base_url,</span><br><span class="line">            wait_until=<span class="string">&#x27;domcontentloaded&#x27;</span>,</span><br><span class="line">            callback=<span class="variable language_">self</span>.parse,</span><br><span class="line">            <span class="comment"># 注意这里要设个等待时间，等ajax数据显示在网页上</span></span><br><span class="line">            sleep=<span class="number">0.5</span></span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">parse</span>(<span class="params">self, response</span>):</span><br><span class="line">    	<span class="comment"># 第一层是一些ul</span></span><br><span class="line">        news_1_list = response.xpath(<span class="string">&#x27;/html/body/div[1]/div[1]/div[2]/div[3]/div[2]/div/ul[position()&gt;=1]&#x27;</span>)</span><br><span class="line">        <span class="keyword">for</span> news_1 <span class="keyword">in</span> news_1_list:</span><br><span class="line">        	<span class="comment"># 第二层是一些li</span></span><br><span class="line">            news_2_list = news_1.xpath(<span class="string">&#x27;./li[position()&gt;=1]&#x27;</span>)</span><br><span class="line">            <span class="built_in">print</span>(<span class="built_in">len</span>(news_2_list))</span><br><span class="line">            <span class="comment"># 每个li都是一个新闻</span></span><br><span class="line">            <span class="keyword">for</span> news <span class="keyword">in</span> news_2_list:</span><br><span class="line">                item = NewsItem()</span><br><span class="line">                item[<span class="string">&#x27;title&#x27;</span>] = news.xpath(<span class="string">&#x27;./span[2]/a/text()&#x27;</span>).get()</span><br><span class="line">                item[<span class="string">&#x27;url&#x27;</span>] = news.xpath(<span class="string">&#x27;./span[2]/a/@href&#x27;</span>).get()</span><br><span class="line">                <span class="keyword">yield</span> item</span><br></pre></td></tr></table></figure></div></li>
+</ol>
+<h1 id="代理池"><a href="#代理池" class="headerlink" title="代理池"></a><span id="proxy-pool">代理池</span></h1><p>怎么说呢，崔大大讲的大部分思想都能看懂，但是代码就看不懂了。。。<br>所以直接拿来用了！<br><a class="link"   target="_blank" rel="noopener" href="https://github.com/Python3WebSpider/ProxyPool" >仓库地址<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a><br>安装并运行过程：（Docker-Compose版）</p>
+<ol>
+<li>准备好Docker和Docker-Compose  <a class="link"   target="_blank" rel="noopener" href="https://blog.csdn.net/qq_51955445/article/details/126288223" >Linux下Docker安装几种NoSQL和MQ和乱七八糟的<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>把项目down下来<br><code>git clone https://github.com/Python3WebSpider/ProxyPool.git</code><br><code>cd ProxyPool</code></li>
+<li>使用docker-compose运行<br><code>docker-compose up -d</code><br>注意这里可能会重试很多次，但是总还是会成功的，要等久一会，然后就是不断的命令行输出对代理的爬取、判活之类的消息了</li>
+<li>尝试获取IP<br><code> http://IP:5555/random</code><br>仓库里也有个用requests获取代理池内代理的example，我都没想过这个。。。第一反应就是Flask，太傻了</li>
+</ol>
+<h1 id="规则化爬虫"><a href="#规则化爬虫" class="headerlink" title="规则化爬虫"></a><span id='rule-spyder'>规则化爬虫</span></h1><p>这章的内容是真的多，一看吓死人，再一看稍微好一点<br>主要多了几个东西</p>
+<ol>
+<li><code>ItemLoader</code><br> 这个就是包装了你的自定义Item，同时它的子类可以灵活定义数据存入取出时的逻辑<br> 拿爬<a class="link"   target="_blank" rel="noopener" href="http://www.71.cn/" >宣讲家网<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>举个涉及知识点较少、适合入门的例子：<br> NewsItem是一个Item <div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">NewsItem</span>(scrapy.Item):</span><br><span class="line">    title = scrapy.Field()</span><br><span class="line">    url = scrapy.Field()</span><br><span class="line">    <span class="comment"># 新闻媒体</span></span><br><span class="line">    media = scrapy.Field()</span><br></pre></td></tr></table></figure></div>
+ 我们进入<strong>详情页</strong>，注意是<strong>详情页</strong>！！！<br> 观察发现我们需要的内容，即标题和媒体，他们都只出现一次，所以我们定义一下在该页面的读取规则，因为待会用xpath之类的选择器读取的时候<strong>不能用extract_first</strong>这类的东西了，只能写selector<br> 定义一个为该Item定制的Loader <div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> scrapy.loader <span class="keyword">import</span> ItemLoader</span><br><span class="line"><span class="keyword">from</span> itemloaders.processors <span class="keyword">import</span> TakeFirst,Join,Compose</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">NewsItemLoader</span>(<span class="title class_ inherited__">ItemLoader</span>):</span><br><span class="line">    <span class="comment"># 默认类中全部变量都只是该页面第一次匹配的结点的数据，且去除左右空格</span></span><br><span class="line">    default_output_processor = Compose(TakeFirst(),<span class="built_in">str</span>.strip) </span><br><span class="line">    <span class="comment"># 也可以如下</span></span><br><span class="line">    <span class="comment"># title_out = Compose(TakeFirst(),str.strip)</span></span><br><span class="line">    <span class="comment"># url_out = Compose(TakeFirst(), str.strip) </span></span><br></pre></td></tr></table></figure></div>
+<ul>
+<li>首先这里能定义in和out，即数据从页面提取并放入loader和从loader拿出到item中的两个阶段都能进行处理，我这里只处理了out</li>
+<li>然后发现这里似乎是通过后缀来判断的，即是否为_in还是_out</li>
+<li>我的第一行是配置的item中全部变量的规则，我们其实可以在下面对某个变量重新赋予规则，覆盖这个全局规则的</li>
+<li>常用规则是：不进行处理<code>Identity</code>，匹配到的结果的第一个非空值<code>TakeFirst</code>,将结果通过某种分隔符拼接<code>Join</code>，组合多个函数<code>Compose</code>、处理json<code>SelectJmes</code>。还有一些东西可以看看<a class="link"   target="_blank" rel="noopener" href="https://blog.csdn.net/zhaohaibo_/article/details/105418792?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522166029196916782246434600%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fall.%2522%257D&request_id=166029196916782246434600&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~first_rank_ecpm_v1~pc_rank_v36-1-105418792-null-null.142%5Ev40%5Epc_rank_v36,185%5Ev2%5Econtrol&utm_term=MapCompose%E5%92%8CCompose&spm=1018.2226.3001.4187" >关于Scrapy ItemLoader、MapCompose、Compose、input_processor与output_processor的一些理解<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a><br> 以上，进行完了详情页面的解析</li>
+</ul>
+</li>
+<li><code>CrawlSpider</code><br> 这个类是<code>Spider</code>类的子类，你暂时可以理解他比Spider多了个<code>rules</code>元组，里面放了很多<code>Rule</code>对象，他们包含了在列表页面找到新闻链接和翻页按钮的规则、找到链接后爬取完详情页html后的回调函数等内容。就是说我们现在是在进行新闻列表的解析，即在列表页面获取想要的新闻的链接，因为我们是要通过这些链接获取详情页html的嘛<br> 3.LinkExtractor<br> 上面那个没代码是因为他的Rule对象的配置的规则实际上是配在这个类里的。这个类参数都是一些选择器、域名黑白名单、后缀黑名单等内容<br> 注意一下<code>CrawlSpider</code>也是可以通过<code>genspider</code>进行生成的，他有几个模板，默认模板的其实就是我们之前用的那个。我们这次选择 <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scrapy genspider -t crawl speaker www.71.cn</span><br></pre></td></tr></table></figure></div>
+ 然后我们再稍微改下speaker.py <div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> scrapy.linkextractors <span class="keyword">import</span> LinkExtractor</span><br><span class="line"><span class="keyword">from</span> scrapy.spiders <span class="keyword">import</span> CrawlSpider, Rule</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> newsCrawler.items <span class="keyword">import</span> NewsItem</span><br><span class="line"><span class="keyword">from</span> newsCrawler.loaders <span class="keyword">import</span> NewsItemLoader</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">SpeakerSpider</span>(<span class="title class_ inherited__">CrawlSpider</span>):</span><br><span class="line">    name = <span class="string">&#x27;speaker&#x27;</span></span><br><span class="line">    allowed_domains = [<span class="string">&#x27;www.71.cn&#x27;</span>]</span><br><span class="line">    start_urls = [<span class="string">&#x27;http://www.71.cn/&#x27;</span>]</span><br><span class="line"></span><br><span class="line">    rules = (</span><br><span class="line">        Rule(LinkExtractor(restrict_xpaths=<span class="string">&#x27;/html/body/div[8]/div[1]/div[2]/div[2]/div/ul/li[position()&gt;=1]/a&#x27;</span>,attrs=<span class="string">&#x27;href&#x27;</span>), callback=<span class="string">&#x27;parse_detail&#x27;</span>),</span><br><span class="line">        <span class="comment"># 因为只是简短demo我就没找有分页的网站了，分页就是如下，只会进行跳转而不会调用回调函数</span></span><br><span class="line">        <span class="comment"># Rule(LinkExtractor(restrict_css=&#x27;.next&#x27;))</span></span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">parse_detail</span>(<span class="params">self, response</span>):</span><br><span class="line">        <span class="comment"># 包装item</span></span><br><span class="line">        loader = NewsItemLoader(item=NewsItem(),response=response)</span><br><span class="line">        loader.add_value(<span class="string">&#x27;url&#x27;</span>,response.url)</span><br><span class="line">        loader.add_xpath(<span class="string">&#x27;title&#x27;</span>,<span class="string">&#x27;//*[@id=&quot;main&quot;]/div/div[2]/div[1]/div[1]/h1/text()&#x27;</span>)</span><br><span class="line">        loader.add_xpath(<span class="string">&#x27;media&#x27;</span>,<span class="string">&#x27;//*[@id=&quot;main&quot;]/div/div[2]/div[1]/div[1]/div[1]/span[2]/text()&#x27;</span>)</span><br><span class="line">        <span class="keyword">yield</span> loader.load_item()</span><br></pre></td></tr></table></figure></div>
+ 运行可出结果，但是我大意了，有些详情页面结构不一样的，不过无伤大雅</li>
+</ol>
+<h2 id="真正规则化"><a href="#真正规则化" class="headerlink" title="真正规则化"></a>真正规则化</h2><p>为啥上面弄了什么loader、Rule这些东西啊，仔细看下，他们把爬取列表上的链接、爬取结点的选择器、结点的in-out规则都分开了，且都是对象或字符串的形式，而不是用extract_first之类的方法进行操作，我们完全可以把他们放进配置文件里头啊！我们定义一个通用Spider，它会获取要调用哪个配置文件，再使用这些配置进行爬取，这样就可以大大提高项目的可维护性了</p>
+<p>具体代码我就不写了，因为我项目暂时不太大，然后有些地方不是单纯用配置文件抽取变量就能解决的，比如<code>scrapy-playwrigh</code>t那边，所以只留个思想在这吧</p>
+<h1 id="数据存储"><a href="#数据存储" class="headerlink" title="数据存储"></a><span id="data-store">数据存储</span></h1><p>这个只涉及ItemPipeline<br>我这里也只演示存储进redis</p>
+<ol>
+<li>首先是安装redis，这里继续参考<a class="link"   target="_blank" rel="noopener" href="https://blog.csdn.net/qq_51955445/article/details/126288223" >Linux下Docker安装几种NoSQL和MQ和乱七八糟的<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>安装redis包以便操作redis <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip3 install redis</span><br></pre></td></tr></table></figure></div></li>
+<li>在settings.py中配置参数 <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">REDIS_HOST = &#x27;192.168.192.129&#x27;</span><br><span class="line">REDIS_PORT = 6379</span><br><span class="line">REDIS_DB_INDEX = 0</span><br><span class="line">REDIS_PASSWORD =&quot;root&quot;</span><br><span class="line"></span><br><span class="line">ITEM_PIPELINES = &#123;</span><br><span class="line">   &#x27;scrapyRedisDemo.pipelines.RedisPipeline&#x27;: 300,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div></li>
+<li>编写pipeline <div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> redis.client <span class="keyword">import</span> StrictRedis</span><br><span class="line"><span class="keyword">from</span> redis.connection <span class="keyword">import</span> ConnectionPool</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">RedisPipeline</span>(<span class="title class_ inherited__">object</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">open_spider</span>(<span class="params">self, spider</span>):</span><br><span class="line">        <span class="comment"># 第一个参数是settings.py里的属性，第二个参数是获取不到值的时候的替代值</span></span><br><span class="line">        host = spider.settings.get(<span class="string">&quot;REDIS_HOST&quot;</span>)</span><br><span class="line">        port = spider.settings.get(<span class="string">&quot;REDIS_PORT&quot;</span>)</span><br><span class="line">        db_index = spider.settings.get(<span class="string">&quot;REDIS_DB_INDEX&quot;</span>)</span><br><span class="line">        db_psd = spider.settings.get(<span class="string">&quot;REDIS_PASSWORD&quot;</span>)</span><br><span class="line">        <span class="comment"># 连接数据库</span></span><br><span class="line">        pool = ConnectionPool(host=host, port=port, db=db_index, password=db_psd)</span><br><span class="line">        <span class="variable language_">self</span>.db_conn = StrictRedis(connection_pool=pool)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">process_item</span>(<span class="params">self, item, spider</span>):</span><br><span class="line">        <span class="variable language_">self</span>.db_conn.rpush(<span class="string">&quot;news&quot;</span>, item[<span class="string">&#x27;title&#x27;</span>])</span><br><span class="line">        <span class="keyword">return</span> item</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">close_spider</span>(<span class="params">self, spider</span>):</span><br><span class="line">        <span class="comment"># 关闭连接</span></span><br><span class="line">        <span class="variable language_">self</span>.db_conn.connection_pool.disconnect()</span><br></pre></td></tr></table></figure></div></li>
+<li>检验是否放入<br>我是用redisinsight可视化工具查看的，但是好像图里有涉及国家政治方面的内容所以图挂了。不再贴了</li>
+</ol>
+<h1 id="分布式爬虫"><a href="#分布式爬虫" class="headerlink" title="分布式爬虫"></a><span id='distributed-spyder'>分布式爬虫</span></h1><p>这里使用的是<code>scrapy-redis</code>包。当然也可以用消息队列，但我没用。<br>其实单机scrapy就内置了一个队列存放Request，并由调度器拿取Request，同时他还内置了去重、中断时记录上下文等功能。<br>但是实现分布式的话，肯定不能用内置的这些队列和功能，这些逻辑应该放到分布式中间件上</p>
+<h2 id="Scrapy-Redis解析"><a href="#Scrapy-Redis解析" class="headerlink" title="Scrapy-Redis解析"></a>Scrapy-Redis解析</h2><p>首先内置了三种集合：队列、栈、有序集合<br>然后实现了去重，即将item的hash值作为指纹，同时指纹用set去重存储，每次存入item前先查看是否存入指纹成功，成功则存入item，否则不存入<br>然后也实现了中断时记录上下文</p>
+<h2 id="Scpray-Redis的demo"><a href="#Scpray-Redis的demo" class="headerlink" title="Scpray-Redis的demo"></a>Scpray-Redis的demo</h2><p>爬取的是<a class="link"   target="_blank" rel="noopener" href="https://www.4399.com/flash/" >4399最新小游戏<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#发现一个东西，记录一下</span></span><br><span class="line"><span class="comment"># 注意这里的操作，可以提取一个大标签下所有标签内部的文本，在爬内容或者正文时很重要</span></span><br><span class="line">temp = response.xpath(<span class="string">&#x27;........&#x27;</span>)</span><br><span class="line">item[<span class="string">&#x27;content&#x27;</span>] = temp.xpath(<span class="string">&#x27;string(.)&#x27;</span>).extract()[<span class="number">0</span>]</span><br></pre></td></tr></table></figure></div>
+
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># BT.py</span></span><br><span class="line"><span class="keyword">from</span> scrapy.linkextractors <span class="keyword">import</span> LinkExtractor</span><br><span class="line"><span class="keyword">from</span> scrapy.spiders <span class="keyword">import</span> CrawlSpider, Rule</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> scrapyRedisDemo.items <span class="keyword">import</span> FilmItem</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> scrapy.linkextractors <span class="keyword">import</span> LinkExtractor</span><br><span class="line"><span class="keyword">from</span> scrapy.spiders <span class="keyword">import</span> CrawlSpider, Rule</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> scrapyRedisDemo.items <span class="keyword">import</span> GameItem</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Spider4399</span>(<span class="title class_ inherited__">CrawlSpider</span>):</span><br><span class="line">    name = <span class="string">&#x27;4399&#x27;</span></span><br><span class="line">    allowed_domains = [<span class="string">&#x27;www.4399.com&#x27;</span>]</span><br><span class="line">    start_urls = [<span class="string">&#x27;https://www.4399.com/flash/&#x27;</span>]</span><br><span class="line">    rules = (</span><br><span class="line">        Rule(LinkExtractor(restrict_xpaths=<span class="string">&#x27;/html/body/div[8]/ul/li[position()&gt;=1]/a&#x27;</span>,attrs=<span class="string">&#x27;href&#x27;</span>), callback=<span class="string">&#x27;parse_detail&#x27;</span>),</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">parse_detail</span>(<span class="params">self, response</span>):</span><br><span class="line">        item = GameItem()</span><br><span class="line">        item[<span class="string">&#x27;title&#x27;</span>] = response.xpath(<span class="string">&#x27;/html/body/div[7]/div[1]/div[1]/div[2]/div[1]/h1/a/text()&#x27;</span>).get()</span><br><span class="line">        item[<span class="string">&#x27;content&#x27;</span>] = response.xpath(<span class="string">&#x27;/html/body/div[7]/div[1]/div[1]/div[2]/div[4]/div/font/text()&#x27;</span>).get()</span><br><span class="line">        item[<span class="string">&#x27;category&#x27;</span>] = response.xpath(<span class="string">&#x27;/html/body/div[7]/div[1]/div[1]/div[2]/div[2]/a/text()&#x27;</span>).get()</span><br><span class="line">        item[<span class="string">&#x27;url&#x27;</span>] = response.url</span><br><span class="line">        <span class="keyword">yield</span> item</span><br></pre></td></tr></table></figure></div>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># items.py</span></span><br><span class="line"><span class="keyword">import</span> scrapy</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">GameItem</span>(scrapy.Item):</span><br><span class="line">    title = scrapy.Field()</span><br><span class="line">    content = scrapy.Field()</span><br><span class="line">    category = scrapy.Field()</span><br><span class="line">    url = scrapy.Field()</span><br></pre></td></tr></table></figure></div>
+<p>重要的来了！！！！！配置Scrapy-Redis<br>settings.py中添加</p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Redis连接参数</span></span><br><span class="line">REDIS_HOST = <span class="string">&#x27;192.168.192.129&#x27;</span></span><br><span class="line">REDIS_PORT = <span class="number">6379</span></span><br><span class="line"></span><br><span class="line">REDIS_PARAMS = &#123;</span><br><span class="line">    <span class="string">&#x27;password&#x27;</span>: <span class="string">&#x27;root&#x27;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 将调度器的类和去重的类替换为Scrapy-Redis提供的</span></span><br><span class="line">SCHEDULER = <span class="string">&#x27;scrapy_redis.scheduler.Scheduler&#x27;</span></span><br><span class="line">DUPEFILTER_CLASS=<span class="string">&#x27;scrapy_redis.dupefilter.RFPDupeFilter&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 调度队列(三选一，默认为优先队列)</span></span><br><span class="line">SCHEDULER_QUEUE_CLASS = <span class="string">&#x27;scrapy_redis.queue.PriorityQueue&#x27;</span></span><br><span class="line"><span class="comment"># SCHEDULER_QUEUE_CLASS = &#x27;scrapy_redis.queue.FifoQueue&#x27;</span></span><br><span class="line"><span class="comment"># SCHEDULER_QUEUE_CLASS = &#x27;scrapy_redis.queue.LifoQueue&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 这里配置不持久化，即爬取完后不保存爬取队列和去重指纹集合，方便调试一些</span></span><br><span class="line">SCHEDULER_PERSIST = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 配置itempipeline(将数据存入redis，很耗内存)</span></span><br><span class="line">ITEM_PIPELINES = &#123;<span class="string">&#x27;scrapy_redis.pipelines.RedisPipeline&#x27;</span>:<span class="number">300</span>&#125;</span><br></pre></td></tr></table></figure></div>
+<h3 id="自定义去重逻辑为布隆过滤器"><a href="#自定义去重逻辑为布隆过滤器" class="headerlink" title="自定义去重逻辑为布隆过滤器"></a>自定义去重逻辑为布隆过滤器</h3><p>这里就不详细讲布隆过滤器了，但还是简单提一句：<br>知道位图bitmap不？比如五个人，每个人有及格和不及格两种情况，就可以用一个五位二进制数，如01100表示第二个和第三个人及格了，但是每多一个人就要多加一位，相对费内存，在数据量大时不太好<br>于是有一种方法：指定多个哈希函数，对要存入的数进行哈希，然后把每个哈希值对应的位的值变为1，这样容易冲突、误判，但是确实降低了内存消耗，而且原则是<strong>能查到的可能是误判，但是查不到的一定不存在</strong><br>直接用了崔大大的包了</p>
+<div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install scrapy-redis-bloomfilter </span><br></pre></td></tr></table></figure></div>
+<p>然后在settings.py中增加或修改如下配置</p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">DUPEFILTER_CLASS = <span class="string">&#x27;scrapy_redis_bloomfilter.dupefilter.RFPDupeFilter&#x27;</span></span><br><span class="line">BLOOMFILTER_BIT = <span class="number">20</span></span><br></pre></td></tr></table></figure></div>
+<p>此时发现redis中的指纹集合的后缀就是bloomfilter了</p>
+<h1 id="爬虫管理和部署"><a href="#爬虫管理和部署" class="headerlink" title="爬虫管理和部署"></a>爬虫管理和部署</h1><p>多机同时更新改动肯定是很麻烦的事，所以我们需要一个管理平台</p>
+<h2 id="基于Scrapyd-别看，乱写的，直接学Docker的"><a href="#基于Scrapyd-别看，乱写的，直接学Docker的" class="headerlink" title="基于Scrapyd(别看，乱写的，直接学Docker的)"></a>基于Scrapyd(别看，乱写的，直接学Docker的)</h2><p>提供了管理各Scrapy项目的命令</p>
+<h3 id="Scrapyd-Client"><a href="#Scrapyd-Client" class="headerlink" title="Scrapyd -Client"></a>Scrapyd -Client</h3><div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip3 install scrapyd-cient</span><br></pre></td></tr></table></figure></div>
+<p>相比于单纯的Scrapyd提供了一系列更方便的API<br>然后我们就要对项目进行一些配置的修改了<br>对于项目里的scrapy.cfg，修改url为被部署的主机的url，让scrapyd能访问到，同时为该主机起个别名spyder-2</p>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[deploy:spyder-1]</span><br><span class="line">url = http://192.168.192.129:6800/</span><br></pre></td></tr></table></figure></div>
+<p>在项目里执行<code>scrapyd-deploy vm-1</code> 部署</p>
+<h3 id="可视化管理Gerapy"><a href="#可视化管理Gerapy" class="headerlink" title="可视化管理Gerapy"></a>可视化管理Gerapy</h3><p>看到Gerapy我就知道崔大大又来推广自己的项目了(笑<br>这是一个基于Scrapyd、Django、Vue.js的分布式爬虫管理框架，提供图形化管理服务</p>
+<ol>
+<li>安装<code>pip3 install gerapy</code></li>
+<li>初始化 <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">	# </span><span class="language-bash">在当前目录生成gerapy文件夹</span></span><br><span class="line">	gerapy init</span><br><span class="line"><span class="meta prompt_">	# </span><span class="language-bash">初始化数据库</span></span><br><span class="line">	gerapy migrate</span><br><span class="line"><span class="meta prompt_">	# </span><span class="language-bash">生成管理员账号</span></span><br><span class="line">	gerapy initadmin</span><br><span class="line"><span class="meta prompt_">	# </span><span class="language-bash">默认在8000端口上启动服务</span></span><br><span class="line">	gerapy runserver</span><br><span class="line">3. 在服务器上进行访问，不知道为什么我不能远程访问这个网页。。。</span><br><span class="line">	`http://localhost:8000`</span><br><span class="line">4. 登录 账号密码都是`admin`</span><br><span class="line">5. 添加主机的Scrapyd运行地址和端口，并在gerapy/project目录下存放Scrapy项目，Gerapy支持项目可视化编辑、可视化部署、启停、日志等服务</span><br><span class="line">。。。。。。。。。。。。。。。。。。。。。我反正没搞懂咋弄的，直接学Docker+K8S的算了，通用一些。。。。。。。。。。。。。。。。。。。。。</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment"># 基于Docker</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment">## 使用Docker</span></span></span><br><span class="line">1. 在项目根目录导出项目依赖</span><br><span class="line">	```shell</span><br><span class="line">	pip install pipreqs</span><br><span class="line">	pipreqs ./ --encoding utf-8</span><br></pre></td></tr></table></figure></div></li>
+<li>在项目根目录编写Dockerfile文件 <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">使用了Docker基础镜像之python3.10</span></span><br><span class="line">FROM python:3.10</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">指定工作目录</span></span><br><span class="line">WORKDIR /spyder</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">把依赖文件复制到工作目录下，即/spyder</span></span><br><span class="line">COPY requirements.txt .</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">安装包</span></span><br><span class="line">RUN pip install -r requirements.txt</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">这里是故意把整个项目的复制放到后面的，具体原因太长了我就不写了</span></span><br><span class="line">COPY . .</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">容器启动时执行的命令</span></span><br><span class="line">CMD [&quot;scrapy&quot;,&quot;crawl&quot;,&quot;4399&quot;]</span><br></pre></td></tr></table></figure></div></li>
+<li>修改配置项，让settings.py中的配置是从环境变量中获得 <div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># REDIS_URL = &#x27;redis://user:pass@hostname:9001&#x27;</span><br><span class="line">REDIS_URL = os.getenv(&#x27;REDIS_URL&#x27;)</span><br></pre></td></tr></table></figure></div></li>
+<li>进入项目根目录打包镜像，注意最右边是个点，表示当前目录。注意项目名必须全小写，不然报错<code>invalid reference format: repository name must be lowercase</code> <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker build -t 项目名 .</span><br></pre></td></tr></table></figure></div>
+ 用<code>docker images</code>查看镜像是否创建成功</li>
+<li>指定环境变量<br> 在部署的服务器上找个位置创建一个<code>.env</code>文件,针对你<code>settings.py</code>中的环境变量编写，比如我的就是 <div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">REDIS_URL=<span class="string">&#x27;redis://:root@host.docker.internal:6379&#x27;</span></span><br></pre></td></tr></table></figure></div>
+ 注意不要有空格出现</li>
+<li>在.env的目录下运行 <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --env-file .env 镜像名</span><br></pre></td></tr></table></figure></div></li>
+<li>推送至docker hub<br> 在<a class="link"   target="_blank" rel="noopener" href="https://hub.docker.com/" >官网<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>注册再登录，注意<code>username</code>是跟你以后仓库地址有关的，比如仓库名叫demo，username叫lyy，那么仓库地址就是lyy&#x2F;demo<br> 用<code>docker login</code>命令也可以登录<br> 给本地镜像打标签 <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker tag 镜像名:版本 想放的仓库地址:版本</span><br></pre></td></tr></table></figure></div>
+ 推送镜像到Docker Hub<br> <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker push 想放的仓库地址:版本</span><br></pre></td></tr></table></figure></div></li>
+<li>以后运行这个镜像<br> 只需要<br> 创建一个 .env<br> 然后 <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --env-file .env 镜像名</span><br></pre></td></tr></table></figure></div></li>
+</ol>
+<h3 id="使用Docker-Compose-更方便"><a href="#使用Docker-Compose-更方便" class="headerlink" title="使用Docker Compose(更方便)"></a><span id='Docker-Compose'>使用Docker Compose(更方便)</span></h3><p>这是一个用yaml配置服务的工具，比Docker命令方便多了</p>
+<ol>
+<li>编写<code>docker-compose.yaml</code> <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">version: &quot;3&quot;</span><br><span class="line">services:</span><br><span class="line">  redis:</span><br><span class="line">    # 使用已有的镜像进行构建</span><br><span class="line">    image: redis:alpine</span><br><span class="line">    container_name: redis</span><br><span class="line">    ports:</span><br><span class="line">      - &quot;6379&quot;</span><br><span class="line">  scrapyRedisDemo:</span><br><span class="line">    build: &quot;.&quot;</span><br><span class="line">    image: &quot;truedude/scrapyredisdemo&quot;</span><br><span class="line">    environment:</span><br><span class="line">      REDIS_URL: &#x27;redis://:root@192.168.192.129:6379&#x27;</span><br><span class="line">    # 等redis起了才起这个容器</span><br><span class="line">    depends_on:</span><br><span class="line">      - redis</span><br></pre></td></tr></table></figure></div></li>
+<li>打包为镜像 <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-compose build</span><br></pre></td></tr></table></figure></div></li>
+<li>运行镜像 <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-compose up</span><br></pre></td></tr></table></figure></div></li>
+<li>推送镜像 <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-compose push</span><br></pre></td></tr></table></figure></div></li>
+</ol>
+<h3 id="K8S的使用"><a href="#K8S的使用" class="headerlink" title="K8S的使用"></a>K8S的使用</h3><p>TODO</p>
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>标题:</strong> scrapy个人循序渐进</li>
+        <li><strong>作者:</strong> urlyy</li>
+        <li><strong>创建于
+                :</strong> 2022-08-14 12:55:02</li>
+        
+            <li>
+                <strong>更新于
+                    :</strong> 2025-12-21 18:39:57
+            </li>
+        
+        <li>
+            <strong>链接:</strong> https://urlyy.github.io/2022/08/14/scrapy个人循序渐进/
+        </li>
+        <li>
+            <strong>
+                版权声明:
+            </strong>
+            
+
+            
+                本文章采用 <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a> 进行许可。
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="prev" rel="prev" href="/2022/09/14/Centos7-6%E9%83%A8%E7%BD%B2fabric%E4%BB%A5%E5%8F%8A%E9%93%BE%E7%A0%81/">
+					<span class="left arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-left"></i>
+					</span>
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">Centos7.6部署fabric以及链码</span>
+						<span class="post-nav-item">上一篇</span>
+					</span>
+				</a>
+			</div>
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2022/07/15/java%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AD%A6%E4%B9%A0/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">java线程池学习</span>
+						<span class="post-nav-item">下一篇</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        评论
+    </div>
+    
+
+        
+            
+    <div id="giscus-container"></div>
+    <script data-swup-reload-script defer>
+        async function loadGiscus() {
+            const giscusConfig = {
+                'src': 'https://giscus.app/client.js',
+                'data-repo': 'urlyy/urlyy_blog_comments',
+                'data-repo-id': 'R_kgDONo8nwQ',
+                'data-category': 'Announcements',
+                'data-category-id': 'DIC_kwDONo8nwc4Cl7pw',
+                'data-mapping': 'title',
+                'data-strict': '0',
+                'data-reactions-enabled': '1',
+                'data-emit-metadata': '1',
+                'data-theme': 'preferred_color_scheme',
+                'data-lang': 'zh-CN',
+                'data-input-position': 'top',
+                'data-loading': 'lazy',
+                'crossorigin': 'anonymous',
+                'async': true
+            }
+            const giscusScript = document.createElement('script');
+            for (const key in giscusConfig) {
+                giscusScript.setAttribute(key, giscusConfig[key]);
+            }
+            document.getElementById('giscus-container').appendChild(giscusScript);
+        }
+        if ('true') {
+            let loadGiscusTimeout = setTimeout(() => {
+                loadGiscus();
+                clearTimeout(loadGiscusTimeout);
+            }, 1000);
+        } else {
+            document.addEventListener('DOMContentLoaded', loadGiscus);
+        }
+    </script>
+
+
+        
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">目录</div>
+		<div class="page-title">scrapy个人循序渐进</div>
+		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E5%8A%A8%E6%9C%BA"><span class="nav-text">学习动机</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E9%A1%B9%E7%9B%AE"><span class="nav-text">创建项目</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%B0%8Fdemo"><span class="nav-text">第一个小demo</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9C%A8Linux%E7%8E%AF%E5%A2%83-%E8%99%9A%E6%8B%9F%E6%9C%BA-%E4%B8%8B%E4%BD%BF%E7%94%A8Docker%E9%85%8D%E7%BD%AENoSQL%E5%92%8CMQ"><span class="nav-text">在Linux环境(虚拟机)下使用Docker配置NoSQL和MQ</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E8%AF%B7%E6%B1%82%E4%B8%AD%E7%9A%84%E6%95%B0%E6%8D%AE"><span class="nav-text">获取请求中的数据</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%8D%E9%81%B5%E5%AE%88robots%E5%8D%8F%E8%AE%AE"><span class="nav-text">不遵守robots协议</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#scrapy%E6%95%B4%E5%90%88Playwright"><span class="nav-text">scrapy整合Playwright</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%88%E5%86%99%E4%B8%AAdemo"><span class="nav-text">先写个demo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%A5%E5%85%A5Scrapy"><span class="nav-text">接入Scrapy</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%A3%E7%90%86%E6%B1%A0"><span class="nav-text">代理池</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%84%E5%88%99%E5%8C%96%E7%88%AC%E8%99%AB"><span class="nav-text">规则化爬虫</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9C%9F%E6%AD%A3%E8%A7%84%E5%88%99%E5%8C%96"><span class="nav-text">真正规则化</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8"><span class="nav-text">数据存储</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E7%88%AC%E8%99%AB"><span class="nav-text">分布式爬虫</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Scrapy-Redis%E8%A7%A3%E6%9E%90"><span class="nav-text">Scrapy-Redis解析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Scpray-Redis%E7%9A%84demo"><span class="nav-text">Scpray-Redis的demo</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E5%8E%BB%E9%87%8D%E9%80%BB%E8%BE%91%E4%B8%BA%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="nav-text">自定义去重逻辑为布隆过滤器</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%88%AC%E8%99%AB%E7%AE%A1%E7%90%86%E5%92%8C%E9%83%A8%E7%BD%B2"><span class="nav-text">爬虫管理和部署</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8EScrapyd-%E5%88%AB%E7%9C%8B%EF%BC%8C%E4%B9%B1%E5%86%99%E7%9A%84%EF%BC%8C%E7%9B%B4%E6%8E%A5%E5%AD%A6Docker%E7%9A%84"><span class="nav-text">基于Scrapyd(别看，乱写的，直接学Docker的)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Scrapyd-Client"><span class="nav-text">Scrapyd -Client</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AF%E8%A7%86%E5%8C%96%E7%AE%A1%E7%90%86Gerapy"><span class="nav-text">可视化管理Gerapy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8Docker-Compose-%E6%9B%B4%E6%96%B9%E4%BE%BF"><span class="nav-text">使用Docker Compose(更方便)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#K8S%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-text">K8S的使用</span></a></li></ol></li></ol></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2021</span>
+              -
+            
+            2025&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">urlyy</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        共撰写了 78 篇文章
+                    </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">访问人数</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">总访问量</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">由 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a> 驱动</span>
+            <span class="text-sm lg:block">主题&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.5</a></span>
+        </div>
+        
+        
+            <div>
+                博客已运行 <span class="odometer" id="runtime_days" ></span> 天 <span class="odometer" id="runtime_hours"></span> 小时 <span class="odometer" id="runtime_minutes"></span> 分钟 <span class="odometer" id="runtime_seconds"></span> 秒
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="fa-regular fa-arrow-up"></i>
+		</li>
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+	<div class="search-pop-overlay">
+	<div class="popup search-popup">
+		<div class="search-header">
+			<span class="search-input-field-pre">
+				<i class="fa-solid fa-keyboard"></i>
+			</span>
+			<div class="search-input-container">
+				<input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="站内搜索您需要的内容..." spellcheck="false" type="search" class="search-input">
+			</div>
+			<span class="popup-btn-close">
+				<i class="fa-solid fa-times"></i>
+			</span>
+		</div>
+		<div id="search-result">
+			<div id="no-result">
+				<i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>
+			</div>
+		</div>
+	</div>
+</div>
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+	
+<script src="/js/build/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/build/utils.js" type="module"></script>
+
+<script src="/js/build/main.js" type="module"></script>
+
+<script src="/js/build/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/build/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/build/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/build/layouts/categoryList.js" type="module"></script>
+
+
+
+    
+<script src="/js/build/tools/localSearch.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/layouts/lazyload.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/runtime.js"></script>
+
+    
+<script src="/js/build/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+  
+<script src="/js/build/plugins/typed.js" type="module"></script>
+
+
+
+
+    
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@9.3.0/dist/mermaid.min.js"></script>
+    
+    
+<script src="/js/build/plugins/mermaid.js"></script>
+
+
+
+
+
+
+    
+<script src="/js/build/libs/anime.min.js"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/tocToggle.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/layouts/toc.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/plugins/tabs.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+<script src="/js/build/layouts/essays.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+
+	
+</body>
+
+</html>

@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="urlyy">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set data attribute for CSS variables
+                root.setAttribute("data-theme", theme);
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes once DOM is ready
+            if (document.readyState !== "loading") {
+                document.body.classList.add(theme + "-mode");
+            } else {
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add(theme + "-mode");
+                    document.body.classList.remove((theme === DARK ? LIGHT : DARK) + "-mode");
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Critical CSS to prevent flash -->
+    <style>
+        :root[data-theme="dark"] {
+            --background-color: #202124;
+            --background-color-transparent: rgba(32, 33, 36, 0.6);
+            --second-background-color: #2d2e32;
+            --third-background-color: #34353a;
+            --third-background-color-transparent: rgba(32, 33, 36, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #ffffff;
+            --second-text-color: #eeeeee;
+            --third-text-color: #bebec6;
+            --fourth-text-color: #999999;
+            --default-text-color: #bebec6;
+            --invert-text-color: #373D3F;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(255, 255, 255, 0.08);
+            --shadow-color-2: rgba(255, 255, 255, 0.05);
+        }
+        
+        :root[data-theme="light"] {
+            --background-color: #fff;
+            --background-color-transparent: rgba(255, 255, 255, 0.6);
+            --second-background-color: #f8f8f8;
+            --third-background-color: #f2f2f2;
+            --third-background-color-transparent: rgba(241, 241, 241, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #16171a;
+            --second-text-color: #2f3037;
+            --third-text-color: #5e5e5e;
+            --fourth-text-color: #eeeeee;
+            --default-text-color: #373D3F;
+            --invert-text-color: #bebec6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(0, 0, 0, 0.08);
+            --shadow-color-2: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+        
+        /* Apply body classes as soon as DOM is ready */
+        :root[data-theme="dark"] body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+    </style>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://urlyy.github.io/2024/11/20/mooctest全国大学生软件测试大赛开发者赛道相关知识记录(junit4)/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta name="description" content="软件测试比赛学习记录">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mooctest全国大学生软件测试大赛开发者赛道相关知识记录(Junit 4)">
+<meta property="og:url" content="http://urlyy.github.io/2024/11/20/mooctest%E5%85%A8%E5%9B%BD%E5%A4%A7%E5%AD%A6%E7%94%9F%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E5%A4%A7%E8%B5%9B%E5%BC%80%E5%8F%91%E8%80%85%E8%B5%9B%E9%81%93%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%E8%AE%B0%E5%BD%95(Junit4)/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="软件测试比赛学习记录">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://urlyy.github.io/article_images/mooctest%E5%85%A8%E5%9B%BD%E5%A4%A7%E5%AD%A6%E7%94%9F%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E5%A4%A7%E8%B5%9B%E5%BC%80%E5%8F%91%E8%80%85%E8%B5%9B%E9%81%93%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%E8%AE%B0%E5%BD%95(Junit4)/1.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/mooctest%E5%85%A8%E5%9B%BD%E5%A4%A7%E5%AD%A6%E7%94%9F%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E5%A4%A7%E8%B5%9B%E5%BC%80%E5%8F%91%E8%80%85%E8%B5%9B%E9%81%93%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%E8%AE%B0%E5%BD%95(Junit4)/2.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/mooctest%E5%85%A8%E5%9B%BD%E5%A4%A7%E5%AD%A6%E7%94%9F%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E5%A4%A7%E8%B5%9B%E5%BC%80%E5%8F%91%E8%80%85%E8%B5%9B%E9%81%93%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%E8%AE%B0%E5%BD%95(Junit4)/3.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/mooctest%E5%85%A8%E5%9B%BD%E5%A4%A7%E5%AD%A6%E7%94%9F%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E5%A4%A7%E8%B5%9B%E5%BC%80%E5%8F%91%E8%80%85%E8%B5%9B%E9%81%93%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%E8%AE%B0%E5%BD%95(Junit4)/4.png">
+<meta property="og:image" content="http://urlyy.github.io/article_images/mooctest%E5%85%A8%E5%9B%BD%E5%A4%A7%E5%AD%A6%E7%94%9F%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E5%A4%A7%E8%B5%9B%E5%BC%80%E5%8F%91%E8%80%85%E8%B5%9B%E9%81%93%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%E8%AE%B0%E5%BD%95(Junit4)/5.png">
+<meta property="article:published_time" content="2024-11-20T12:46:41.000Z">
+<meta property="article:modified_time" content="2025-12-21T10:39:57.270Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://urlyy.github.io/article_images/mooctest%E5%85%A8%E5%9B%BD%E5%A4%A7%E5%AD%A6%E7%94%9F%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E5%A4%A7%E8%B5%9B%E5%BC%80%E5%8F%91%E8%80%85%E8%B5%9B%E9%81%93%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%E8%AE%B0%E5%BD%95(Junit4)/1.png">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/avatar.jpg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.jpg">
+    <meta name="theme-color" content="#5c701a">
+    <link rel="shortcut icon" href="/images/avatar.jpg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            mooctest全国大学生软件测试大赛开发者赛道相关知识记录(Junit 4) | urlyy的小窝
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+        <link href="" rel="stylesheet">
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"urlyy.github.io","root":"/","language":"zh-CN","path":"search.json"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":false,"auto":false,"list":[""]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":true},"copyright":true,"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#5c701a","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":true,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":false},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"side_tools":{"gear_rotation":true,"auto_expand":false},"open_graph":true,"google_analytics":{"enable":false,"id":null},"busuanzi_counter":{"enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"pjax":true},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/bg/1.jpg","dark":"/images/bg/1.jpg"},"title":"urlyy的小窝","subtitle":{"text":["Loading..."],"hitokoto":{"enable":true,"show_author":false,"api":"https://v1.hitokoto.cn?c=a&c=b&c=d&c=k"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"style":"default","links":{"github":"https://github.com/urlyy?tab=repositories","instagram":null,"zhihu":null,"twitter":null,"email":"2213732736@qq.com"},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":true,"version":"9.3.0"}},"version":"2.8.5","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Categories":{"icon":"fa-regular fa-folder","path":"/categories/"},"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Github":{"path":"https://github.com/urlyy","icon":"fa-brands fa-github"},"个人介绍":{"path":"/personal/profile.html","icon":"fa-regular fa-user"}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"cloud"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":null},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2021/9/7 16:55:00"};
+    window.lang_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 个月前","year":"%s 年前"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                urlyy的小窝
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    首页
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/categories/"
+                                        >
+                                    <i class="fa-regular fa-folder fa-fw"></i>
+                                    分类
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/archives"
+                                        >
+                                    <i class="fa-regular fa-archive fa-fw"></i>
+                                    归档
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   target="_blank" rel="noopener" href="https://github.com/urlyy"
+                                        >
+                                    <i class="fa-brands fa-github fa-fw"></i>
+                                    GITHUB
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/personal/profile.html"
+                                        >
+                                    <i class="fa-regular fa-user fa-fw"></i>
+                                    个人介绍
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                首页
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/categories/"
+                        >
+                            <span>
+                                分类
+                            </span>
+                            
+                                <i class="fa-regular fa-folder fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/archives"
+                        >
+                            <span>
+                                归档
+                            </span>
+                            
+                                <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           target="_blank" rel="noopener" href="https://github.com/urlyy"
+                        >
+                            <span>
+                                GITHUB
+                            </span>
+                            
+                                <i class="fa-brands fa-github fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/personal/profile.html"
+                        >
+                            <span>
+                                个人介绍
+                            </span>
+                            
+                                <i class="fa-regular fa-user fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">25</div>
+        <div class="label text-third-text-color text-sm">标签</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">29</div>
+        <div class="label text-third-text-color text-sm">分类</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">78</div>
+        <div class="label text-third-text-color text-sm">文章</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">mooctest全国大学生软件测试大赛开发者赛道相关知识记录(Junit 4)</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/avatar.jpg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">urlyy</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2024-11-20 20:46:41</span>
+        <span class="mobile">2024-11-20 20:46:41</span>
+        <span class="hover-info">创建</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2025-12-21 18:39:57</span>
+            <span class="mobile">2025-12-21 18:39:57</span>
+            <span class="hover-info">更新</span>
+        </span>
+    
+
+    
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<h1 id="环境要求"><a href="#环境要求" class="headerlink" title="环境要求"></a>环境要求</h1><ul>
+<li>JDK 8 <del>虽然我只有JDK 17，改了下Language Level，保证不会使用新特性。但是还是改用jdk8了</del>  (后面会讲，变异测试需要jdk8)</li>
+<li>Junit 4.12(在pom.xml中已指定好)</li>
+<li>我用的是 IDEA，毕竟2024年mooctest比赛终于可以不用那个难用得要死的eclipse了</li>
+</ul>
+<h1 id="异常处理"><a href="#异常处理" class="headerlink" title="异常处理"></a>异常处理</h1><div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.junit.rules.ExpectedException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ProductTest</span> &#123;</span><br><span class="line">	<span class="meta">@Rule</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">ExpectedException</span> <span class="variable">thrown</span> <span class="operator">=</span> ExpectedException.none();</span><br><span class="line">	</span><br><span class="line">	<span class="meta">@Test(timeout=1000)</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">test</span><span class="params">()</span> &#123;</span><br><span class="line">		thrown.expect(NullPointerException.class);</span><br><span class="line">		thrown.expectMessage(<span class="string">&quot;qwer&quot;</span>);</span><br><span class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">NullPointerException</span>(<span class="string">&quot;1234&quot;</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>注意，一个Test方法只能测试一处异常。如果你想测试一个对象方法里会有的多个异常，还是只能分成多个测试方法分开测。</p>
+<h2 id="可以自己实现assertThrows"><a href="#可以自己实现assertThrows" class="headerlink" title="!!!!!可以自己实现assertThrows"></a>!!!!!可以自己实现assertThrows</h2><p>其实有个允许一个Test方法内测试多个异常的函数，但是是Junit5中的。通过参考23年省赛答案，我发现了答案中对assertThrows主动进行了实现。</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">assertThrows</span><span class="params">(Runnable r, Class&lt;? extends Throwable&gt; exception)</span> &#123;</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		r.run();</span><br><span class="line">		fail();</span><br><span class="line">	&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">		assertTrue(exception.isAssignableFrom(e.getClass()));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 我还加了个允许使用报错信息进行比较的</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">assertThrows</span><span class="params">(Runnable r, Class&lt;? extends Throwable&gt; exception, String message)</span> &#123;</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		r.run();</span><br><span class="line">		fail();</span><br><span class="line">	&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">		assertTrue(exception.isAssignableFrom(e.getClass()));</span><br><span class="line">		assertEquals(e.getMessage(),message);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">assertThrows(() -&gt; &#123;</span><br><span class="line">	<span class="comment">// 调用被测方法</span></span><br><span class="line">	...</span><br><span class="line">	methodToTest();</span><br><span class="line">&#125;, IndexOutOfBoundsException.class);</span><br></pre></td></tr></table></figure></div>
+
+<h1 id="反射读写private字段"><a href="#反射读写private字段" class="headerlink" title="反射读写private字段"></a>反射读写private字段</h1><p>有些私有字段我们想主动访问而不是通过调用public方法间接访问，就直接用反射直接读写。</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Shop</span> <span class="variable">shop</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Shop</span>();</span><br><span class="line"><span class="type">Field</span> <span class="variable">productsField</span> <span class="operator">=</span> shop.getClass().getDeclaredField(<span class="string">&quot;products&quot;</span>);</span><br><span class="line">productsField.setAccessible(<span class="literal">true</span>);</span><br><span class="line"><span class="comment">// 写</span></span><br><span class="line">productsField.set(shop, <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;Product&gt;());</span><br><span class="line"><span class="comment">// 读</span></span><br><span class="line">ArrayList&lt;Product&gt; value = (ArrayList&lt;Product&gt;) productsField.get(shop);</span><br></pre></td></tr></table></figure></div>
+
+
+<h1 id="反射调用私有方法"><a href="#反射调用私有方法" class="headerlink" title="反射调用私有方法"></a>反射调用私有方法</h1><p>有些私有方法我们测试不到或者不能直接测试到，就可以通过反射直接调用。</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.lang.reflect.InvocationTargetException;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Demo</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String <span class="title function_">getMessage</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;invoke private method&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TestDemo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> NoSuchMethodException, InvocationTargetException, IllegalAccessException &#123;</span><br><span class="line">        <span class="type">Demo</span> <span class="variable">demo</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Demo</span>();</span><br><span class="line">        Class&lt;?&gt; clazz = demo.getClass();</span><br><span class="line">        <span class="type">Method</span> <span class="variable">privateMethod</span> <span class="operator">=</span> clazz.getDeclaredMethod(<span class="string">&quot;getMessage&quot;</span>);</span><br><span class="line">        privateMethod.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        <span class="type">String</span> <span class="variable">result</span> <span class="operator">=</span> (String) privateMethod.invoke(demo);</span><br><span class="line">        System.out.println(result); <span class="comment">// 输出：invoke private method</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h1 id="assertEquals和assertSame"><a href="#assertEquals和assertSame" class="headerlink" title="assertEquals和assertSame"></a>assertEquals和assertSame</h1><p><code>assertEquals</code>是使用 <code>==</code> 进行比较，<code>assertSame</code>比较两个引用是否指向堆上的同一个对象。</p>
+<h1 id="assertEquals-double"><a href="#assertEquals-double" class="headerlink" title="assertEquals(double)"></a>assertEquals(double)</h1><p>主动提这个是因为IDE会有警告或者报错，要求传入第三个参数，即误差范围。</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> <span class="title function_">assertEquals</span><span class="params">(<span class="type">double</span> expected, <span class="type">double</span> actual, <span class="type">double</span> delta)</span></span><br></pre></td></tr></table></figure></div>
+<p>查看源码可以发现就是差&lt;&#x3D;误差就认为相等。</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Math.abs(d1 - d2) &lt;= delta</span><br></pre></td></tr></table></figure></div>
+<h1 id="遍历枚举"><a href="#遍历枚举" class="headerlink" title="遍历枚举"></a>遍历枚举</h1><p>懒得一个一个枚举的测试？直接遍历！</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 定义</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> <span class="title class_">ProductEnum</span> &#123;</span><br><span class="line">    BOOK(<span class="string">&quot;书籍&quot;</span>),</span><br><span class="line">    DRINK(<span class="string">&quot;饮料&quot;</span>),</span><br><span class="line">    ELECTRONICS(<span class="string">&quot;电子产品&quot;</span>);</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 遍历</span></span><br><span class="line"><span class="keyword">for</span> (ProductEnum productEnum : ProductEnum.values()) &#123;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h1 id="Before和-After"><a href="#Before和-After" class="headerlink" title="@Before和@After"></a>@Before和@After</h1><p>有时我们想对于每个测试方法，都做同一个前置或后置操作(比如创建新对象、将变化的值恢复)。Junit 提供了对应的注解。<br>这里主要使用了@After和@Before。还有个@BeforeClass，它只在所有Test方法运行前调用一次，且这个注解所在的方法必须是静态方法(这个好理解吧，就是类初始化时调用一次这样)。@AfterClass在此比赛中没用，故不写了。</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.junit.After;</span><br><span class="line"><span class="keyword">import</span> org.junit.Before;</span><br><span class="line"><span class="keyword">import</span> org.junit.BeforeClass;</span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="keyword">static</span> org.junit.Assert.assertEquals;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Demo</span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="variable">cnt</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TestDemo</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@BeforeClass</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">beforeClass</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;=== before_class&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Before</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">before</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;*** before&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@After</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">after</span><span class="params">()</span> &#123;</span><br><span class="line">        Demo.cnt = <span class="number">0</span>;</span><br><span class="line">        System.out.println(<span class="string">&quot;&gt;&gt;&gt; after&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">test1</span><span class="params">()</span> &#123;</span><br><span class="line">        Demo.cnt ++;</span><br><span class="line">        assertEquals(Demo.cnt, <span class="number">1</span>);</span><br><span class="line">        System.out.println(<span class="string">&quot;run test1&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">test2</span><span class="params">()</span> &#123;</span><br><span class="line">        Demo.cnt ++;</span><br><span class="line">        assertEquals(Demo.cnt, <span class="number">1</span>);</span><br><span class="line">        System.out.println(<span class="string">&quot;run test2&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">test3</span><span class="params">()</span> &#123;</span><br><span class="line">        Demo.cnt ++;</span><br><span class="line">        assertEquals(Demo.cnt, <span class="number">1</span>);</span><br><span class="line">        System.out.println(<span class="string">&quot;run test3&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>输出为</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">=== before_class</span><br><span class="line">*** before</span><br><span class="line">run test1</span><br><span class="line">&gt;&gt;&gt; after</span><br><span class="line">*** before</span><br><span class="line">run test2</span><br><span class="line">&gt;&gt;&gt; after</span><br><span class="line">*** before</span><br><span class="line">run test3</span><br><span class="line">&gt;&gt;&gt; after</span><br><span class="line"></span><br><span class="line">Process finished with exit code <span class="number">0</span></span><br></pre></td></tr></table></figure></div>
+
+
+
+<h1 id="测试控制台输出"><a href="#测试控制台输出" class="headerlink" title="测试控制台输出"></a>测试控制台输出</h1><p>众所周知测试肯定不能修改待测代码，但是对于只有 sout 的 void 方法，我们肯定也是要测试。我们可以通过输出重定向的方法捕获输出内容到变量中，然后 assert。我的这种写法是在每个Test结束后恢复默认out，在部分需要重定向输出的方法内自行setOut。因为重定向后，就不能把自己的日志打印到终端上了。</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.junit.After;</span><br><span class="line"><span class="keyword">import</span> org.junit.BeforeClass;</span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.ByteArrayOutputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.PrintStream;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="keyword">static</span> org.junit.Assert.assertEquals;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Demo</span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">print</span><span class="params">()</span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;Hello World&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TestDemo</span> &#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="type">PrintStream</span> <span class="variable">console</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@BeforeClass</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">before</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="comment">// 初始先保存默认的out</span></span><br><span class="line">        console = System.out;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@After</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">after</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="comment">// 每次测试结束，恢复默认out</span></span><br><span class="line">        System.setOut(console);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">testResult</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="comment">// 输出重定向</span></span><br><span class="line">        <span class="type">ByteArrayOutputStream</span> <span class="variable">newOut</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ByteArrayOutputStream</span>();</span><br><span class="line">        System.setOut(<span class="keyword">new</span> <span class="title class_">PrintStream</span>(newOut));</span><br><span class="line">        <span class="type">Demo</span> <span class="variable">demo</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Demo</span>();</span><br><span class="line">        <span class="comment">// 调用它，让它输出，并重定向到 newOut 中</span></span><br><span class="line">        demo.print();</span><br><span class="line">        assertEquals(<span class="string">&quot;Hello World&quot;</span>,newOut.toString().trim());</span><br><span class="line">        <span class="comment">// 注意如果不reset，输出会不断追加到newOut中</span></span><br><span class="line">        newOut.reset();</span><br><span class="line">        demo.print();</span><br><span class="line">        assertEquals(<span class="string">&quot;Hello World&quot;</span>,newOut.toString().trim());</span><br><span class="line">        newOut.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<h1 id="根据操作系统适配换行符与路径分隔符"><a href="#根据操作系统适配换行符与路径分隔符" class="headerlink" title="根据操作系统适配换行符与路径分隔符"></a>根据操作系统适配换行符与路径分隔符</h1><p>为什么要根据OS适配？具体可以看CSDN的这篇文章：<a class="link"   target="_blank" rel="noopener" href="https://blog.csdn.net/csdnnews/article/details/142933011?ops_request_misc=&request_id=&biz_id=102&spm=1018.2226.3001.4187" >回车换行（CRLF）已过时，应废除！”SQLite 之父的公开呼吁引发热议<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">lineSeparator</span> <span class="operator">=</span> System.getProperty(<span class="string">&quot;line.separator&quot;</span>);</span><br><span class="line"><span class="type">String</span> <span class="variable">fileSeparator</span> <span class="operator">=</span> System.getProperty(<span class="string">&quot;file.separator&quot;</span>);</span><br></pre></td></tr></table></figure></div>
+
+<h1 id="变异测试"><a href="#变异测试" class="headerlink" title="变异测试"></a>变异测试</h1><p>变异测试的原理就是，把待测代码(在字节码层面改)改一下，如果我们的测试代码的 assert 依然通过(即变异子存活)，那说明代码存在问题。比如我们测试 <code>int subtract(int a,int b)&#123;return a-b;&#125;</code> 这个减法函数，如果我们的 junit 写的是 <code>assertEquals(subtract(0,0), 0)</code>，那么变异子将subtract的减法改成加法，这个 assert 依然通过，说明咱们的测试存在疏漏。</p>
+<p>我的理解是变异测试不是让开发人员自行对代码单元测试的，而是让测试人员完善测试用例的。</p>
+<p>我们使用 pitest 这个工具进行测试。包在 pom.xml 里已经有了。</p>
+<p>我们使用下面的命令启动测试。</p>
+<div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn org.pitest:pitest-maven:mutationCoverage</span><br></pre></td></tr></table></figure></div>
+<p>注意如果版本 &gt;&#x3D; jdk9，会报错<br><code>Unable to make field private final java.util.Comparator java.util.TreeMap.comparator accessible: module java.base does not &quot;opens java.util&quot; to unnamed module</code><br>所以就只能老老实实用 jdk8 了……</p>
+<p>按下面这样配一个运行按钮，会方便一点。注意填入的命令是<code>pitest:mutationCoverage</code><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/mooctest%E5%85%A8%E5%9B%BD%E5%A4%A7%E5%AD%A6%E7%94%9F%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E5%A4%A7%E8%B5%9B%E5%BC%80%E5%8F%91%E8%80%85%E8%B5%9B%E9%81%93%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%E8%AE%B0%E5%BD%95(Junit4)/1.png"
+                     
+                ><br>运行成功后，查看<code>target/pit-reports/时间/index.html</code>即可<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/mooctest%E5%85%A8%E5%9B%BD%E5%A4%A7%E5%AD%A6%E7%94%9F%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E5%A4%A7%E8%B5%9B%E5%BC%80%E5%8F%91%E8%80%85%E8%B5%9B%E9%81%93%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%E8%AE%B0%E5%BD%95(Junit4)/2.png"
+                     
+                ></p>
+<h2 id="共享变量被修改导致变异测试失败"><a href="#共享变量被修改导致变异测试失败" class="headerlink" title="共享变量被修改导致变异测试失败"></a>共享变量被修改导致变异测试失败</h2><p>可能即便测 coverage 已经全部 pass 了，pitest 这里还是有报错<code>All tests did not pass without mutation when calculating line coverage. Mutation testing requires a green suite. See http://pitest.org for more details.</code></p>
+<p>可能是因为多个方法共享的变量(如静态变量等)被修改导致测试不通过(虽然我也不确定一定是这个问题导致的)。可以看下面的例子，各个Test方法是从上到下执行的，上面方法修改类变量cnt，会影响在下面方法里的测试。</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"><span class="keyword">import</span> <span class="keyword">static</span> org.junit.Assert.assertEquals;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Demo</span>&#123;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="variable">cnt</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ProductTest2</span> &#123;</span><br><span class="line">	<span class="meta">@Test</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">test</span><span class="params">()</span> &#123;</span><br><span class="line">		Demo.cnt ++;</span><br><span class="line">		assertEquals(Demo.cnt,<span class="number">1</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Test</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">test2</span><span class="params">()</span> &#123;</span><br><span class="line">		Demo.cnt ++;</span><br><span class="line">		assertEquals(Demo.cnt,<span class="number">2</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+
+
+<h2 id="变异测试详细学习"><a href="#变异测试详细学习" class="headerlink" title="变异测试详细学习"></a>变异测试详细学习</h2><p><a class="link"   target="_blank" rel="noopener" href="https://pitest.org/quickstart/mutators/" >突变子列表<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>，这个链接介绍了有哪些突变子以及对应做了什么突变。浏览一下可以方便我们看 index.html 里内容的时候知道是哪些变异子活下来了。</p>
+<p>这些是运行 mutation 覆盖率测试时默认激活的 mutator：</p>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">INCREMENTS_MUTATOR</span><br><span class="line">VOID_METHOD_CALL_MUTATOR</span><br><span class="line">RETURN_VALS_MUTATOR</span><br><span class="line">MATH_MUTATOR</span><br><span class="line">NEGATE_CONDITIONALS_MUTATOR</span><br><span class="line">INVERT_NEGS_MUTATOR</span><br><span class="line">CONDITIONALS_BOUNDARY_MUTATOR</span><br></pre></td></tr></table></figure></div>
+<p>也可以自行配置其他突变子，这会导致测试时间变长，但能发现更多问题。(因为不知道比赛方是怎么配置的，不过这里不用深究，反正没空专门写变异测试)</p>
+<div class="code-container" data-rel="Xml"><figure class="iseeu highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">targetClasses</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">param</span>&gt;</span>com.baeldung.testing.mutation.*<span class="tag">&lt;/<span class="name">param</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">targetClasses</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">targetTests</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">param</span>&gt;</span>com.baeldung.mutation.test.*<span class="tag">&lt;/<span class="name">param</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">targetTests</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">mutators</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">mutator</span>&gt;</span>CONSTRUCTOR_CALLS<span class="tag">&lt;/<span class="name">mutator</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">mutator</span>&gt;</span>VOID_METHOD_CALLS<span class="tag">&lt;/<span class="name">mutator</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">mutator</span>&gt;</span>RETURN_VALS<span class="tag">&lt;/<span class="name">mutator</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">mutator</span>&gt;</span>NON_VOID_METHOD_CALLS<span class="tag">&lt;/<span class="name">mutator</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">mutators</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure></div>
+
+<p>在index.html中，悬停在红色数字上可以看到下面黄色区域的内容，就是对应行的存活变异子。</p>
+<p>下面的例子就是说，第150行有两个变异子存活，即条件边界改变和条件取反。比如一个是变异成<code>if(index &lt; 2)</code>这种，一个是<code>if(index &gt; 0)</code>这种。我们就要针对这些情况再添加相关assert。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/mooctest%E5%85%A8%E5%9B%BD%E5%A4%A7%E5%AD%A6%E7%94%9F%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E5%A4%A7%E8%B5%9B%E5%BC%80%E5%8F%91%E8%80%85%E8%B5%9B%E9%81%93%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%E8%AE%B0%E5%BD%95(Junit4)/3.png"
+                     
+                ></p>
+<h1 id="其他注意事项（来自2024省赛说明文件）"><a href="#其他注意事项（来自2024省赛说明文件）" class="headerlink" title="其他注意事项（来自2024省赛说明文件）"></a>其他注意事项（来自2024省赛说明文件）</h1><ol>
+<li>所提交的Java文件名需与代码中的类名保持一致。Java 语法要求代码文件名必须与代码类名一致，否则无法正常执行代码。有部分选手提交的文件名带有数字后缀，如“LibraryTest(1).java”，同样无法执行。</li>
+<li>本届比赛要求选手将所有测试用例写在一个测试类中（最终提交一个 Java 文件）。所提交的测试类不要求必须为题目模板中的测试类，但需符合上述第1条要求。有考生写多个测试类并简单复制到同一类中，导致提交的测试类出现大量语法冲突。</li>
+<li>由于变异测试的特殊性，所提交的所有测试用例均需要正常通过JUnit执行，不可有failure 或 error情况，否则将没有变异测试得分。</li>
+<li>在算分的时候，将使用题目模板项目进行算分，这将导致根据修改过的源代码编写的测试代码可能无法通过执行。</li>
+<li>由于慕测平台长时间不操作会自动退出登录，预选赛中有选手在结束前一分钟内提交答案时，被提醒登录“登录超时”，再次登陆后比赛已结束，导致未能成功提交答案。请各位参赛选手预留出充足的答案提交时间。</li>
+</ol>
+<h1 id="做题技巧"><a href="#做题技巧" class="headerlink" title="做题技巧"></a>做题技巧</h1><ul>
+<li><p>某些情况可以多用循环，增加覆盖率的同时，也更好杀死变异体。</p>
+</li>
+<li><p>先用 idea 的 diagram 看各个类的依赖关系，先覆盖最上层的类的方法，这样也会覆盖一些底层方法。如果先从底层类开始，会浪费时间。同时最好先提高覆盖率，再去弄变异测试，别花费时间在不提高分数的测试用例的编写上。</p>
+</li>
+<li><p>尽量避免修改共享变量，如果一定要修改，尽量改后还原(Test方法末尾还原或者在@After内处理)。</p>
+</li>
+<li><p>注意判题标准。反正24年的是下面这样。所以不要只做覆盖率。然后各个Test方法把名称和注释都弄得可读性搞些。运行效率的话，虽然我上面说了可以用循环，但是感觉只要不写死循环就OK吧。<code>注意是分支覆盖，所以不用浪费时间测试那些没有分支的函数如setter、getter</code><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/mooctest%E5%85%A8%E5%9B%BD%E5%A4%A7%E5%AD%A6%E7%94%9F%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E5%A4%A7%E8%B5%9B%E5%BC%80%E5%8F%91%E8%80%85%E8%B5%9B%E9%81%93%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%E8%AE%B0%E5%BD%95(Junit4)/4.png"
+                     
+                ></p>
+<blockquote>
+<p>按以下五个维度进行评分。</p>
+<ul>
+<li>（30%）分支覆盖率：代码分支覆盖率。</li>
+<li>（30%）变异杀死率：参阅PIT工具网站指定的常见变异类型。</li>
+<li>（20%）可读性与可维护性：参阅各大企业的测试同样指南进行评分。</li>
+<li>（20%）脚本运行效率：针对该题为每个覆盖率区间给定一个基准时间，分数为(基准时间-运行时间)&#x2F;基准时间。</li>
+</ul>
+<p>脚本编写效率：总分&#x3D;上述分数累加，总分相同则按提交时间二次排序。</p>
+</blockquote>
+</li>
+<li><p>可读性与维护性：可以使用<code>Alibaba Java Coding Guidelines</code>这个插件检查代码，或者直接用 idea 的 problems 面板查看。建议最后留五分钟改改代码可读性。<br>  <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/../article_images/mooctest%E5%85%A8%E5%9B%BD%E5%A4%A7%E5%AD%A6%E7%94%9F%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E5%A4%A7%E8%B5%9B%E5%BC%80%E5%8F%91%E8%80%85%E8%B5%9B%E9%81%93%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%E8%AE%B0%E5%BD%95(Junit4)/5.png"
+                     
+                ></p>
+</li>
+<li><p>打完预选赛，根本做不完分支覆盖，可能是我太菜了。所以变异覆盖率也只能靠做分支覆盖时多加几种边缘值assert顺便提升。真的没空专门弄变异覆盖。</p>
+</li>
+<li><p>先把两个题目大概看下，可能第二题比第一题还容易。。。(指24年省赛的五星改为四星的第二题😓)</p>
+</li>
+</ul>
+<h1 id="闲聊"><a href="#闲聊" class="headerlink" title="闲聊"></a>闲聊</h1><ul>
+<li>青科大、广大、重邮应该是有加分，人嘎嘎多，把省一占满了都。</li>
+<li>这个比赛争议挺大的，主要是软件测试没必要办比赛、认可度低、监管不严、可以用GPT这些。</li>
+<li>个人感觉这个比赛挺抽象的，23年的省赛待测项目里没给test文件夹，一堆人临时学用eclipse建测试文件夹。24年省赛第二题一开始是五星，等我开始做第二题时发现变成了四星，难度比第一题低多了。然后允许用GPT，理论上来说是只不准用向日葵这种软件，反正赛中我看到个女生电脑屏幕界面上微信绿泡泡出现的时长比IDEA的时间久，又或者一个学生没主动写过一行代码，全程用的edge的侧栏copilot，是cv领域大神！真给我整无语了。考场的监管也挺松的，聊天软件不禁用就算了，最重要的是也没有签退机制和提交IP限制，我严重怀疑一些提前出考场的本校学生是回宿舍开黑了😓。</li>
+<li>广东比陕西卷多了，我双75在陕西勉强拿了个省一，放广州顶多省二。又不加分又没报销，懒得去花1k拿个国三了。</li>
+<li>如果能抽出三四天的空闲、代码理解能力强的可以来玩玩，这个比赛也不要怎么培训，全靠个人的经验和技术水平，拿个省一也够了。</li>
+</ul>
+<h1 id="赛题列表-欢迎热心同学一起整合历史赛题"><a href="#赛题列表-欢迎热心同学一起整合历史赛题" class="headerlink" title="赛题列表(欢迎热心同学一起整合历史赛题)"></a>赛题列表(欢迎热心同学一起整合历史赛题)</h1><p><a class="link"   target="_blank" rel="noopener" href="https://download.csdn.net/download/qq_51955445/90010003" >2024年全国大学生软件测试大赛开发者赛道省赛题目<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>标题:</strong> mooctest全国大学生软件测试大赛开发者赛道相关知识记录(Junit 4)</li>
+        <li><strong>作者:</strong> urlyy</li>
+        <li><strong>创建于
+                :</strong> 2024-11-20 20:46:41</li>
+        
+            <li>
+                <strong>更新于
+                    :</strong> 2025-12-21 18:39:57
+            </li>
+        
+        <li>
+            <strong>链接:</strong> https://urlyy.github.io/2024/11/20/mooctest全国大学生软件测试大赛开发者赛道相关知识记录(Junit4)/
+        </li>
+        <li>
+            <strong>
+                版权声明:
+            </strong>
+            
+
+            
+                本文章采用 <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a> 进行许可。
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="prev" rel="prev" href="/2024/11/24/2024%E5%AD%97%E8%8A%82%E9%9D%92%E8%AE%AD%E8%90%A5%E7%AC%94%E8%AE%B0-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E4%B8%8E%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/">
+					<span class="left arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-left"></i>
+					</span>
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">2024字节青训营笔记-消息队列与定时任务</span>
+						<span class="post-nav-item">上一篇</span>
+					</span>
+				</a>
+			</div>
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2024/11/13/2024%E5%AD%97%E8%8A%82%E9%9D%92%E8%AE%AD%E8%90%A5%E7%AC%94%E8%AE%B0-Golang%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E4%B8%8EGC/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">2024字节青训营笔记-Golang性能优化与GC</span>
+						<span class="post-nav-item">下一篇</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        评论
+    </div>
+    
+
+        
+            
+    <div id="giscus-container"></div>
+    <script data-swup-reload-script defer>
+        async function loadGiscus() {
+            const giscusConfig = {
+                'src': 'https://giscus.app/client.js',
+                'data-repo': 'urlyy/urlyy_blog_comments',
+                'data-repo-id': 'R_kgDONo8nwQ',
+                'data-category': 'Announcements',
+                'data-category-id': 'DIC_kwDONo8nwc4Cl7pw',
+                'data-mapping': 'title',
+                'data-strict': '0',
+                'data-reactions-enabled': '1',
+                'data-emit-metadata': '1',
+                'data-theme': 'preferred_color_scheme',
+                'data-lang': 'zh-CN',
+                'data-input-position': 'top',
+                'data-loading': 'lazy',
+                'crossorigin': 'anonymous',
+                'async': true
+            }
+            const giscusScript = document.createElement('script');
+            for (const key in giscusConfig) {
+                giscusScript.setAttribute(key, giscusConfig[key]);
+            }
+            document.getElementById('giscus-container').appendChild(giscusScript);
+        }
+        if ('true') {
+            let loadGiscusTimeout = setTimeout(() => {
+                loadGiscus();
+                clearTimeout(loadGiscusTimeout);
+            }, 1000);
+        } else {
+            document.addEventListener('DOMContentLoaded', loadGiscus);
+        }
+    </script>
+
+
+        
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">目录</div>
+		<div class="page-title">mooctest全国大学生软件测试大赛开发者赛道相关知识记录(Junit 4)</div>
+		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E8%A6%81%E6%B1%82"><span class="nav-text">环境要求</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86"><span class="nav-text">异常处理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%AF%E4%BB%A5%E8%87%AA%E5%B7%B1%E5%AE%9E%E7%8E%B0assertThrows"><span class="nav-text">!!!!!可以自己实现assertThrows</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%8D%E5%B0%84%E8%AF%BB%E5%86%99private%E5%AD%97%E6%AE%B5"><span class="nav-text">反射读写private字段</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%8D%E5%B0%84%E8%B0%83%E7%94%A8%E7%A7%81%E6%9C%89%E6%96%B9%E6%B3%95"><span class="nav-text">反射调用私有方法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#assertEquals%E5%92%8CassertSame"><span class="nav-text">assertEquals和assertSame</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#assertEquals-double"><span class="nav-text">assertEquals(double)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%81%8D%E5%8E%86%E6%9E%9A%E4%B8%BE"><span class="nav-text">遍历枚举</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Before%E5%92%8C-After"><span class="nav-text">@Before和@After</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E6%8E%A7%E5%88%B6%E5%8F%B0%E8%BE%93%E5%87%BA"><span class="nav-text">测试控制台输出</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A0%B9%E6%8D%AE%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E9%80%82%E9%85%8D%E6%8D%A2%E8%A1%8C%E7%AC%A6%E4%B8%8E%E8%B7%AF%E5%BE%84%E5%88%86%E9%9A%94%E7%AC%A6"><span class="nav-text">根据操作系统适配换行符与路径分隔符</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%98%E5%BC%82%E6%B5%8B%E8%AF%95"><span class="nav-text">变异测试</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B1%E4%BA%AB%E5%8F%98%E9%87%8F%E8%A2%AB%E4%BF%AE%E6%94%B9%E5%AF%BC%E8%87%B4%E5%8F%98%E5%BC%82%E6%B5%8B%E8%AF%95%E5%A4%B1%E8%B4%A5"><span class="nav-text">共享变量被修改导致变异测试失败</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%98%E5%BC%82%E6%B5%8B%E8%AF%95%E8%AF%A6%E7%BB%86%E5%AD%A6%E4%B9%A0"><span class="nav-text">变异测试详细学习</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%EF%BC%88%E6%9D%A5%E8%87%AA2024%E7%9C%81%E8%B5%9B%E8%AF%B4%E6%98%8E%E6%96%87%E4%BB%B6%EF%BC%89"><span class="nav-text">其他注意事项（来自2024省赛说明文件）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%81%9A%E9%A2%98%E6%8A%80%E5%B7%A7"><span class="nav-text">做题技巧</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%B2%E8%81%8A"><span class="nav-text">闲聊</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%B5%9B%E9%A2%98%E5%88%97%E8%A1%A8-%E6%AC%A2%E8%BF%8E%E7%83%AD%E5%BF%83%E5%90%8C%E5%AD%A6%E4%B8%80%E8%B5%B7%E6%95%B4%E5%90%88%E5%8E%86%E5%8F%B2%E8%B5%9B%E9%A2%98"><span class="nav-text">赛题列表(欢迎热心同学一起整合历史赛题)</span></a></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2021</span>
+              -
+            
+            2025&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">urlyy</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        共撰写了 78 篇文章
+                    </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">访问人数</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">总访问量</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">由 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a> 驱动</span>
+            <span class="text-sm lg:block">主题&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.5</a></span>
+        </div>
+        
+        
+            <div>
+                博客已运行 <span class="odometer" id="runtime_days" ></span> 天 <span class="odometer" id="runtime_hours"></span> 小时 <span class="odometer" id="runtime_minutes"></span> 分钟 <span class="odometer" id="runtime_seconds"></span> 秒
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="fa-regular fa-arrow-up"></i>
+		</li>
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+	<div class="search-pop-overlay">
+	<div class="popup search-popup">
+		<div class="search-header">
+			<span class="search-input-field-pre">
+				<i class="fa-solid fa-keyboard"></i>
+			</span>
+			<div class="search-input-container">
+				<input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="站内搜索您需要的内容..." spellcheck="false" type="search" class="search-input">
+			</div>
+			<span class="popup-btn-close">
+				<i class="fa-solid fa-times"></i>
+			</span>
+		</div>
+		<div id="search-result">
+			<div id="no-result">
+				<i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>
+			</div>
+		</div>
+	</div>
+</div>
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+	
+<script src="/js/build/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/build/utils.js" type="module"></script>
+
+<script src="/js/build/main.js" type="module"></script>
+
+<script src="/js/build/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/build/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/build/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/build/layouts/categoryList.js" type="module"></script>
+
+
+
+    
+<script src="/js/build/tools/localSearch.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/layouts/lazyload.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/runtime.js"></script>
+
+    
+<script src="/js/build/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+  
+<script src="/js/build/plugins/typed.js" type="module"></script>
+
+
+
+
+    
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@9.3.0/dist/mermaid.min.js"></script>
+    
+    
+<script src="/js/build/plugins/mermaid.js"></script>
+
+
+
+
+
+
+    
+<script src="/js/build/libs/anime.min.js"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/tocToggle.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/layouts/toc.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/plugins/tabs.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+<script src="/js/build/layouts/essays.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+
+	
+</body>
+
+</html>
