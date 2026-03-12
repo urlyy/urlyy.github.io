@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="urlyy">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set data attribute for CSS variables
+                root.setAttribute("data-theme", theme);
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes once DOM is ready
+            if (document.readyState !== "loading") {
+                document.body.classList.add(theme + "-mode");
+            } else {
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add(theme + "-mode");
+                    document.body.classList.remove((theme === DARK ? LIGHT : DARK) + "-mode");
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Critical CSS to prevent flash -->
+    <style>
+        :root[data-theme="dark"] {
+            --background-color: #202124;
+            --background-color-transparent: rgba(32, 33, 36, 0.6);
+            --second-background-color: #2d2e32;
+            --third-background-color: #34353a;
+            --third-background-color-transparent: rgba(32, 33, 36, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #ffffff;
+            --second-text-color: #eeeeee;
+            --third-text-color: #bebec6;
+            --fourth-text-color: #999999;
+            --default-text-color: #bebec6;
+            --invert-text-color: #373D3F;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(255, 255, 255, 0.08);
+            --shadow-color-2: rgba(255, 255, 255, 0.05);
+        }
+        
+        :root[data-theme="light"] {
+            --background-color: #fff;
+            --background-color-transparent: rgba(255, 255, 255, 0.6);
+            --second-background-color: #f8f8f8;
+            --third-background-color: #f2f2f2;
+            --third-background-color-transparent: rgba(241, 241, 241, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #16171a;
+            --second-text-color: #2f3037;
+            --third-text-color: #5e5e5e;
+            --fourth-text-color: #eeeeee;
+            --default-text-color: #373D3F;
+            --invert-text-color: #bebec6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(0, 0, 0, 0.08);
+            --shadow-color-2: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+        
+        /* Apply body classes as soon as DOM is ready */
+        :root[data-theme="dark"] body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+    </style>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://urlyy.github.io/2026/03/10/在qemu上运行vxworks 7并部署cyclonedds的教程/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta name="description" content="简介本教程介绍如何基于 QEMU 运行 VxWorks 7 24.03，并在其上构建和运行 CycloneDDS 示例程序。整个流程已在 Ubuntu 22.04 系统上验证可行。 本教程参考自 eclipse-cyclonedds&#x2F;cyclonedds issue #1909，该 issue 中一位开发者为 CycloneDDS 增加了对 VxWorks 24.03 的支持，并编写了构">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在QEMU上运行VxWorks 7并部署CycloneDDS的教程">
+<meta property="og:url" content="http://urlyy.github.io/2026/03/10/%E5%9C%A8QEMU%E4%B8%8A%E8%BF%90%E8%A1%8CVxWorks%207%E5%B9%B6%E9%83%A8%E7%BD%B2CycloneDDS%E7%9A%84%E6%95%99%E7%A8%8B/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="简介本教程介绍如何基于 QEMU 运行 VxWorks 7 24.03，并在其上构建和运行 CycloneDDS 示例程序。整个流程已在 Ubuntu 22.04 系统上验证可行。 本教程参考自 eclipse-cyclonedds&#x2F;cyclonedds issue #1909，该 issue 中一位开发者为 CycloneDDS 增加了对 VxWorks 24.03 的支持，并编写了构">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-03-10T15:46:41.000Z">
+<meta property="article:modified_time" content="2026-03-12T03:11:10.160Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/avatar.jpg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.jpg">
+    <meta name="theme-color" content="#5c701a">
+    <link rel="shortcut icon" href="/images/avatar.jpg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            在QEMU上运行VxWorks 7并部署CycloneDDS的教程 | urlyy的小窝
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+        <link href="" rel="stylesheet">
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"urlyy.github.io","root":"/","language":"zh-CN","path":"search.json"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":false,"auto":false,"list":[""]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":true},"copyright":true,"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#5c701a","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":true,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":false},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"side_tools":{"gear_rotation":true,"auto_expand":false},"open_graph":true,"google_analytics":{"enable":false,"id":null},"busuanzi_counter":{"enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"pjax":true},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/bg/1.jpg","dark":"/images/bg/1.jpg"},"title":"urlyy的小窝","subtitle":{"text":["Loading..."],"hitokoto":{"enable":true,"show_author":false,"api":"https://v1.hitokoto.cn?c=a&c=b&c=d&c=k"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"style":"default","links":{"github":"https://github.com/urlyy?tab=repositories","instagram":null,"zhihu":null,"twitter":null,"email":"2213732736@qq.com"},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":true,"version":"9.3.0"}},"version":"2.8.5","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Categories":{"icon":"fa-regular fa-folder","path":"/categories/"},"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Github":{"path":"https://github.com/urlyy","icon":"fa-brands fa-github"},"个人介绍":{"path":"/personal/profile.html","icon":"fa-regular fa-user"}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"cloud"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":null},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2021/9/7 16:55:00"};
+    window.lang_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 个月前","year":"%s 年前"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                urlyy的小窝
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    首页
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/categories/"
+                                        >
+                                    <i class="fa-regular fa-folder fa-fw"></i>
+                                    分类
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/archives"
+                                        >
+                                    <i class="fa-regular fa-archive fa-fw"></i>
+                                    归档
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   target="_blank" rel="noopener" href="https://github.com/urlyy"
+                                        >
+                                    <i class="fa-brands fa-github fa-fw"></i>
+                                    GITHUB
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/personal/profile.html"
+                                        >
+                                    <i class="fa-regular fa-user fa-fw"></i>
+                                    个人介绍
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                首页
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/categories/"
+                        >
+                            <span>
+                                分类
+                            </span>
+                            
+                                <i class="fa-regular fa-folder fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/archives"
+                        >
+                            <span>
+                                归档
+                            </span>
+                            
+                                <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           target="_blank" rel="noopener" href="https://github.com/urlyy"
+                        >
+                            <span>
+                                GITHUB
+                            </span>
+                            
+                                <i class="fa-brands fa-github fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/personal/profile.html"
+                        >
+                            <span>
+                                个人介绍
+                            </span>
+                            
+                                <i class="fa-regular fa-user fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">25</div>
+        <div class="label text-third-text-color text-sm">标签</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">29</div>
+        <div class="label text-third-text-color text-sm">分类</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">83</div>
+        <div class="label text-third-text-color text-sm">文章</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">在QEMU上运行VxWorks 7并部署CycloneDDS的教程</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/avatar.jpg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">urlyy</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2026-03-10 23:46:41</span>
+        <span class="mobile">2026-03-10 23:46:41</span>
+        <span class="hover-info">创建</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2026-03-12 11:11:10</span>
+            <span class="mobile">2026-03-12 11:11:10</span>
+            <span class="hover-info">更新</span>
+        </span>
+    
+
+    
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>本教程介绍如何基于 QEMU 运行 VxWorks 7 24.03，并在其上构建和运行 CycloneDDS 示例程序。整个流程已在 Ubuntu 22.04 系统上验证可行。</p>
+<p>本教程参考自 <a class="link"   target="_blank" rel="noopener" href="https://github.com/eclipse-cyclonedds/cyclonedds/issues/1909#issuecomment-3224382992" >eclipse-cyclonedds&#x2F;cyclonedds issue #1909<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>，该 issue 中一位开发者为 CycloneDDS 增加了对 VxWorks 24.03 的支持，并编写了构建与测试的教程。</p>
+<hr>
+<h2 id="整体流程概览"><a href="#整体流程概览" class="headerlink" title="整体流程概览"></a>整体流程概览</h2><ol>
+<li>下载 VxWorks SDK 和 CycloneDDS 源码</li>
+<li>在本机编译 <code>idlc</code> 工具</li>
+<li>激活 VxWorks 工具链环境，交叉编译 CycloneDDS</li>
+<li>配置网络接口并安装 QEMU</li>
+<li>启动 QEMU 虚拟机并运行示例程序</li>
+</ol>
+<hr>
+<h2 id="第一步：下载所需资源"><a href="#第一步：下载所需资源" class="headerlink" title="第一步：下载所需资源"></a>第一步：下载所需资源</h2><h3 id="1-1-下载-VxWorks-SDK"><a href="#1-1-下载-VxWorks-SDK" class="headerlink" title="1.1 下载 VxWorks SDK"></a>1.1 下载 VxWorks SDK</h3><p>访问 VxWorks SDK 下载页面：</p>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://forums.windriver.com/t/vxworks-software-development-kit-sdk/43</span><br></pre></td></tr></table></figure></div>
+
+<p>在页面中找到并下载以下版本：</p>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">VxWorks SDK for IA - QEMU (x86-64) 1.14 24.03</span><br></pre></td></tr></table></figure></div>
+
+<p>下载完成后，将压缩包解压到本地目录。解压后的目录结构如下（其中 <code>sdkenv.sh</code> 是后续激活 VxWorks 工具链的关键脚本）：</p>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">wrsdk-vxworks7-qemu/</span><br><span class="line">    ├── sdkenv.sh         # 工具链环境激活脚本</span><br><span class="line">    ├── vxsdk/</span><br><span class="line">    │   └── bsps/</span><br><span class="line">    │       └── */</span><br><span class="line">    │           └── vxWorks   # QEMU 启动所需的内核镜像</span><br><span class="line">    └── ...</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="1-2-下载-CycloneDDS-必需依赖"><a href="#1-2-下载-CycloneDDS-必需依赖" class="headerlink" title="1.2 下载 CycloneDDS 必需依赖"></a>1.2 下载 CycloneDDS 必需依赖</h2><div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install git cmake gcc build-essential</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="1-3-下载-CycloneDDS-源码"><a href="#1-3-下载-CycloneDDS-源码" class="headerlink" title="1.3 下载 CycloneDDS 源码"></a>1.3 下载 CycloneDDS 源码</h3><p>将 CycloneDDS 仓库克隆到本地，并切换到当前最新发行版<code>11.0.0</code>。</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/eclipse-cyclonedds/cyclonedds.git</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> cyclonedds</span><br><span class="line"></span><br><span class="line">git checkout tags/11.0.0</span><br></pre></td></tr></table></figure></div>
+
+<hr>
+<h2 id="第二步：构建项目"><a href="#第二步：构建项目" class="headerlink" title="第二步：构建项目"></a>第二步：构建项目</h2><p>本步骤分为两个阶段：首先在本机编译 <code>idlc</code> 工具，然后使用 VxWorks 的交叉编译工具链为目标平台构建 CycloneDDS 库和示例程序。</p>
+<h3 id="2-1-编译本机版本的-idlc"><a href="#2-1-编译本机版本的-idlc" class="headerlink" title="2.1 编译本机版本的 idlc"></a>2.1 编译本机版本的 idlc</h3><p><code>idlc</code> 是 CycloneDDS 的 IDL 编译器，在构建示例程序时会被用到。将其编译并安装到本机的 <code>/usr/local</code> 目录下，以便后续交叉编译时能够正确引用。</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> cyclonedds</span><br><span class="line"><span class="built_in">mkdir</span> build</span><br><span class="line"><span class="built_in">cd</span> build</span><br><span class="line">cmake ..</span><br><span class="line"><span class="built_in">sudo</span> make install</span><br></pre></td></tr></table></figure></div>
+
+<p>安装完成后，<code>idlc</code> 可执行文件会被放置在 <code>/usr/local/bin/</code> 目录下。</p>
+<h3 id="2-2-为-VxWorks-交叉编译-CycloneDDS"><a href="#2-2-为-VxWorks-交叉编译-CycloneDDS" class="headerlink" title="2.2 为 VxWorks 交叉编译 CycloneDDS"></a>2.2 为 VxWorks 交叉编译 CycloneDDS</h3><h4 id="2-2-1-激活-VxWorks-工具链环境"><a href="#2-2-1-激活-VxWorks-工具链环境" class="headerlink" title="2.2.1 激活 VxWorks 工具链环境"></a>2.2.1 激活 VxWorks 工具链环境</h4><p>在开始交叉编译之前，必须先激活 VxWorks SDK 提供的工具链环境。<code>sdkenv.sh</code> 脚本会配置编译器路径等关键环境变量。</p>
+<p>将下面命令中的 <code>&lt;path/to&gt;</code> 替换为你实际解压 SDK 的路径：</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">source</span> &lt;path/to&gt;/sdkenv.sh</span><br><span class="line"><span class="built_in">export</span> WIND_CC_SYSROOT=<span class="variable">$WIND_SDK_CC_SYSROOT</span></span><br></pre></td></tr></table></figure></div>
+
+<p>执行 <code>source</code> 命令后，当前 Shell 会话中将自动设置好 VxWorks 的交叉编译环境。</p>
+<blockquote>
+<p><strong>注意：</strong> 每次打开新的终端窗口时，都需要重新执行上述两条命令才能激活工具链。</p>
+</blockquote>
+<h4 id="2-2-2-使用-VxWorks-工具链构建-CycloneDDS"><a href="#2-2-2-使用-VxWorks-工具链构建-CycloneDDS" class="headerlink" title="2.2.2 使用 VxWorks 工具链构建 CycloneDDS"></a>2.2.2 使用 VxWorks 工具链构建 CycloneDDS</h4><p>回到 <code>cyclonedds</code> 目录，新建一个用于 VxWorks 的构建目录，然后使用 VxWorks 提供的 <code>toolchain.cmake</code> 文件指定交叉编译工具链：</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> cyclonedds</span><br><span class="line"><span class="built_in">mkdir</span> build_vx</span><br><span class="line"><span class="built_in">cd</span> build_vx</span><br><span class="line"></span><br><span class="line">cmake .. -DCMAKE_TOOLCHAIN_FILE=<span class="variable">$WIND_SDK_CC_SYSROOT</span>/mk/toolchain.cmake \</span><br><span class="line">  -DBUILD_EXAMPLES=ON -DCMAKE_PREFIX_PATH=/usr/local</span><br><span class="line"></span><br><span class="line">cmake --build .</span><br></pre></td></tr></table></figure></div>
+
+<p>参数说明：</p>
+<ul>
+<li><code>-DCMAKE_TOOLCHAIN_FILE</code>：指定交叉编译工具链配置文件，CMake 将使用 VxWorks 的编译器而非本机 GCC。</li>
+<li><code>-DBUILD_EXAMPLES=ON</code>：同时构建示例程序，包括本教程后续用到的 <code>HelloworldPublisher</code> 和 <code>HelloworldSubscriber</code>。</li>
+<li><code>-DCMAKE_PREFIX_PATH=/usr/local</code>：告知 CMake 在 <code>/usr/local</code> 中查找 <code>idlc</code>，即第 2.1 步安装的位置。</li>
+</ul>
+<p>构建完成后，在 <code>build_vx</code> 目录下可以找到编译好的库文件（<code>.so</code>）和<code>examples</code>示例程序二进制文件。</p>
+<hr>
+<h2 id="第三步：准备运行环境"><a href="#第三步：准备运行环境" class="headerlink" title="第三步：准备运行环境"></a>第三步：准备运行环境</h2><h3 id="3-1-配置-tap0-虚拟网络接口"><a href="#3-1-配置-tap0-虚拟网络接口" class="headerlink" title="3.1 配置 tap0 虚拟网络接口"></a>3.1 配置 tap0 虚拟网络接口</h3><p>QEMU 使用 TAP 网络设备实现与宿主机之间的网络通信。需要在宿主机上创建并配置 <code>tap0</code> 接口。</p>
+<p>首先安装 <code>uml-utilities</code> 工具包（提供 <code>tunctl</code> 命令）：</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install uml-utilities</span><br></pre></td></tr></table></figure></div>
+
+<p>创建 <code>tap0</code> 网络接口，并将其分配给当前用户：</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> tunctl -u <span class="variable">$USER</span> -t tap0</span><br></pre></td></tr></table></figure></div>
+
+<p>为 <code>tap0</code> 接口配置 IP 地址并启用：</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> ip addr add 192.168.200.254/24 dev tap0</span><br><span class="line"><span class="built_in">sudo</span> ip <span class="built_in">link</span> <span class="built_in">set</span> tap0 up</span><br></pre></td></tr></table></figure></div>
+
+<p>配置完成后，宿主机在 <code>tap0</code> 接口上的 IP 为 <code>192.168.200.254</code>，VxWorks 虚拟机将使用 <code>192.168.200.1</code>。</p>
+<h3 id="3-2-安装-QEMU"><a href="#3-2-安装-QEMU" class="headerlink" title="3.2 安装 QEMU"></a>3.2 安装 QEMU</h3><div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install qemu-system</span><br></pre></td></tr></table></figure></div>
+
+<p>安装完成后，验证版本信息：</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-x86_64 --version</span><br></pre></td></tr></table></figure></div>
+
+<p>预期输出示例：</p>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">QEMU emulator version 6.2.0 (Debian 1:6.2+dfsg-2ubuntu6.28)</span><br><span class="line">Copyright (c) 2003-2021 Fabrice Bellard and the QEMU Project developers</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="3-3-创建-CycloneDDS-配置文件"><a href="#3-3-创建-CycloneDDS-配置文件" class="headerlink" title="3.3 创建 CycloneDDS 配置文件"></a>3.3 创建 CycloneDDS 配置文件</h3><p>进入之前编译 VxWorks 版本的构建目录，创建 CycloneDDS 的 XML 配置文件。该文件用于指定 DDS 通信所使用的网络接口。</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> build_vx</span><br><span class="line"></span><br><span class="line"><span class="built_in">cat</span> &lt;&lt;<span class="string">EOF &gt; cyclonedds.xml</span></span><br><span class="line"><span class="string">&lt;CycloneDDS&gt;</span></span><br><span class="line"><span class="string">  &lt;Domain id=&quot;any&quot;&gt;</span></span><br><span class="line"><span class="string">    &lt;General&gt;</span></span><br><span class="line"><span class="string">      &lt;Interfaces&gt;</span></span><br><span class="line"><span class="string">        &lt;NetworkInterface address=&quot;127.0.0.1&quot;&gt;&lt;/NetworkInterface&gt;</span></span><br><span class="line"><span class="string">      &lt;/Interfaces&gt;</span></span><br><span class="line"><span class="string">    &lt;/General&gt;</span></span><br><span class="line"><span class="string">  &lt;/Domain&gt;</span></span><br><span class="line"><span class="string">&lt;/CycloneDDS&gt;</span></span><br><span class="line"><span class="string">EOF</span></span><br></pre></td></tr></table></figure></div>
+
+<p>此配置将 DDS 通信绑定到回环地址 <code>127.0.0.1</code>，使发布者和订阅者之间能在同一 QEMU 实例内完成通信。</p>
+<hr>
+<h2 id="第四步：启动-QEMU-虚拟机"><a href="#第四步：启动-QEMU-虚拟机" class="headerlink" title="第四步：启动 QEMU 虚拟机"></a>第四步：启动 QEMU 虚拟机</h2><p>以下命令将启动 QEMU，并以 USB 存储设备的形式将当前的 <code>build_vx</code> 目录挂载到虚拟机中。VxWorks 启动后即可从该”USB 盘”中读取编译好的程序文件。</p>
+<p>在 <code>build_vx</code> 目录下执行：</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-x86_64 -m 512M -kernel <span class="variable">$WIND_SDK_HOME</span>/vxsdk/bsps/*/vxWorks \</span><br><span class="line">  -net nic -net tap,ifname=tap0,script=no,downscript=no -display none -serial mon:stdio \</span><br><span class="line">  -append <span class="string">&quot;bootline:fs(0,0)host:vxWorks h=192.168.200.254 e=192.168.200.1 g=192.168.200.254 u=target pw=vxTarget o=gei0&quot;</span> \</span><br><span class="line">  -usb -device usb-ehci,<span class="built_in">id</span>=ehci -device usb-storage,drive=fat32 -drive file=fat:rw:`<span class="built_in">pwd</span>`,<span class="built_in">id</span>=fat32,format=raw,<span class="keyword">if</span>=none</span><br></pre></td></tr></table></figure></div>
+
+<p>参数说明：</p>
+<ul>
+<li><code>-m 512M</code>：为虚拟机分配 512 MB 内存。</li>
+<li><code>-kernel</code>：指定 VxWorks 内核镜像路径，由 SDK 提供。</li>
+<li><code>-net nic -net tap,ifname=tap0,...</code>：使用 TAP 网络接口连接虚拟机与宿主机，禁用自动配置脚本。</li>
+<li><code>-display none -serial mon:stdio</code>：不显示图形界面，将 VxWorks 串口输出重定向到当前终端，同时允许使用 <code>Ctrl-A X</code> 退出 QEMU。</li>
+<li><code>-append &quot;bootline:...&quot;</code>：传递 VxWorks 启动参数，其中：<ul>
+<li><code>h=192.168.200.254</code>：宿主机（host）IP 地址</li>
+<li><code>e=192.168.200.1</code>：VxWorks 虚拟机的 IP 地址</li>
+<li><code>g=192.168.200.254</code>：网关地址</li>
+<li><code>u=target pw=vxTarget</code>：登录用户名和密码</li>
+<li><code>o=gei0</code>：使用的网络接口名称</li>
+</ul>
+</li>
+<li><code>-usb -device usb-ehci,...</code>：启用 USB 控制器，并将当前目录以 FAT32 格式挂载为 USB 存储设备，虚拟机内可通过 <code>/bd0a</code> 路径访问。</li>
+</ul>
+<p>启动后，终端中会出现 VxWorks 的启动日志，待系统初始化完成后，会显示命令提示符。</p>
+<blockquote>
+<p><strong>提示：</strong> 要退出 QEMU，在终端中按 <code>Ctrl-A</code>，然后按 <code>X</code>。</p>
+</blockquote>
+<hr>
+<h2 id="第五步：运行-HelloWorld-示例"><a href="#第五步：运行-HelloWorld-示例" class="headerlink" title="第五步：运行 HelloWorld 示例"></a>第五步：运行 HelloWorld 示例</h2><p>示例程序演示了 DDS 发布&#x2F;订阅通信模型：<code>HelloworldPublisher</code> 负责发布消息，<code>HelloworldSubscriber</code> 负责接收消息。二者需要同时运行才能完成通信演示。</p>
+<h3 id="5-1-在-QEMU-串口终端中运行发布者"><a href="#5-1-在-QEMU-串口终端中运行发布者" class="headerlink" title="5.1 在 QEMU 串口终端中运行发布者"></a>5.1 在 QEMU 串口终端中运行发布者</h3><p>QEMU 启动后，在当前终端（串口控制台）中进入 VxWorks 的 shell：</p>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-&gt; cmd</span><br></pre></td></tr></table></figure></div>
+
+<p>切换到 USB 存储设备中的 <code>bin</code> 目录，设置必要的环境变量，然后运行发布者程序：</p>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[vxWorks *]# cd /bd0a/bin/</span><br><span class="line">[vxWorks *]# set env LD_LIBRARY_PATH=&quot;/bd0a/lib&quot;</span><br><span class="line">[vxWorks *]# set env CYCLONEDDS_URI=&quot;/bd0a/cyclonedds.xml&quot;</span><br><span class="line">[vxWorks *]# ./HelloworldPublisher</span><br><span class="line">=== [Publisher]  Waiting for a reader to be discovered ...</span><br></pre></td></tr></table></figure></div>
+
+<p>环境变量说明：</p>
+<ul>
+<li><code>LD_LIBRARY_PATH</code>：指定 CycloneDDS 动态库（<code>.so</code> 文件）所在的路径，确保程序能够找到依赖库。</li>
+<li><code>CYCLONEDDS_URI</code>：指定 CycloneDDS 配置文件路径，程序启动时将读取此配置。</li>
+</ul>
+<p>发布者启动后会等待订阅者加入，一旦发现订阅者即开始发送消息。</p>
+<h3 id="5-2-通过-telnet-连接-QEMU-并运行订阅者"><a href="#5-2-通过-telnet-连接-QEMU-并运行订阅者" class="headerlink" title="5.2 通过 telnet 连接 QEMU 并运行订阅者"></a>5.2 通过 telnet 连接 QEMU 并运行订阅者</h3><p>在宿主机上另外打开一个终端窗口，通过 telnet 连接到 VxWorks 虚拟机：</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">telnet 192.168.200.1</span><br></pre></td></tr></table></figure></div>
+
+<p>连接成功后，同样进入 VxWorks shell，设置环境变量，运行订阅者程序：</p>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-&gt; cmd</span><br><span class="line">[vxWorks *]# cd /bd0a/bin/</span><br><span class="line">[vxWorks *]# set env LD_LIBRARY_PATH=&quot;/bd0a/lib&quot;</span><br><span class="line">[vxWorks *]# set env CYCLONEDDS_URI=&quot;/bd0a/cyclonedds.xml&quot;</span><br><span class="line">[vxWorks *]# ./HelloworldSubscriber</span><br><span class="line">=== [Subscriber] Waiting for a sample ...</span><br><span class="line">=== [Subscriber] Received : Message (1, Hello World)</span><br></pre></td></tr></table></figure></div>
+
+<p>同时发布者所在的终端输出：</p>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">=== [Publisher]  Writing : Message (1, Hello World)</span><br></pre></td></tr></table></figure></div>
+
+<p>订阅者成功接收到发布者发送的消息，说明 DDS 通信已正常工作。</p>
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>标题:</strong> 在QEMU上运行VxWorks 7并部署CycloneDDS的教程</li>
+        <li><strong>作者:</strong> urlyy</li>
+        <li><strong>创建于
+                :</strong> 2026-03-10 23:46:41</li>
+        
+            <li>
+                <strong>更新于
+                    :</strong> 2026-03-12 11:11:10
+            </li>
+        
+        <li>
+            <strong>链接:</strong> https://urlyy.github.io/2026/03/10/在QEMU上运行VxWorks 7并部署CycloneDDS的教程/
+        </li>
+        <li>
+            <strong>
+                版权声明:
+            </strong>
+            
+
+            
+                本文章采用 <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a> 进行许可。
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2025/12/31/2025%E6%80%BB%E7%BB%93/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">2025总结</span>
+						<span class="post-nav-item">下一篇</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        评论
+    </div>
+    
+
+        
+            
+    <div id="giscus-container"></div>
+    <script data-swup-reload-script defer>
+        async function loadGiscus() {
+            const giscusConfig = {
+                'src': 'https://giscus.app/client.js',
+                'data-repo': 'urlyy/urlyy_blog_comments',
+                'data-repo-id': 'R_kgDONo8nwQ',
+                'data-category': 'Announcements',
+                'data-category-id': 'DIC_kwDONo8nwc4Cl7pw',
+                'data-mapping': 'title',
+                'data-strict': '0',
+                'data-reactions-enabled': '1',
+                'data-emit-metadata': '1',
+                'data-theme': 'preferred_color_scheme',
+                'data-lang': 'zh-CN',
+                'data-input-position': 'top',
+                'data-loading': 'lazy',
+                'crossorigin': 'anonymous',
+                'async': true
+            }
+            const giscusScript = document.createElement('script');
+            for (const key in giscusConfig) {
+                giscusScript.setAttribute(key, giscusConfig[key]);
+            }
+            document.getElementById('giscus-container').appendChild(giscusScript);
+        }
+        if ('true') {
+            let loadGiscusTimeout = setTimeout(() => {
+                loadGiscus();
+                clearTimeout(loadGiscusTimeout);
+            }, 1000);
+        } else {
+            document.addEventListener('DOMContentLoaded', loadGiscus);
+        }
+    </script>
+
+
+        
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">目录</div>
+		<div class="page-title">在QEMU上运行VxWorks 7并部署CycloneDDS的教程</div>
+		<ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%B5%81%E7%A8%8B%E6%A6%82%E8%A7%88"><span class="nav-text">整体流程概览</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E6%AD%A5%EF%BC%9A%E4%B8%8B%E8%BD%BD%E6%89%80%E9%9C%80%E8%B5%84%E6%BA%90"><span class="nav-text">第一步：下载所需资源</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E4%B8%8B%E8%BD%BD-VxWorks-SDK"><span class="nav-text">1.1 下载 VxWorks SDK</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-%E4%B8%8B%E8%BD%BD-CycloneDDS-%E5%BF%85%E9%9C%80%E4%BE%9D%E8%B5%96"><span class="nav-text">1.2 下载 CycloneDDS 必需依赖</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E4%B8%8B%E8%BD%BD-CycloneDDS-%E6%BA%90%E7%A0%81"><span class="nav-text">1.3 下载 CycloneDDS 源码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E6%AD%A5%EF%BC%9A%E6%9E%84%E5%BB%BA%E9%A1%B9%E7%9B%AE"><span class="nav-text">第二步：构建项目</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E7%BC%96%E8%AF%91%E6%9C%AC%E6%9C%BA%E7%89%88%E6%9C%AC%E7%9A%84-idlc"><span class="nav-text">2.1 编译本机版本的 idlc</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E4%B8%BA-VxWorks-%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91-CycloneDDS"><span class="nav-text">2.2 为 VxWorks 交叉编译 CycloneDDS</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E6%AD%A5%EF%BC%9A%E5%87%86%E5%A4%87%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83"><span class="nav-text">第三步：准备运行环境</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E9%85%8D%E7%BD%AE-tap0-%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%E6%8E%A5%E5%8F%A3"><span class="nav-text">3.1 配置 tap0 虚拟网络接口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E5%AE%89%E8%A3%85-QEMU"><span class="nav-text">3.2 安装 QEMU</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-%E5%88%9B%E5%BB%BA-CycloneDDS-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="nav-text">3.3 创建 CycloneDDS 配置文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E5%9B%9B%E6%AD%A5%EF%BC%9A%E5%90%AF%E5%8A%A8-QEMU-%E8%99%9A%E6%8B%9F%E6%9C%BA"><span class="nav-text">第四步：启动 QEMU 虚拟机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%BA%94%E6%AD%A5%EF%BC%9A%E8%BF%90%E8%A1%8C-HelloWorld-%E7%A4%BA%E4%BE%8B"><span class="nav-text">第五步：运行 HelloWorld 示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-%E5%9C%A8-QEMU-%E4%B8%B2%E5%8F%A3%E7%BB%88%E7%AB%AF%E4%B8%AD%E8%BF%90%E8%A1%8C%E5%8F%91%E5%B8%83%E8%80%85"><span class="nav-text">5.1 在 QEMU 串口终端中运行发布者</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-%E9%80%9A%E8%BF%87-telnet-%E8%BF%9E%E6%8E%A5-QEMU-%E5%B9%B6%E8%BF%90%E8%A1%8C%E8%AE%A2%E9%98%85%E8%80%85"><span class="nav-text">5.2 通过 telnet 连接 QEMU 并运行订阅者</span></a></li></ol></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2021</span>
+              -
+            
+            2026&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">urlyy</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        共撰写了 83 篇文章
+                    </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">访问人数</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">总访问量</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">由 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a> 驱动</span>
+            <span class="text-sm lg:block">主题&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.5</a></span>
+        </div>
+        
+        
+            <div>
+                博客已运行 <span class="odometer" id="runtime_days" ></span> 天 <span class="odometer" id="runtime_hours"></span> 小时 <span class="odometer" id="runtime_minutes"></span> 分钟 <span class="odometer" id="runtime_seconds"></span> 秒
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="fa-regular fa-arrow-up"></i>
+		</li>
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+	<div class="search-pop-overlay">
+	<div class="popup search-popup">
+		<div class="search-header">
+			<span class="search-input-field-pre">
+				<i class="fa-solid fa-keyboard"></i>
+			</span>
+			<div class="search-input-container">
+				<input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="站内搜索您需要的内容..." spellcheck="false" type="search" class="search-input">
+			</div>
+			<span class="popup-btn-close">
+				<i class="fa-solid fa-times"></i>
+			</span>
+		</div>
+		<div id="search-result">
+			<div id="no-result">
+				<i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>
+			</div>
+		</div>
+	</div>
+</div>
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+	
+<script src="/js/build/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/build/utils.js" type="module"></script>
+
+<script src="/js/build/main.js" type="module"></script>
+
+<script src="/js/build/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/build/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/build/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/build/layouts/categoryList.js" type="module"></script>
+
+
+
+    
+<script src="/js/build/tools/localSearch.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/layouts/lazyload.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/runtime.js"></script>
+
+    
+<script src="/js/build/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+  
+<script src="/js/build/plugins/typed.js" type="module"></script>
+
+
+
+
+    
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@9.3.0/dist/mermaid.min.js"></script>
+    
+    
+<script src="/js/build/plugins/mermaid.js"></script>
+
+
+
+
+
+
+    
+<script src="/js/build/libs/anime.min.js"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/tocToggle.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/layouts/toc.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/plugins/tabs.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+<script src="/js/build/layouts/essays.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+
+	
+</body>
+
+</html>
